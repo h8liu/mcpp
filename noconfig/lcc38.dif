@@ -1,0 +1,46 @@
+*** noconfig.H	2006-05-29 00:21:45.000000000 +0900
+--- noconfig.H.lcc38	2006-06-01 19:13:07.000000000 +0900
+***************
+*** 27,33 ****
+   */
+  
+  /* Define target operating-system.  */
+! #define SYSTEM              SYS_FREEBSD
+  
+  /* Define target compiler.          */
+  #ifndef COMPILER
+--- 27,33 ----
+   */
+  
+  /* Define target operating-system.  */
+! #define SYSTEM              SYS_WIN32
+  
+  /* Define target compiler.          */
+  #ifndef COMPILER
+***************
+*** 38,49 ****
+  #define HOST_SYSTEM         SYSTEM
+  
+  /* Define host compiler.            */
+! #define HOST_COMPILER       GNUC
+  
+  /* Version message.                 */
+  /* "MCPP V.2.* (200y/mm) " precedes VERSION_MSG */
+  #define VERSION_MSG     \
+!     "compiled by GNU C 3.4"
+  #if     0
+      "compiled by LCC-Win32 V.3.8"
+      "compiled by Visual C 2005"
+--- 38,49 ----
+  #define HOST_SYSTEM         SYSTEM
+  
+  /* Define host compiler.            */
+! #define HOST_COMPILER       LCC
+  
+  /* Version message.                 */
+  /* "MCPP V.2.* (200y/mm) " precedes VERSION_MSG */
+  #define VERSION_MSG     \
+!     "compiled by LCC-Win32 V.3.8"
+  #if     0
+      "compiled by LCC-Win32 V.3.8"
+      "compiled by Visual C 2005"
