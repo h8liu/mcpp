@@ -37,6 +37,14 @@ V.2.5       2005/03     Absorbed POST_STANDARD into STANDARD as an
                 compiler-systems on MS-DOS except Borland C 4.0).
                                                                 kmatsui
 
+V.2.6-prerelease    2006/06     Integrated STANDARD and PRE_STANDARD
+                modes into one executable, differenciating by the
+                invocation options.
+            Removed compiler-specific behaviors from stand-alone build.
+            Removed configurations for pre-C90 compilers, MS-DOS
+                compilers and Plan 9 / cpp.
+                                                                kmatsui
+
 
 
 ☆　目次　☆
@@ -48,26 +56,22 @@ V.2.5       2005/03     Absorbed POST_STANDARD into STANDARD as an
 ３．各処理系に移植する方法：概要
     [3.1]       移植ずみの処理系
         [3.1.1]     共通の設定
-        [3.1.2]     FreeBSD / GNU C V.2.*, V.3.*
-        [3.1.3]     Linux / GNU C V.2.*, V.3.*
-        [3.1.4]     CygWIN / GNU C V.2.*
+        [3.1.2]     FreeBSD / GNU C V.2.*, V.3.*, V.4.*
+        [3.1.3]     Linux / GNU C V.2.*, V.3.*, V.4.*
+        [3.1.4]     CygWIN / GNU C V.2.*, V.3.*, V.4.*
         [3.1.5]     LCC-WIN32 V.3.*
-        [3.1.6]     Visual C++ .net
+        [3.1.6]     Visual C++ 2002, 2003, 2005
         [3.1.7]     Borland C V.4.*, V.5.*
-            [3.1.7.1]   MS-DOS 処理系用の mcpp を WIN32 処理系で
-                        コンパイル
-        [3.1.8]     Plan 9 ed.4 / pcc
     [3.2]       DECUS cpp で対応していた処理系
     [3.3]       noconfig.H, configed.H, system.H
-    [3.4]       system.c, mbchar.c
+    [3.4]       system.c
     [3.5]       lib.c
     [3.6]       標準ヘッダ
     [3.7]       makefile とMCPP を使ったリコンパイル
-        [3.7.1]     Plan 9 / pcc でのコンパイル
     [3.8]       MCPP をコンパイルできる処理系
     [3.9]       コンパイルする処理系とターゲットの処理系
     [3.10]      対応していない処理系
-    [3.11]      MS-DOS のメモリモデル
+    [3.11]      Stand-alone 版のコンパイル
 ４．各処理系に移植する方法：詳細
     [4.1]       noconfig.H, configed.H, system.H の設定
         [4.1.1]     PART 1  ターゲットシステムの設定
@@ -79,13 +83,11 @@ V.2.5       2005/03     Absorbed POST_STANDARD into STANDARD as an
             [4.1.1.6]   ターゲットとホストに共通の設定
         [4.1.2]     PART 2  ホストシステムの設定
         [4.1.3]     PART 3  MCPP の動作仕様の設定
-            [4.1.3.1]   新旧モードの指定
+            [4.1.3.1]   新旧各種の動作モード
             [4.1.3.2]   動作モードの細部の指定
-            [4.1.3.3]   特殊な指定
-            [4.1.3.4]   Translation limits の指定
+            [4.1.3.3]   Translation limits の指定
     [4.2]       system.c
-    [4.3]       mbchar.c
-    [4.4]       lib.c
+    [4.3]       lib.c
     [4.extra]   malloc()
 ５．バグ報告と移植の報告
     [5.1]       バグかどうか？
@@ -108,7 +110,7 @@ V.2.5       2005/03     Absorbed POST_STANDARD into STANDARD as an
 書き直したＣプリプロセッサです。MCPP という名前は Matsui cpp という意味
 です。これはソースで提供するもので、各処理系で使うには、その処理系に合わ
 せてソースに若干の変更を加えた上でコンパイルして、MCPP の実行プログラム
-を作る必要があります。*
+を作る必要があります。
   このドキュメントはソースを各処理系に移植する方法を説明しています。でき
 あがった実行プログラムの動作仕様については、mcpp-manual.txt というマニュ
 アルを参照してください。
@@ -116,80 +118,66 @@ V.2.5       2005/03     Absorbed POST_STANDARD into STANDARD as an
   MCPP は次のような特徴を持っています（この [1.1] - [1.2] は mcpp-manual.
 txt と重複している）。
 
-  * MCPP の実行プログラムは各処理系のプリプロセッサと置換して使うもので
-    ある。したがって、実行プログラムの名前はその処理系のプリプロセッサの
-    名前になる。多くの処理系ではそれは cpp である。
-
     [1.1]       ＯＳや処理系を選ばない portable なソース
 
-  GNU/Linux, DOS/Windows 等の多くのＯＳをサポートしている porbable なプ
-リプロセッサであり、そのソースは Standard C (ANSI/ISO C) の処理系はもち
-ろんのこと、C++ の処理系でも、K&R 1st. の処理系でも十分コンパイルできる
-広い portability を持っている。
-  ライブラリ関数は古典的なものしか使っていない。一部のライブラリ関数には
-Ｃによるソースも添付している。Standard C の処理系がないため、あるいは処
-理系が Standard C に準拠していない部分があるため Standard C のプリプロセ
-ッサがコンパイルできない、などというやっかいな問題は起こらない。
+  Linux, FreeBSD, Windows 等の多くのＯＳをサポートしている portable なプ
+リプロセッサであり、そのソースは Standard C (ANSI/ISO/JIS C) の処理系ま
+たは Standard C++ の処理系でさえあればコンパイルできる広い portability
+を持っている。ライブラリ関数は古典的なものしか使っていない。
   各処理系に移植するためには、多くの場合、ヘッダファイル中のいくつかのマ
 クロ定義を書き替えてコンパイルするだけですむ。最悪の場合でも、system.c
 というソースファイルに数十行書き足す程度である。
-  MCPP のオブジェクトはメモリを節約しながら動作するので、アドレス空間の
-小さい 16 ビットシステムでも（制限はあるが）使える。
-  Multi-byte character（漢字）の処理は日本の EUC-JP, shift-JIS、中国の
-GB-2312、台湾の Big-5、韓国の KSC-5601 (KSX 1001) に対応している。32 ビ
-ット以上のシステムでは ISO-2022-JP, UTF-8 も使える。Shift-JIS や Big-5
-の場合、コンパイラ本体が漢字を認識しない処理系では、MCPP がそれを補う。
+  Multi-byte character（漢字）の処理は日本の EUC-JP, shift-JIS, ISO2022-
+JP、中国の GB-2312、台湾の Big-5、韓国の KSC-5601 (KSX 1001) に対応して
+いる。UTF-8 も使える。Shift-JIS や Big-5 の場合、コンパイラ本体が漢字を
+認識しない処理系では、MCPP がそれを補う。
 
     [1.2]       正確な Standard C モードに加えてその他の各種モードも
 
-  MCPP 自身をコンパイルする時にヘッダファイル system.H 中のマクロを変更
-することで、各種の動作仕様のプリプロセッサができあがる。
-  もちろん Standard C 準拠のモードもあるが、K&R 1st. のモードの実行プロ
-グラムを作ることもできる。Standard C モードの実行プログラムは C++ のプリ
-プロセッサとして動作する実行時オプションも持ち、さらには自称 post-
-Standard 仕様のオプションまである。K&R モードのものでは "Reiser" model
-cpp の動作オプションもある。
+  Standard C 準拠の動作モードのほかに、K&R 1st. のモードや "Reiser"
+model cpp のモードもあり、さらには自称 post-Standard 仕様のモードまであ
+る。C++ のプリプロセッサとして動作する実行時オプションもある。
   Standard C モードは既存の多くのプリプロセッサと違って、規格を完全に実
-装しているつもりである。ISO/IEC 9899:1990 およびその Corrigendum 1:1994,
-Amendment 1:1995 に対応している。C99 (ISO/IEC 9899:1999) にも対応してい
-る。Standard C プリプロセスの reference model となるものを目指して作って
-ある。これらの規格のバージョンは実行時オプションで指定することができる。
-  コンパイラ本体が Standard C に対応していなくても、プリプロセッサで対応
-できるものはすべて実装している。隣接する文字列リテラルの連結をしないコン
-パイラ本体のために、MCPP にこれを処理させるようにすることができる。
+装しているつもりである。C90, C95, C99, C++98 のすべてに対応している。
+Standard C プリプロセスの reference model となるものを目指して作ってある。
+これらの規格のバージョンは実行時オプションで指定することができる。*1
   ほかにいくつかの有用な拡張機能も持っている。マクロの展開機序や #if 式
 の評価機序をトレースする #pragma MCPP debug もある。ヘッダファイルを
 "pre-preprocess" しておくこともできる。
   いくつかの有用な実行時オプションも備えている。ウォーニングのレベルを指
 定するオプションや、include directory を指定するオプション等である。
-  ソースにどんな間違いがあっても MCPP は暴走したり見当外れなメッセージを
+  ソースにどんな間違いがあってもMCPP は暴走したり見当外れなメッセージを
 出したりせず、正確でわかりやすい診断メッセージを出して適切な処理をする。
 移植上で問題となる点についても警告を発する。
+  高品質でありながら、コードサイズは比較的小さく、メモリ消費も比較的少な
+い。
   詳細なドキュメントも付属している。
 
-  MCPP の欠点を強いて挙げれば、速度がやや遅いことです。GNU C / cpp に比
-べると２倍から３倍の時間がかかります。しかし、Borland C 5.5 / cpp と同じ
-くらいの速度で、ヘッダファイルの pre-preprocess の機能を使うともう少し速
-くなるので、特に遅いほうではありません。正確であること、portable なソー
-スであること、少ないメモリでも動作すること等のためには、この程度の処理時
-間はやむをえないと考えています。
+  MCPP の欠点を強いて挙げれば、速度がやや遅いことです。GNU C V.3 / cc1
+に比べると２倍くらいの時間がかかります。しかし、Borland C 5.5 / cpp と同
+じくらいの速度で、ヘッダファイルの pre-preprocess の機能を使うともう少し
+速くなるので、特に遅いほうではありません。正確であること、portable なソ
+ースであること、少ないメモリでも動作すること等のためには、この程度の処理
+時間はやむをえないと考えています。
 
   なお、プリプロセッサの Standard C 準拠度をテストするための検証セットで
-ある "Validation Suite for Standard C Preprocessing"、その解説およびそれ
+ある"Validation Suite for Standard C Preprocessing"、その解説およびそれ
 を使ってテストした各種プリプロセッサの採点簿 cpp-test.txt を MCPP ととも
 に公開しています。これを見ると、「Standard C 準拠」と称する既存のプリプ
-ロセッサにいかに多くの問題があるかがわかります。*
+ロセッサにいかに多くの問題があるかがわかります。*2
 
-  Ｃ言語の規格としては ISO/IEC 9899:1990 (JIS X 3010-1993) が使われてき
-ましたが、1999 年には ISO/IEC 9899:1999 が採択されました。ここでは前者を
-C90、後者を C99 と呼びます。前者は ANSI X3.159-1989 が移行したものなので、
-一般には ANSI C または C89 と呼ばれることもあります。また、ISO/IEC 9899:
-1990 + Amendment 1995 を C95 と呼ぶことがあります。
+  *1 Ｃ言語の規格としては ISO/IEC 9899:1990 (JIS X 3010-1993) が長く使わ
+    れてきたが、1999 年には ISO/IEC 9899:1999 が採択された。ここでは前者
+    を C90、後者を C99 と呼ぶ。前者は ANSI X3.159-1989 が移行したものな
+    ので、一般には ANSI C または C89 と呼ばれることもある。また、ISO/IEC
+    9899:1990 + Amendment 1995 を C95 と呼ぶことがある。C++ の規格は ISO
+    /IEC 14882:1998 およびその正誤訂正版である ISO/IEC 14882:2003 で、こ
+    れをここでは C++98 と呼ぶ。
 
-  * この cpp は V.2.2 までは単に cpp と呼んでいたが、一般の cpp と紛らわ
-    しいので、V.2.3 からは MCPP と呼ぶことにした。このドキュメントでは V.
-    2.2 までのバージョンも MCPP と呼ぶ。また、このドキュメントの名前は V.
-    2.2 までは cpp.doc としていたが、V.2.3 からは porting.txt と変更し、
+  *2 この cpp は V.2.2 までは単に cpp と呼んでいたが、一般の cpp と紛ら
+    わしいので、V.2.3 からは MCPP と呼ぶことにした。このドキュメントでは
+    V.2.2 までのバージョンも MCPP と呼ぶ。また、このドキュメントの名前は
+    V.2.2 までは cpp.doc としていたが、V.2.3 からは porting.txt と変更し、
     さらに V.2.5 からは mcpp-porting.txt と変更した。私自身の名前も、V.2.
     2 までは Psycho としていたが、V.2.3 からは kmatsui と変更した。
 
@@ -203,10 +191,10 @@ PDP-11 / RT11, PDP-11 / RSX, VAX / VMS, VAX / ULTRIX 等のシステムの当時
 のＣ言語処理系のために書かれたＣプリプロセッサです。移植性の良い書き方が
 されているので、他のシステムに移植することは比較的容易で、オリジナル版で
 もすでに DEC 以外のいくつかの UNIX システムに対応していたようです。
-    [2.2]  私がバージョンアップの元にしたのは、C Users' Group の配付ディ
-スク #243 です。このソース中にある修正履歴を見ると、原作者による最終修正
-が 85/06 となっています。その後、原作者がバージョンアップをしているのか
-どうか、私は知りません。
+    [2.2]  私が MCPP の出発点としたのは、C Users' Group の配付ディスク #
+243 でした。このソース中にある修正履歴を見ると、原作者による最終修正が
+85/06 となっています。その後、原作者がバージョンアップをしているのかどう
+か、私は知りません。
     [2.3]  その後 88/12 までに何人かによって MS-DOS 上のいくつかの処理系
 にも移植されました。CUG のディスクに入っているのはこのバージョンです。
     [2.4]  ftp.oreilly.com/pub/examples/imake/DECUS-cpp.tar.gz にもソー
@@ -224,7 +212,7 @@ README 自体も 84 または 85 年のものと思われる）。
   私はこれらを free software として公開します。私自身は DECUS とは何の関
 係もありません。
   なお、オリジナル版には版数が付けられていませんが、MCPP と対比する時に
-は、そちらを「DECUS cpp」または「旧版」と呼ぶことにします。
+は、そちらを DECUS cpp と呼ぶことにします。
     [2.7]  Standard C のマクロ展開の実装方法については、E. Ream 作の MS-
 DOS 上の PDS である CPP V.5.3 (1989/08, CUG #319) のソースも参考にさせて
 いただきました。そのほか、GNU C / cpp の動作や、J. Roskind の JRCPP のド
@@ -245,25 +233,25 @@ IEC 14882:1998) に対応して update したものです。検証セット V.1.2 ととも
 には、GNU C / testsuite の一部として自動的にテストを実行することのできる
 edition が追加されました。
     [2.12] MCPP は V.2.3 の開発の途中で、検証セット V.1.3 とともに、情報
-処理振興事業協会 (IPA) の平成１４年度「未踏ソフトウェア創造事業」に新部
-裕・プロジェクトマネージャによって採択され、2002/07 - 2003/02 の間は IPA
-の資金援助と新部ＰＭの助言のもとに開発が進められました。英語版ドキュメン
-トもこのプロジェクトの中で、有限会社・ハイウェル（東京）に翻訳を委託し、
-それに私が修正とテキスト整形を加えてできあがったものです。このプロジェク
-トの中で cvs repository と ftp site が用意され、V.2.3 はそこで 2002/08
-に pre-release 1 が、2002/12 に pre-release 2 が、2003/02 にリリース版が
-開発されました。その後、2003/03 に V.2.3 patch 1 が出されています。*
+処理推進機構(IPA) の平成１４年度「未踏ソフトウェア創造事業」に新部 裕・
+プロジェクトマネージャによって採択され、2002/07 - 2003/02 の間は IPA の
+資金援助と新部ＰＭの助言のもとに開発が進められました。英語版ドキュメント
+もこのプロジェクトの中で、有限会社・ハイウェル（東京）に翻訳を委託し、そ
+れに私が修正とテキスト整形を加えてできあがったものです。このプロジェクト
+の中で cvs repository と ftp site が用意され、V.2.3 はそこで 2002/08 に
+pre-release 1 が、2002/12 に pre-release 2 が、2003/02 にリリース版が開
+発されました。その後、2003/03 に V.2.3 patch 1 が出されています。*
     [2.13] MCPP はさらに平成１５年度にも「未踏ソフトウェア創造事業」に伊
 知地 宏 PM によって継続して採択され、2003/06 - 2004/02 の間は IPA の資金
 援助と伊知地ＰＭの助言のもとに V.2.4 への update 作業が進められました。
 そして、2003/11 には V.2.4 prerelease が開発されました。このバージョンで
-は Visual C++ .net への移植が追加され、また、MCPP の make を自動化する
+は Visual C++ 2003 への移植が追加され、また、MCPP の make を自動化する
 configure スクリプトが作成されました。なお、MCPP はそれまで明確なライセ
 ンス表示をしていませんでしたが、この時から BSD スタイルのライセンス表示
 をするようになりました。さらに、2004/02 にはリリース版が開発されました。
-このバージョンでは multi-byte character の処理が拡張され、Plan 9 / pcc
-にも移植されました。また、英語版ドキュメントもハイウェルに翻訳を委託し、
-日本語版に合わせて update されました。
+このバージョンでは multi-byte character の処理が拡張されました。また、英
+語版ドキュメントもハイウェルに翻訳を委託し、日本語版に合わせて update さ
+れました。
     [2.14] 2004/03 には MCPP V.2.4.1 がリリースされました。これは再帰的
 マクロの展開方法を修正したものです。
     [2.15] 2005/03 には MCPP V.2.5 がリリースされました。このバージョン
@@ -273,33 +261,32 @@ configure スクリプトが作成されました。なお、MCPP はそれまで明確なライセ
 的マクロの展開方法は再修正されて完全なものとなりました。また、GNU C V.3.
 3, 3.4 に対応した一方で、16 ビットシステムでの処理系に関するドキュメント
 の多くを削除しました。
+    [2.16] 2006/06 には MCPP V.2.6-prerelease が公開されました。このバー
+ジョンでは、STANDARD モードと PRE_STANDARD モードが１つの実行プログラム
+にまとめられました。stand-alone build の仕様は処理系に依存しないものに改
+められました。いくつかの処理系の新しいバージョンへの対応が追加された一方
+で、pre-C90 の仕様の処理系に移植するための設定は削除されました。MS-DOS
+上のコンパイラや Plan 9 への移植も削除されました。ソースの書き換えは大幅
+なものになりました。今後はソースの追加や細部の修正はあっても、大幅な書き
+換えは発生しない見込みです。
 
   * 「未踏ソフトウェア創造事業」(Exploratory Software Project) の概要は
     次のところで知ることができる。
 
         http://www.ipa.go.jp/jinzai/esp/
 
-    なお、情報処理振興事業協会 (IPA) は 2004/01 に独立行政法人・情報処理
-    推進機構 (IPA) に改組された。
-
-    MCPP のソースおよびドキュメントと検証セットは開発中の revision を含
-    めて、次の CVS repository に置いている。ここから tar-ball を
-    download できる。
-
-        http://cvs.m17n.org/cgi-bin/viewcvs/?cvsroot=matsui-cpp
-
-    次のところからは anonymous ftp できる。
-
-        ftp://ftp.m17n.org/pub/mcpp/
-
-    また、次のところには案内の web page がある。
+    MCPP V.2.3 以降のソースおよびドキュメントと検証セット V.1.3 以降は次
+    のところに置いてきたが、
 
         http://www.m17n.org/mcpp/
 
+    2006/04/28 に次のところに移った。
+
+        http://mcpp.sourceforge.net/
+
     cpp V.2.2 および検証セット V.1.2 はベクター社のサイトの次のところに
-    ある。「PACK for WIN GOLD」という CD-ROM にも収録されていた。dos/
-    prog/c というディレクトリに入れられているが、MS-DOS 専用ではない。ソ
-    ースは UNIX, WIN32/MS-DOS 等に対応している。
+    ある。dos/prog/c というディレクトリに入れられているが、MS-DOS 専用で
+    はない。ソースは UNIX, WIN32/MS-DOS 等に対応している。
 
         http://download.vector.co.jp/pack/dos/prog/c/cpp22src.lzh
         http://download.vector.co.jp/pack/dos/prog/c/cpp22bin.lzh
@@ -308,39 +295,30 @@ configure スクリプトが作成されました。なお、MCPP はそれまで明確なライセ
     http://download.vector.co.jp/ は ftp://ftp.vector.co.jp/ でも同じよ
     うである。
 
-    旧版は次のところにもある（ここは会員制の closed なフォーラムである）。
-
-        @nifty / FC / lib 2
-
-    これらのアーカイブファイル中のテキストファイルは、NIFTY および
-    Vector のものは DOS/Windows 系に合わせて、改行コードは [CR]+[LF]、漢
-    字は shift-JIS で encode してある。m17n.org のものは UNIX 系に合わせ
-    て改行コードは [LF]、漢字は EUC-JP である。他のＯＳで使う場合は変換
-    が必要である。
-    拙作の convf というツールを使うと、全ファイルを一括して変換コピーで
-    きるので簡単である（バイナリファイルは自動的に判別して無変換でコピー
-    する。Time-stamp や mode は保存される）。ただし、MCPP のパッケージに
-    は特定の multi-byte character encoding をテストするためのファイルも
-    含まれているので、それらは encoding を変換してはいけない。まず全ファ
-    イルを改行コードだけ変換して一括コピーし、さらに doc ディレクトリだ
-    け改行コードと漢字 encoding の双方を変換して上書きコピーするのが良い。
-    Convf そのものも MCPP を移植したのと同じ処理系に対応している。ただし、
-    ファイルを DOS/Windows から他のＯＳに持っていく場合は、MS-DOS や
-    Windows95 で解凍すると大文字と小文字の区別がなくなってしまうので、ア
-    ーカイブファイルのまま移してから、解凍して変換すること。Convf は次の
-    ところにある。
-
-        http://download.vector.co.jp/pack/dos/util/text/conv/code/
-                                                        convf-1.8.lzh
+    これらのアーカイブファイル中のテキストファイルは、Vector のものは
+    DOS/Windows 系に合わせて、改行コードは [CR]+[LF]、漢字は shift-JIS
+    で encode してある。SourceForge のものは V.2.5 までは UNIX 系に合わ
+    せて改行コードは [LF]、漢字は EUC-JP である。
 
 
 ☆　３．各処理系に移植する方法：概要　☆
 
   MCPP のソースは４本のヘッダファイルと８本の *.c ファイルからなっていま
 す。ＯＳや処理系に依存する部分は configed.H, noconfig.H, system.H,
-system.c の４本のソースにまとめてあります。また、ライブラリ関数の一部の
-Ｃによるソースが lib.c にあります。したがって、MCPP を何らかの処理系で使
-うには、それに合わせてこれらのソースファイルに変更を加える必要があります。
+system.c の４本のソースにまとめてあります。configed.H と noconfig.H とは
+同時に使われることはなく、必ずどちらか一方が使われます。また、ライブラリ
+関数の一部のＣによるソースが lib.c にあります。したがって、MCPP を何らか
+の処理系で使うには、それに合わせてこれらのソースファイルに変更を加える必
+要があります。
+
+  MCPP には２つの build があります。１つは stand-alone build で、処理系
+からは独立して単体で動くものです。実行時オプションなどの仕様は一定で、処
+理系依存の部分はありません。これはコンパイルさえ通ればすむのでごく簡単で
+す。これについては [3.11] で述べます。
+  もう１つは処理系のプリプロセッサに代替して使う compiler-specific build
+です。処理系ごとに仕様が異なります。以下の [3.1] - [3.10] ではこの
+compiler-specific build を説明します。
+
   MCPP をコンパイルするには２つの方法があります。１つは configure スクリ
 プトを実行して、config.h というヘッダファイルと Makefile を自動生成する
 方法です。あとは単に make; make install とするだけですみます。configed.H
@@ -365,25 +343,25 @@ system.c の４本のソースにまとめてあります。また、ライブラリ関数の一部の
 使っています。*
 
     FreeBSD 5.3                 GNU C V.3.4.2
-    VineLinux 3.1               GNU C V.2.95.3, V.3.2, V.3.3.2, V.3.4.3
+    VineLinux 3.2               GNU C V.2.95.3, V.3.2, V.3.3.2, V.3.4.3
+    openSUSE Linux 10.0         GNU C V.4.0.2
     CygWIN 1.3.10               GNU C V.2.95.3
-    WIN32                       LCC-WIN32 V.3.2
-    WIN32                       Visual C++ .net 2003
-    WIN32, MS-DOS               Borland C++ V.4.02J, V.5.5J
-    Plan 9 ed.4                 pcc
+    CygWIN 1.5.18               GNU C V.3.4.4
+    WIN32                       Visual C++ 2003, 2005
+    WIN32                       Borland C++ V.4.0J, V.5.5J
+    WIN32                       LCC-Win32 V.3.2, V.3.8
 
-  これらの処理系で Standard C モードのプリプロセッサを作るための修正はき
-わめて簡単で、noconfig.H, system.H の数個のマクロ定義を変更するだけです。
-system.c の変更は必要ありません。
+  これらの処理系で MCPP をコンパイルするための修正は簡単で、noconfig.H
+の数個のマクロ定義を変更するだけです。
   noconfig ディレクトリの *.dif というファイルは FreeBSD 5.3 / GNU C 3.4
-用の noconfig.H, system.H を各処理系用に修正する差分ファイルです。Visual
-C++ .net 2003 を例にとると、src ディレクトリで
+用の noconfig.H を各処理系用に修正する差分ファイルです。Visual C++ 2005
+を例にとると、src ディレクトリで
 
-    patch -c < ..\noconfig\vc2003.dif
+    patch -c < ..\noconfig\vc2005.dif
 
-とすると、修正されます。patch は UNIX の標準的なコマンドで、MS-DOS 等に
-も移植されています。MS-DOS 5.0 に標準で付いていた patch とはまったく別物
-です。
+とすると、修正されます。patch は UNIX の標準的なコマンドで、Windows 等に
+も移植されています。patch を使わなくても、差分ファイルを見てエディタで修
+正してもかまいません。
   Include ディレクトリの指定などは、差分ファイルによる修正とは別に、ユー
 ザが自分のシステムに合わせて修正しなければなりません。
   こうして修正したソースをコンパイルするための各処理系用の makefile も添
@@ -395,22 +373,38 @@ C++ .net 2003 を例にとると、src ディレクトリで
   以下の作業も src ディレクトリで行います。作業は特に断らない限り、
 noconfig.H の修正です。
 
-  *  このほか、MCPP V.2.2 までは次のものをサポートしていたが、その後、私
+  * このほか、MCPP V.2.2 までは次のものをサポートしていたが、その後、私
     はこれらの処理系を使わなくなった。V.2.3 ではソースとドキュメントに設
     定を残していたが、V.2.4 ではそれも削除した。
 
         MS-DOS                          Turbo C V.2.0
         OS-9/6x09 level 2               Microware C
 
-      V.2.5 では次の処理系に関するドキュメントを削除した。ソースにはまだ
-    設定を残しているが、それも次のバージョンでは削除する予定である。
+      V.2.5 では次の処理系に関するドキュメントを削除した。
 
         GO32 / DJGPP V.1.12-M4          GNU C V.2.7.1
         MS-DOS                          LSI C-86 V.3.3 試食版
 
+      V.2.6 では上の２つの処理系の設定をソースからも削除し、さらに次の処
+    理系に関するドキュメントとソースを削除した。
+
+        MS-DOS / Borland C 4.0
+        Plan 9 / pcc
+
         [3.1.1]     共通の設定
 
-  以下のどの処理系でも、デフォルトの include directory の設定を
+  以下のどの処理系でも、compiler-specific build を作るためには、
+
+#define COMPILER        STAND_ALONE
+
+となっている行を
+
+#define COMPILER        MSC
+
+等と、その処理系を表すマクロに変更します。COMPILER は make のオプション
+で上書きすることもできます。例えば、nmake COMPILER=MSC; nmake COMPILER=
+MSC install 等とします。
+  また、以下のどの処理系でも、デフォルトの include directory の設定を
 C_INCLUDE_DIR1, C_INCLUDE_DIR2 というマクロに書いておきます。C と異なる
 C++ 固有の include directory がある場合は、それを CPLUS_INCLUDE_DIR1,
 CPLUS_INCLUDE_DIR2, CPLUS_INCLUDE_DIR3 に書きます（これらのディレクトリ
@@ -418,15 +412,13 @@ CPLUS_INCLUDE_DIR2, CPLUS_INCLUDE_DIR3 に書きます（これらのディレクトリ
   Include directory はこのほか、system.c でも設定されています。UNIX で言
 えば system.c で設定されるのはいわゆる OS-specific なもの（通常は /usr/
 include）といわゆる site-specific なもの（通常は /usr/local/include）で
-す。DOS/Windows 系のＯＳに関しては、system.c では include directory は何
-も設定されません。
+す。Windows では system.c では include directory は何も設定されません。
   また、必要なら CPU_STD1, CPU_STD2 等で定義される組み込みマクロ名も変更
 します。
   Multi-byte character の encoding はデフォルトでは、UNIX 系では EUC-JP、
-DOS/Windows 系では shift-JIS、Plan 9 では UTF-8 としていますが、必要なら
-MBCHAR というマクロを書き換えて他の encoding に変更します。32 ビット以上
-のシステムでは multi-byte character encoding は実行時に環境変数・オプシ
-ョン・#pragma で変更することもできます。
+Windows では shift-JIS としていますが、必要なら MBCHAR というマクロを書
+き換えて他の encoding に変更します。Multi-byte character encoding は実行
+時に環境変数・オプション・#pragma で変更することもできます。
   処理系によっては shift-JIS や Big5 等の encoding に対応していないため、
 multi-byte character の中に '\\' と同じ 0x5c の値のバイトがあると
 tokenization でエラーになることがありますが、そういう処理系では MCPP は
@@ -435,32 +427,39 @@ tokenization でエラーになることがありますが、そういう処理系では MCPP は
   添付の makefile については、処理系のバイナリの置かれているディレクトリ
 の設定を必要に応じて書き換えます。
 
-        [3.1.2]     FreeBSD / GNU C V.2.*, V.3.*
+        [3.1.2]     FreeBSD / GNU C V.2.*, V.3.*, V.4.*
 
-  ソースは FreeBSD 5.3 上の GNU C V.3.4.* でコンパイルして FreeBSD 5.3
-用の MCPP を生成する状態になっています。このままコンパイルすればできあが
-りです。
-  GNU C の他のバージョンであれば、
+  ソースは FreeBSD 5.3 上の GNU C V.3.4.* でコンパイルして stand-alone
+build の MCPP を生成する状態になっています。FreeBSD 5.3 / GNU C V.3.4.*
+用の compiler-specific build を作るには、
+
+#define COMPILER        STAND_ALONE
+
+となっている行を
+
+#define COMPILER        GNUC
+
+と変更して、
+
+#define VERSION_MSG     \
+    "compiled by GNU C 3.4"
+
+を
 
 #define VERSION_MSG     \
     "GNU C compiled by GNU C 3.4"
 
-および
+として、コンパイルすればできあがりです。
+  GNU C の他のバージョンであれば、VERSION_MSG および
 
 #define COMPILER_EXT_VAL    "3"
-#define COMPILER_EX2_VAL    "4"
+#define COMPILER_EXT2_VAL   "4"
 #define COMPILER_CPLUS_VAL  "3"
 
 となっているところのバージョン番号を変更します。COMPILER_EXT_VAL は GNU
-C の major version number を、COMPILER_EX2_VAL は minor version number
+C の major version number を、COMPILER_EXT2_VAL は minor version number
 を書きます。COMPILER_CPLUS_VAL は __GNUG__ マクロの値で、
 COMPILER_EXT_VAL と同じになります。
-
-  GNU C V.2.7-2.95 であれば、次の２つのマクロの定義をそれぞれ FALSE,
-199409L に変更します。
-
-#define HAVE_INTMAX_T       TRUE
-#define STDC_VERSION        0L
 
   FreeBSD のバージョンが 5.* でなければ、
 
@@ -469,20 +468,25 @@ COMPILER_EXT_VAL と同じになります。
 の値を変更します。
   さらに include directory が FreeBSD 5.3 の標準と違っている場合は、
 
-#define CPLUS_INCLUDE_DIR1  "/usr/include/c++"
-#define CPLUS_INCLUDE_DIR2  "/usr/include/c++/backward"
+#define CPLUS_INCLUDE_DIR1  "/usr/include/c++/3.4"
+#define CPLUS_INCLUDE_DIR2  "/usr/include/c++/3.4/backward"
 
 となっているディレクトリを変更します。CPLUS_INCLUDE_DIR3, C_INCLUDE_DIR1
 の設定も必要かもしれません。
+
+  GNU C V.2.7-2.95 であれば次のマクロの定義を 199409L に変更します。
+
+#define STDC_VERSION        0L
+
   GNU C V.3 ではプリプロセスがコンパイラ (cc1, cc1plus) に吸収されてしま
 ったので、MCPP を使うには、gcc, g++ の呼び出しを shell-script に置き換え
 て、mcpp => cc1, mcpp => cc1plus の順序で実行されるようにしなければなり
 ません。その方法については、mcpp-manual.txt [3.9.7] を見てください。
-  他の UNIX でもコンパイラが GNU C であれば、このバージョン表示や、
+  他の UNIX 系 OS でもコンパイラが GNU C であれば、このバージョン表示や、
 include ディレクトリの設定、ＯＳ固有の組み込みマクロの設定、等を変えるだ
 けですむのではないでしょうか（[4.1.1] 参照）。
 
-        [3.1.3]     Linux / GNU C V.2.*, V.3.*
+        [3.1.3]     Linux / GNU C V.2.*, V.3.*, V.4.*
 
   Linux / GNU C ではまず、
 
@@ -501,10 +505,11 @@ include ディレクトリの設定、ＯＳ固有の組み込みマクロの設定、等を変えるだ
 #define COMPILER_SP3_VAL    "long int"
 
 に変更します。
-  そして、FreeBSD の場合と同じように、VERSION_MSG, COMPILER_EXT_VAL,
-COMPILER_EX2_VAL, COMPILER_CPLUS_VAL, CPLUS_INCLUDE_DIR1,
-CPLUS_INCLUDE_DIR2, C_INCLUDE_DIR1, HAVE_INTMAX_T, STDC_VERSION 等のマク
-ロの値を変更します。
+  そして、FreeBSD の場合と同じように、COMPILER, VERSION_MSG,
+COMPILER_EXT_VAL, COMPILER_EXT2_VAL, COMPILER_CPLUS_VAL,
+CPLUS_INCLUDE_DIR1, CPLUS_INCLUDE_DIR2, C_INCLUDE_DIR1 等のマクロの値を
+変更します。
+  GNU C 2.* では STDC_VERSION の値を変更します。
   Linux は distribution によって標準の include directory が異なることも
 あるので、
 
@@ -514,115 +519,71 @@ CPLUS_INCLUDE_DIR2, C_INCLUDE_DIR1, HAVE_INTMAX_T, STDC_VERSION 等のマク
 として確かめてから設定してください。
   また、システムの標準の GNU C とは別のバージョンをインストールした場合
 はそのバージョン固有の include ディレクトリが別に作られるでしょうから、
-そのディレクトリを上記のマクロで指定します。vlinux_gcc32.dif という差分
-ファイルは VineLinux 上に GNU C V.3.2 を私がインストールした例です。
+そのディレクトリを上記のマクロで指定します。linux_gcc32.dif という差分フ
+ァイルは VineLinux 上に GNU C V.3.2 を私がインストールした場合の例です。
 
-  noconfig ディレクトリの vlinux_gcc2953.dif, vlinux_gcc32.dif,
-vlinux_gcc332.dif はFreeBSD / GNU C V.3.4 用のソースを VineLinux 3.1 /
-GNU C V.2.95.3, V.3.2, V.3.3.2 用に修正する差分ファイルです。
-
+  noconfig ディレクトリの linux_gcc2953.dif, linux_gcc32.dif,
+linux_gcc332.dif, linux_gcc343.dif はFreeBSD / GNU C V.3.4 用のソースを
+VineLinux 3.* / GNU C V.2.95.3, V.3.2, V.3.3.2, V.3.4.3 用に修正する差分
+ファイルです。linux_gcc402.dif は openSUSE Linux / GNU C V.4.0.2 用のも
+のです。それぞれ compiler-specific build ではさらに、それぞれ COMPILER,
+VERSION_MSG を変更します。
   なお、glibc の getopt() は POSIX 等の標準のものとは仕様が異なるので、
 使わずに、lib.c のものを使ってください。noconfig.H は Linux ではデフォル
 トで glibc が使われていると判断します。
 
-        [3.1.4]     CygWIN V.1.* / GNU C 2.*
+  GNU C 3.*, 4.* については、mcpp-manual.txt [3.9.7] を参照してください。
+
+        [3.1.4]     CygWIN V.1.* / GNU C 2.*, 3.*
 
   CygWIN V.1.3.10 / GNU C V.2.95.3 では noconfig.H に cyg1310.dif にある
-ような変更を加えます。
+ような変更を加えます。CygWIN V.1.5.18 / GNU C V.3.4.4 では noconfig.H に
+cyg1518.dif にあるような変更を加えます。もちろん COMPILER, VERSION_MSG
+も書き換えます。
   他の version では、VERSION_MSG, C_INCLUDE_DIR1, CPLUS_INCLUDE_DIR1,
-COMPILER_EXT_VAL, COMPILER_EX2_VAL, COMPILER_SP3_VAL 等のマクロを変更す
-ることで対応できるでしょう。GNU C 3.* については、[3.1.2] を参照してくだ
-さい。
+COMPILER_EXT_VAL, COMPILER_EXT2_VAL, COMPILER_SP3_VAL 等のマクロを変更す
+ることで対応できるでしょう。GNU C 3.*, 4.* については、mcpp-manual.txt
+[3.9.7] を参照してください。
 
         [3.1.5]     LCC-WIN32 V.3.*
 
-  LCC-WIN32 V.3.2 では lcc32.dif のような変更を加えます。
+  LCC-WIN32 V.3.2, V.3.8 ではそれぞれ lcc32.dif, lcc38.dif のような変更
+を加え、さらに COMPILER, VERSION_MSG を書き換えます。
   他の version では VERSION_MSG マクロを変更します。
   LCC-WIN32 の long long にはかつてはバグがあって使えませんでしたが、少
-なくとも V.3.2 (2003/08) ではちゃんと使えるようになっています。
+なくとも V.3.2 (2003/08) 以降ではちゃんと使えるようになっています。
 
-        [3.1.6]     Visual C++ .net
+        [3.1.6]     Visual C++ 2002, 2003, 2005
 
-  Visual C++ .net 2003, 2002 ではそれぞれ vc2003.dif, vc2002.dif のよう
-な変更を加えます。
+  Visual C++ 2005, 2003, 2002 ではそれぞれ vc2005.dif, vc2003.dif,
+vc2002.dif のような変更を加えた上で、COMPILER, VERSION_MSG を書き換えま
+す。
   Visual C の他のバージョンでは、VERSION_MSG マクロを変更するほか、
-_MSC_VER という組み込みマクロの値を COMPILER_EXT_VAL というマクロの設定
-を変えることで、また、_M_IX86 という組み込みマクロの値を
-COMPILER_SP2_VAL というマクロの設定を変えることで対応させます。また、
-Visual C は少なくとも V.6.0 以降はプリプロセッサが c1.dll, c1xx.dll とい
-うコンパイラに吸収されたようですが、プリプロセッサが独立していたバージョ
-ンでは ONE_PASS というマクロを FALSE とします（[4.1.1.3] 参照）。
+_MSC_VER および _MSC_FULL_VER という組み込みマクロの値をそれぞれ
+COMPILER_EXT_VAL, COMPILER_EXT2_VAL というマクロの設定を変えることで、ま
+た、_M_IX86 という組み込みマクロの値を COMPILER_SP2_VAL というマクロの設
+定を変えることで対応させます。また、Visual C は少なくとも V.6.0 以降はプ
+リプロセッサが c1.dll, c1xx.dll というコンパイラに吸収されたようですが、
+プリプロセッサが独立していたバージョンでは ONE_PASS というマクロを FALSE
+とします（[4.1.1.3] 参照）。
 
         [3.1.7]     Borland C++ V.4.*, V.5.*
 
-  Borland C V.5.5 / bcc32 では bc55_w32.dif のような変更を加えます。
-  Borland C V.4.0 / bcc / large memory model では bc40_16l.dif のような
-変更を加えます。
+  Borland C V.5.5 / bcc32 では bc55.dif のような変更を加えます。Borland
+C V.4.0 / bcc32 では bc40.dif のような変更を加えます。どちらも COMPILER,
+VERSION_MSG の書き換えが必要です。
   Borland C/C++ の別のバージョンでは VERSION_MSG のほか、__TURBOC__,
 __BORLANDC__, __BCPLUSPLUS__ という組み込みマクロの値をそれぞれ noconfig.
 H の COMPILER_STD2_VAL, COMPILER_EXT_VAL, COMPILER_CPLUS_VAL というマク
-ロの設定を変えることで、対応させます（[4.1.1.1] 参照）。Digraphs と
-__STDC_VERSION__ の実装されているバージョンであれば、HAVE_DIGRAPHS,
-STDC_VERSION の設定を変更します。
-  Borland C 4.* までのバージョンでは、
+ロの設定を変えることで、対応させます（[4.1.1.1] 参照）。Digraphs の実装
+されているバージョンであれば、HAVE_DIGRAPHS の設定を変更します。
+__STDC_VERSION__ の実装されているバージョンであれば、STDC_VERSION の設定
+を変更します。
+  また、Borland C 4.* までのバージョンでは、
 
-#define SEARCH_INIT     CURRENT
-
-とします。
-  また、WIN32 版 (bcc32) ではなく MS-DOS 版 (bcc) の場合は
-
-#define SYSTEM              SYS_WIN32
-
-ではなく
-
-#define SYSTEM              SYS_MSDOS
+#define SEARCH_INIT         CURRENT
 
 とします。
-
-            [3.1.7.1]   MS-DOS 処理系用の cpp を WIN32 処理系で
-                        コンパイル
-
-  また、移植する目的の処理系と MCPP をコンパイルする処理系とは必らずしも
-同じでなくても良いので、例えば Borland C 用の MCPP を MS-DOS 上の処理系
-である LSI C-86 でコンパイルしてもかまいません。この場合はそのほうがコー
-ドサイズがコンパクトになります。逆に LSI C-86 用の MCPP を Borland C /
-bcc32 等でコンパイルすることもできます。WIN32 でコンパイルすれば、その
-MCPP は WIN32 上でしか動きませんが、tranlation limits を大きくできます。
-
-  ここでは Borland C 4.0 / bcc32 で MS-DOS 版 Borland C 4.0 用の cpp を
-コンパイルする場合を例にとります。noconfig.H では次のようにします。
-
-#define SYSTEM              SYS_MSDOS
-#define COMPILER            BORLANDC
-#define HOST_SYSTEM         SYS_WIN32
-#define HOST_COMPILER       BORLANDC
-#define VERSION_MSG     \
-    "Borland C compiled by Borland C V.4.0/bcc32"
-
-  noconfig.H の PART 1 は target-compiler 用の設定にし、PART 2 は host-
-compiler 用の設定にします（Borland C 同士の場合は PART 2 はデフォルトの
-ままでかまわない）。
-  添付の bc4_16_by_bc4_32.dif は MS-DOS 版 Borland C V.4.0 用 MCPP を
-Borland C V.4.0 / bcc32 でコンパイルするための設定をする差分ファイルです。
-makefile は noconfig/borlandc.mak を使い、インストールするディレクトリの
-設定を書き換えて、-DWIN32 というオプションを付けて make します。
-
-        [3.1.8]    Plan 9 ed.4 / pcc
-
-  Plan 9 では plan9r4.dif の変更を加えてコンパイルします。
-  plan9r4.dif は他の *.dif とは形式が違っています。Plan 9 には diff はあ
-りますが、patch がありません。そこで、plan9r4.dif には diff -c ではなく
-diff -e による差分を書き出して、その後ろに
-
-    w
-
-という１字だけの行を書き加えてあります。したがって、これを使ってソースを
-書き換えるには、次のようにします。
-
-    ed noconfig.H < ../noconfig/plan9r4.dif
-
-  Plan 9 でのコンパイルは他のシステムとはかなり違っています。それについ
-ては [3.7.1] を見てください。
 
     [3.2]       DECUS cpp で対応していた処理系
 
@@ -640,59 +601,35 @@ noconfig.H には PART 1 と PART 2 という部分があり、system.H には PART 3
 があります。
   これらのファイルには、各処理系に移植する時に必要ないくつかのマクロが定
 義されています。まだ移植されていない処理系に移植するには、PART 1 に数行
-ないし十数行を書き足します。また、Standard C 以外のモードの MCPP を作る
-には、PART 3 にある数個のマクロを書き替えます。
+ないし十数行を書き足します。
   PART 1 はＯＳと target 処理系に依存する定義で、PART 2 は host 処理系に
 依存する定義、そして PART 3 は MCPP の動作仕様の定義です。
   デフォルトの設定と違う設定で移植する場合は、これらのファイルの全体に必
 ず目を通してください。
 
-    [3.4]       system.c, mbchar.c
+    [3.4]       system.c
 
   configed.H (noconfig.H), system.H のマクロだけでは吸収できないＯＳや処
 理系の差異は、system.c で吸収しています。未実装の処理系に移植するには、
-ここに数行から数十行のソースを書き足すことが必要になるでしょう。
+ここに数十行のソースを書き足すことが必要になるでしょう。
   このファイルに記述されているのは、MCPP 起動時のオプション、usage 文、
 include ディレクトリ、ヘッダファイルやソースファイルをオープンする時のＯ
 Ｓ固有のディレクトリパスの扱い、#pragma の処理、処理系固有の拡張ディレク
 ティブの処理、等です。ほとんどは target OS と target 処理系の設定です。
 
-  V.2.4 からは mbchar.c というソースファイルが追加されました。ここには
-multi-byte character 処理のルーチンと文字タイプのテーブルがあります。未
-実装の multi-byte character encoding を実装する場合は、ここに処理ルーチ
-ンと文字タイプ・テーブルを書き足します。
-
     [3.5]       lib.c
 
   ライブラリ関数のうち、Standard C にない getopt(), stpcpy() のＣによる
-ソースをここに書いてあります。また、memmove(), memcmp(), memcpy(),
-strstr(), strcspn() は Standard C にはありますが、古い処理系ではない場合
-もあるので、Ｃソースを用意しました（本当は、いわゆるブロック転送命令を持
-つ CPU では、この５つと stpcpy() はアセンブラで書き直したほうが良い）。
-  getopt() は glibc のものは大幅な拡張が施されていてかえってやっかいなの
-で、こちらのものを使ってください。
-  memmove() はないものの memcpy() が memmove() の仕様を持っている処理系
-もあります（古い BSD 系の処理系がそのようである）。その場合は noconfig.H
-またはシステムの strings.h か何かに
-
-    #define memmove( dst, src, size)    memcpy( dst, src, size)
-
-と書いておけばすみます。
-  fgets() はどの処理系にもあるものですが、細部の仕様が Standard C とは違
-っている場合があるので、Ｃソースを載せておきます。処理系付属のものでも実
-用上は問題ないでしょう。Standard C では、１バイトも読まないで EOF となっ
-た時はバッファには何も書き込まないことになっているのですが（したがって直
-前に読んだ行がバッファに保存される）、'\0' を書き込んでしまうものがあり
-ます。そういう fgets() ではソースファイルが <backslash><newline> で終わ
-っている場合や <newline> なしで終わっている場合の診断メッセージに不都合
-が出るだけです。
-  fgets() 以外のライブラリ関数はいずれも、処理系によって微妙に違う恐れの
-ある仕様に依存した使い方はしていないので、どの処理系のものでもバグさえな
-ければ大丈夫でしょう。
-  MCPP で使っている関数はごくありふれたものばかりです。また例えば #if 式
-での整数定数の評価には strtoul() も atol() も使わず、自前でやっています。
-strtoul() は古い処理系にはなく、atol() では out of range のチェックがで
-きないからです。
+ソースをここに書いてあります。getcwd() は Standard C にはありませんが
+（POSIX では規定されている）、OS に依存する関数であり portable に書くこ
+とができないので、lib.c には含めていません。MCPP の使う唯一の低水準関数
+です。しかし、これを持たない処理系はないでしょう。MCPP V.2.5 までは
+fgets(), memmove(), memcmp(), memcpy(), strstr(), strcspn() のソースも用
+意していましたが、これらの関数が必要な処理系はもはやないと思われるので、
+削除しました。
+  ライブラリ関数はいずれも、処理系によって微妙に違う恐れのある仕様に依存
+した使い方はしていないので、どの処理系のものでもバグさえなければ大丈夫で
+す。
   lib.c 中の xyz という関数を使うには、noconfig.H (configed.H) の PART 2
 にある HOST_HAVE_XYZ というマクロを FALSE に定義します。configed.H では
 ターゲット処理系とホスト処理系とが同じであると仮定していますが、異なる場
@@ -700,15 +637,9 @@ strtoul() は古い処理系にはなく、atol() では out of range のチェックがで
 
     [3.6]       標準ヘッダ
 
-  MCPP のソースでは stdio.h, ctype.h, errno.h を無条件で include してい
-ます。これを持たない処理系はまずないでしょう。これらのヘッダファイルは必
-ずしも Standard C の規定に従っている必要はありません。stdlib.h, string.h,
-stddef.h, time.h は Standard C で規定されているものですが、古い処理系に
-はないので、その場合は必要な関数宣言やマクロ定義を直接使えるように
-noconfig.H (configed.H) の PART 2 に書いてあります。同機能の関数の名前が
-違っている場合のことも考慮してあります。
-  これらの部分は #if 1 - #else - #endif, #if 0 - #else - #endif で囲んで
-あるので、必要に応じてこの 1 と 0 を逆にしてください。
+  MCPP のソースでは stdio.h, ctype.h, errno.h, stdlib.h, string.h,
+stddef.h, time.h を無条件で include しています。UNIX 系のシステムでは
+unistd.h も include します。これらを持たない処理系はまずないでしょう。
   configed.H ではターゲット処理系の設定を使っているので、ホスト処理系が
 違っている場合は、PART 2 を編集します。
 
@@ -722,10 +653,11 @@ noconfig.H (configed.H) の PART 2 に書いてあります。同機能の関数の名前が
 
     patch -c < ../noconfig/xyz.dif
 
-として noconfig.H, system.H を修正します。さらに自分のシステムに合わせて
-noconfig.H の C_INCLUDE_DIR? 等のマクロをエディタで修正します。そして、
-使用する noconfig/xyz.mak を Makefile にコピーし、ディレクトリ指定等を自
-分のシステムに合わせて修正した上で、
+として noconfig.H を修正します。次に、noconfig.H の COMPILER と
+VERSION_MSG というマクロを書き換えます。さらに自分のシステムに合わせて
+noconfig.H の C_INCLUDE_DIR? 等のマクロを修正します。そして、使用する
+noconfig/xyz.mak を Makefile にコピーし、ディレクトリ指定等を自分のシス
+テムに合わせて修正した上で、
 
     make
     make install
@@ -737,35 +669,35 @@ noconfig.H の C_INCLUDE_DIR? 等のマクロをエディタで修正します。そして、
 
     main.c, control.c, eval.c, expand.c, support.c, system.c, mbchar.c
         は system.H, internal.H に依存する
-    lib.c は system.H に依存する
-    system.H は configed.H または noconfig.H に依存する
+    lib.c は configed.H (noconfig.H) に依存する
+    system.H は configed.H (noconfig.H) に依存する
 
 という関係になっています。system.H は internal.H より先に include する必
 要があります。
   スタックサイズはシステムの使う分に NMACWORK + (NEXP * 30) + (sizeof
-(int) * 100) を追加してください。MODE == STANDARD ではさらに (sizeof
+(int) * 100) を追加してください。Standard モード ではさらに (sizeof
 (char *) * 12 * RESCAN_LIMIT) を追加します（NMACWORK, NEXP, RESCAN_LIMIT
 は system.H で定義されているマクロ）。
-  MS-DOS のようにワイルドカードを shell（コマンドプロセッサ）が展開しな
+  Windows のようにワイルドカードを shell（コマンドプロセッサ）が展開しな
 いシステムでは、MCPP でも展開しないようにコンパイルしておいたほうが安全
 です（-o オプションが指定されない限り、第２引数が出力ファイルの指定とみ
 なされるので）。
 
   MCPP 自身を使って MCPP をリコンパイルするには、処理系のプリプロセッサ
-のあるべき場所にこの実行プログラムをおきます。例えば FreeBSD, Linux,
-CygWIN であれば、処理系付属の cpp0 を cpp0_gnuc とでも rename し、MCPP
-を mcpp_std 等としておきます。その時に使うものを cpp0 にリンクするのが良
-いでしょう。すなわち、使うプリプロセッサを mcpp_std とすると、
+のあるべき場所にこの実行プログラムをおきます。例えば GNU C V.2.95 であれ
+ば、処理系付属の cpp0 を cpp0_gnuc とでも rename しておき、その時に使う
+ものを cpp0 にリンクするのが良いでしょう。すなわち、使うプリプロセッサを
+mcpp とすると、
 
-    ln -sf mcpp_std cpp0
+    ln -sf mcpp cpp0
 
-とします。DOS/Windows では使うものを cpp.exe にコピーします。*
-  この場合は初めから、
+とします。Windows では使うものを cpp.exe にコピーします。*
+  MCPP 実行プログラムの名前は
 
-    make NAME=mcpp_std
+    make NAME=mcpp32
 
-とすれば、後で rename しなくてすみます（同じことを BC make では make
--DNAME=mcpp_std とする。UCB make では -D は付けても付けなくても良い。GNU
+等として指定することができます（同じことを BC make では make
+-DNAME=mcpp とする。UCB make では -D は付けても付けなくても良い。GNU
 make では -D は付けてはいけない）。
   添付の makefile では freebsd.mak, linux.mak 以外は make install ではこ
 まかい処理はしないので、手で補ってください。処理系付属のプリプロセッサは、
@@ -797,78 +729,25 @@ BC make では
 ョンで指定します。LCC-Win32 make で私の malloc() をリンクするためには、
 makefile を修正する必要があります。
 
-  * FreeBSD では cpp を置くディレクトリは /usr/libexec である。mcpp-
-    manual.txt [2.1] を参照のこと。
-    Vine Linux 2.6 (i386) では /usr/lib/gcc-lib/i386-redhat-linux/2.95.3
-    というひどく奥深いディレクトリになっている。Linux / GNU C では
-    distribution やその version に応じて makefile のこのディレクトリの指
-    定を書き換える必要がある。Include directory もいろいろあるので、確か
-    めなければならない。
-    また、GNU C 2.95 や 3.2 では cpp のほかに cpp0 があり、gcc から呼び
-    出されるのは cpp0 のほうである。
-    なお、mcpp-manual.txt [3.9.5], [3.9.7] も参照のこと。GNU C V.3 では
-    プリプロセスがコンパイラ (cc1, cc1plus) に吸収されてしまったので、
+  * FreeBSD では cpp0, cc1 を置く標準のディレクトリは /usr/libexec であ
+    る。
+    Linux では /usr/lib/gcc-lib/i686-redhat-linux/3.3.2 といったひどく奥
+    深いディレクトリになっている。Linux / GNU C では distribution やその
+    version に応じて makefile のこのディレクトリの指定を書き換える必要が
+    ある。Include directory もいろいろあるので、確かめなければならない。
+    また、Linux や FreeBSD では /usr/bin/cpp というものがあるが、これは
+    実際には cpp0 または cc1 を呼び出す。gcc も cpp0 または cc1 を呼び出
+    す。
+    なお、mcpp-manual.txt [3.9.5], [3.9.7] も参照のこと。GNU C 3.*, 4.*
+    ではプリプロセスがコンパイラ (cc1, cc1plus) に吸収されてしまったので、
     MCPP を使うには gcc, g++ の呼び出しを shell-script に置き換える必要
     がある。
-
-        [3.7.1]     Plan 9 / pcc でのコンパイル
-
-  Plan 9 には Dennis Ritchie の書いたプリプロセッサと Ken Thompson の書
-いたコンパイラがあります。コンパイラはプリプロセス機能を内蔵したものです
-（ただし、#if が実装されていない）。
-  コンパイラ・ドライバには cc と pcc の２つがあります。Cc はプリプロセッ
-サを呼び出さずにコンパイラを呼び出すものです。Pcc すなわち portable cc
-for ANSI & POSIX environment はプリプロセッサを呼び出してからコンパイラ
-を呼び出すものです。Include directory もこの両者で異なっています。
-  MCPP のソースには #if が使われているので、pcc でないとコンパイルできま
-せん。ここで説明するのは、MCPP を pcc でコンパイルして Ritchie の cpp と
-置き換えて使う方法です。
-  Plan 9 ではまた、make は mk という名前のコマンドとなっており、makefile
-も mkfile という名前にするのが慣例です。mkfile の書式は他の make とはか
-なり違っていて、Plan 9 専用のものとなっています。また、if, else は使えな
-いので、コンパイルの仕方を変える時は mkfile を書き換える必要があります。
-
-  MCPP をコンパイルするには MCPP の src ディレクトリで、noconfig.H に [3.
-1.9] にあるような方法で変更を加えた上で、
-
-    cp ../noconfig/plan9.mk mkfile
-    mk
-    mk install
-    mk clean
-
-とします。すると、mcpp_std という名前の実行プログラムが /$objtype/bin/
-ディレクトリにコピーされるので、
-
-    cp /$objtype/bin/cpp /$objtype/bin/cpp_ritchie
-
-として Ritchie cpp を保存した上で、
-
-    cp /$objtype/bin/mcpp_std /$objtype/bin/cpp
-
-とします。$objtype という環境変数は CPU が x86 の場合は 386 となるので、
-直接 386 とタイプすればすみます。
-
-  MCPP の "pre-preprocess" 機能を使って MCPP をリコンパイルするには、
-mkfile の
-
-    PREPROCESSED=0
-
-という行を
-
-    PREPROCESSED=1
-
-と書き換えた上で、
-
-    mk preprocessed
-
-とします。mk install 以下は上記と同様です。
 
     [3.8]       MCPP をコンパイルできる処理系
 
   各処理系に移植するためにはいくつかの設定が必要ですが、MCPP のソースを
-コンパイルすること自体は、K&R 1st. の仕様を満たしている処理系であれば十
-分できます。正確に言えば、K&R 1st. と Standard C との共通仕様を満たして
-いれば十分です。
+コンパイルすること自体は、C90 (ANSI C) の仕様を満たしている処理系であれ
+ば十分できます。プリプロセッサも同様です。*
   C++ でもコンパイルできます（C++ であるかどうかは、#ifdef __cplusplus
 で判断している）。次の手順でコンパイルします。
 
@@ -883,28 +762,16 @@ mkfile の
   char 型は符号付きでも符号なしでもかまいません。
   浮動小数点演算は不要です。
 
-  プリプロセッサも同様で、それどころかいわゆる Reiser model cpp （MCPP
-の OLD_PREPROCESSOR モードがこれに近い）でも可です。#if 式に int の定数
-式しか使えないものや、その評価がかなりいいかげんなものでも大丈夫でしょう。
-MCPP 自身を使ってリコンパイルする場合も、MCPP の実行プログラムは system.
-H でどういうモードの設定をして生成したものでもかまいません（ただし、標準
-ヘッダがそのモードの MCPP の持たない仕様を前提としている場合は話は別であ
-る）。
+  このソースは処理系の微妙な差に影響されないように書いてあります。もっと
+も、実際に各処理系でコンパイルするためには、さらにその処理系のバグも回避
+する必要があります。これはやってみないと何が出てくるかわかりません。私が
+移植したいくつかの処理系でも、バグであることを確かめその回避方法を見つけ
+るまでにかなりの時間がかかってしまったことが何回かあります。
 
-  このソースは処理系の微妙な差に影響されないように書いてあります。
-Standard C で新設された機能は使っていません。Standard C に完全に対応した
-プリプロセッサのソースを portable に書くためには、こういう方法を採る必要
-があるのです。*
-  もっとも、実際に各処理系でコンパイルするためには、さらにその処理系のバ
-グも回避する必要があります。これはやってみないと何が出てくるかわかりませ
-ん。私が移植したいくつかの処理系でも、バグであることを確かめその回避方法
-を見つけるまでにかなりの時間がかかってしまったことが何回かあります。
-
-  * ただし、printf() での long long の length modifier の記述には文字列
-    リテラルの連結という Standard C の仕様を使っている。Length modifier
-    が処理系によって異なるため、この方法をとるしかないのである。そして、
-    long long を持つ処理系が文字列リテラルの連結ができないということはな
-    いはずである。
+  * MCPP V.2.5 までは K&R 1st. の処理系でもコンパイルできるようにしてい
+    たが、すでにその必要はなくなっていると思われるので、V.2.6 からは C90
+    を前提とするように改めた。それに伴ってソースを整理し、このドキュメン
+    トも整理した。
 
     [3.9]       コンパイルする処理系とターゲットの処理系
 
@@ -915,7 +782,8 @@ SYSTEM, COMPILER でターゲットを指定し、HOST_SYSTEM, HOST_COMPILER はホス
 トを指定します。また、PART 1 にある諸定義はターゲット用のもので、PART 2
 にあるものはホスト用の設定です。system.c は主としてターゲット用のもので
 す。lib.c はホスト用の設定でコンパイルします。
-  ただし、次のような制限があります。
+
+  ホストとターゲットの関係には、次のような制限があります。
   １．ホスト処理系はターゲット処理系と同じＯＳ上のものであるか、またはク
 ロスコンパイラであることが必要です。
   ２．ホスト処理系の long (unsigned long) はターゲット処理系のそれより範
@@ -924,11 +792,12 @@ SYSTEM, COMPILER でターゲットを指定し、HOST_SYSTEM, HOST_COMPILER はホス
 
   なお、ここで言うホストとターゲットというのは、クロスコンパイラのそれと
 は関係ありません。クロスコンパイルするのはコンパイラ本体の仕事で、プリプ
-ロセッサは原則としてそれには関知しません。Cpp を「クロスコンパイラに」移
-植する場合は、そのクロスコンパイラがここで言うターゲット処理系です。ホス
-ト処理系としてはクロスコンパイラでないものを使うことになるはずです。Cpp
-を「クロスコンパイラで」コンパイルする場合は、そのクロスコンパイラがホス
-ト処理系で、クロスコンパイラのターゲットがターゲット処理系となります。
+ロセッサは原則としてそれには関知しません。MCPP を「クロスコンパイラに」
+移植する場合は、そのクロスコンパイラがここで言うターゲット処理系です。ホ
+スト処理系としてはクロスコンパイラでないものを使うことになるはずです。
+MCPP を「クロスコンパイラで」コンパイルする場合は、そのクロスコンパイラ
+がホスト処理系で、クロスコンパイラのターゲットがターゲット処理系となりま
+す。
   UNIX 上で動作する Windows 用プログラムのクロス処理系の MCPP を作るよう
 な場合は、noconfig.H の PART 1 で MBCHAR を EUC_JP ではなく SJIS としま
 す。すなわち、multi-byte character encoding の指定はターゲットのそれに合
@@ -936,40 +805,61 @@ SYSTEM, COMPILER でターゲットを指定し、HOST_SYSTEM, HOST_COMPILER はホス
   ただし、MCPP では、MCPP をコンパイルするホスト処理系の文字セットとそれ
 を使うターゲット処理系の文字セットとはともに ASCII であると仮定していま
 す。クロスコンパイラのホストとターゲットの文字セットについても同様です。
-もしこの両者で文字セットが異なる場合は、mbchar.c の type_*[] と必要なら
-noconfig.H の ALERT, VT をターゲット処理系のそれに合わせ、文字列リテラル
-の連結を MCPP ではやらないようにすれば（CONCAT_STRINGS を FALSE とする）
-良いのではないかと思いますが（文字列リテラルと文字定数中の numeric
-escape sequence 以外の文字はクロスコンパイラのコンパイラ本体が変換し、隣
-接する文字列リテラルの連結もしてくれるのであれば）、私は ASCII 以外の文
-字セットもクロスコンパイラというものも使ったことがないので、よくわかりま
-せん。
 
     [3.10]      対応していない処理系
 
   MCPP が対応していないのは、特殊な文字セットを持つ処理系と特殊な CPU で
 す。
-  EBCDIC には対応していません。EBCDIC は mbchar.c の type_*[] という文字
-タイプのテーブルを書き替えるだけで対応できるのではないかと思いますが、私
-のところにはテストする環境がありません。
+  EBCDIC には対応していません。
   また、整数演算が２の補数でない CPU にも、対応していません。２の補数で
 ない場合は、#if 式でオーバーフローが発生した時に、おかしくなるかもしれま
 せん。
 
-    [3.11]      MS-DOS のメモリモデル
+    [3.11]      Stand-alone 版のコンパイル
 
-  MCPP を MS-DOS 上の処理系に移植する場合は、メモリモデルによって
-translation limits とメモリ消費と速度が異なるので、目的に応じて適当なメ
-モリモデルを選択する必要があります。
-  小さいプログラムの処理には small data memory model でもすみます。しか
-し、マクロ定義が数百個以上もあったり、1 KB 以上に及ぶ長大なマクロ定義が
-あったり、長大な定義を持つマクロをネストして呼び出したりするソースをコン
-パイルする必要があるなら、large data モデルでコンパイルしておいてくださ
-い（small data モデルでコンパイルした cpp に比べて５〜６割、速度が遅くな
-るが）。
-  MCPP の全機能を使うためには large code モデルでコンパイルする必要があ
-ります。small code モデルの場合は、system.H で OK_MAKE や DEBUG_EVAL を
-FALSE にするなどして、一部の機能を実装しないようにします。
+  MCPP を処理系からは独立して単体で動く stand-alone 版としてコンパイルす
+ることもできます。これはコンパイルさえ通ればすむので簡単です。Stand-
+alone 版は実行時オプションなどの仕様は一定で、処理系依存の部分はありませ
+ん。OS による相違が少しあるだけです。include directory も UNIX 系で /usr
+/include, /usr/local/include が設定されるだけなので、あとは環境変数や -I
+オプションで指定する必要があります。*
+
+  configure が使えるシステムで GNU C でコンパイルする場合は単に
+
+    configure; make; make install
+
+とすればすみます。この場合は noconfig.H ではなく configed.H というヘッダ
+ファイルが使われます。
+
+  configure の使えないシステムでも MCPP がすでに移植されている処理系では、
+noconfig ディレクトリにある所定の差分ファイルを使って noconfig.H を書き
+換えればすみます。それ以外の変更は必要ありません。makefile も noconfig
+ディレクトリにあるものをコピーして使います。インストールするディレクトリ
+は makefile 中の BINDIR という変数に書きます。そして、make し、make
+install します。
+  MCPP がすでに移植されている処理系とバージョンが少し違うだけの場合は、
+まず近いバージョンの差分ファイルを適用して、それを編集します。
+
+  MCPP がまだ移植されていない処理系では、noconfig.H を編集してください。
+Stand-alone 版では COMPILER を STAND_ALONE に定義し、SYSTEM をその OS に
+定義し、VERSION_MSG を適宜定義します。ターゲット処理系は存在しないので、
+PART 1 には設定することはありません。
+
+  PART 2 は MCPP をコンパイルするホスト処理系が Standard C の仕様をどれ
+だけ実装しているか、必要な関数を持っているかによって、設定が違ってきます。
+最も違うのは long long という型の実装です。Visual C 2002, 2003, 2005 や
+Borland C 5.5 等では __int64 という型になっていて、その値を printf() で
+表示する指定子が VC 2005 以外では j や ll ではなく I64 なので、LL_FORM
+というマクロを "I64" に定義します。
+  stpcpy(), getopt() という関数のない処理系では、それぞれ
+HOST_HAVE_STPCPY, HOST_HAVE_GETOPT を FALSE に定義します。
+
+  makefile は noconfig ディレクトリにあるものを参考にして書いてください
+（[3.7] も参照のこと）。
+
+  * MCPP V.2.4, V.2.5 では stand-alone 版の仕様は中途半端で、処理系の仕
+    様に対応した単体のプリプロセッサであった。V.2.6 からは処理系から独立
+    した一定の仕様とした。
 
 
 ☆　４．各処理系に移植する方法：詳細　☆
@@ -991,6 +881,9 @@ SYSTEM
 COMPILER
     ターゲット処理系を指定します。コンパイラの名前はこの直後に定義されて
     います。名前が定義されていないコンパイラは適宜定義してください。
+    COMPILER を STAND_ALONE に定義すると、ターゲット処理系の存在しない
+    stand-alone 版の MCPP が生成されます。この場合は PART 1 の多くの設定
+    が無視されます。
 VERSION_MSG
     -v オプションや usage() 文で表示するためのバージョン情報を文字列リテ
     ラルで書きます。
@@ -1012,18 +905,18 @@ HOST_SYSTEM, HOST_COMPILER
         [4.1.1.1]   事前定義マクロ
 
 CPU_OLD, CPU_STD1, CPU_STD2, SYSTEM_OLD, SYSTEM_STD1, SYSTEM_STD2,
-    SYSTEM_EXT, SYSTEM_EX2, COMPILER_OLD, COMPILER_STD1, COMPILER_STD2,
-    COMPILER_EXT, COMPILER_EX2
+SYSTEM_EXT, SYSTEM_EXT2, COMPILER_OLD, COMPILER_STD1, COMPILER_STD2,
+COMPILER_EXT, COMPILER_EXT2
     MCPP で pre-define する処理系固有のマクロの名前を文字列リテラルで指
     定します。不要なものは定義しないでおきます（0 個のトークンに定義して
     はいけない）。*_OLD で生成されるのは '_' (underline) で始まらない古
     い流儀のマクロで、これらは MCPP 実行時に -S <n> オプションで <n> に
-    1 以上を指定すると pre-define されません。*_STD?, *_EXT, *_EX2 では
+    1 以上を指定すると pre-define されません。*_STD?, *_EXT, *_EXT2 では
     必ず _ で始まるマクロ名を指定します。*_STD1 は __ で始まるもので、*
-    _STD2 は __ で始まって __ で終わるものです。SYSTEM_EXT, SYSTEM_EX2,
-    COMPILER_STD1, COMPILER_STD2, COMPILER_EXT, COMPILER_EX2 ではそのマ
-    クロの値も SYSTEM_EXT_VAL, SYSTEM_EX2_VAL, COMPILER_STD1_VAL,
-    COMPILER_STD2_VAL, COMPILER_EXT_VAL, COMPILER_EX2_VAL で指定します。
+    _STD2 は __ で始まって __ で終わるものです。SYSTEM_EXT, SYSTEM_EXT2,
+    COMPILER_STD1, COMPILER_STD2, COMPILER_EXT, COMPILER_EXT2 ではそのマ
+    クロの値も SYSTEM_EXT_VAL, SYSTEM_EXT2_VAL, COMPILER_STD1_VAL,
+    COMPILER_STD2_VAL, COMPILER_EXT_VAL, COMPILER_EXT2_VAL で指定します。
     これは整数を "" で囲んだ文字列リテラルで指定します。0 個のトークンに
     展開されるマクロは "" と定義します。指定されなければ、そのマクロの値
     は 1 になります。その他の predefined マクロ（CPU_*, SYSTEM_OLD,
@@ -1045,18 +938,20 @@ COMPILER_CPLUS, COMPILER_CPLUS_VAL
     ます。名前は '_' で始まるものでなければなりません。必要がなければ
     COMPILER_CPLUS そのものを定義しないでおきます。
 
+  このほか、実行時オプションに応じて system.c で定義される事前定義マクロ
+もあります。
   以上の設定で事前定義されたマクロはすべて -N オプションで無効となります。
 
         [4.1.1.2]   Include ディレクトリ等
 
 C_INCLUDE_DIR1, C_INCLUDE_DIR2, CPLUS_INCLUDE_DIR1, CPLUS_INCLUDE_DIR2,
-    CPLUS_INCLUDE_DIR3
+CPLUS_INCLUDE_DIR3
     MCPP でサーチする標準ヘッダファイルの include directory を指定します。
     CPLUS_INCLUDE_DIR? は C++ の include directory がＣのものと違ってい
     る場合に、設定します（MCPP を起動する時に -+ オプションを指定するこ
-    とで有効となる）。UNIX の /usr/include, /usr/local/include は system.
-    c で設定されるので、C_INCLUDE_DIR? にはそれ以外の処理系固有のものを
-    指定します。
+    とで有効となる）。UNIX の /usr/include, /usr/local/include は
+    system.c で設定されるので、C_INCLUDE_DIR? にはそれ以外の処理系固有の
+    ものを指定します。
 ENV_C_INCLUDE_DIR, ENV_CPLUS_INCLUDE_DIR
     MCPP でサーチする標準ヘッダファイルの include directory を実行時に環
     境変数で指定する場合のために、その環境変数の名前に定義します。
@@ -1095,17 +990,17 @@ LINE_PREFIX
     # 123 "fname"
 
     という形式なら "# " と定義し、どちらでもない独自の形式ならそれに合わ
-    せて定義します（場合によっては system.c の sharp() 等に書き足さなけ
-    ればならないかもしれない）。
+    せて定義します（場合によっては main.c の sharp() 等に書き足さなけれ
+    ばならないかもしれない）。
     処理系によっては、GNU C のように、付属プリプロセッサの出力は１番目の
     形ではないが、compiler-proper は１番目の形も認識する場合があります。
     一般には、１番目のほうがＣのソースと同じ形で一般性があるので好ましい
     と言えます。Compiler-proper がこれを認識すれば、同一ＯＳ上での cpp
     は処理系が違っても１つでも足りるくらいです。
     しかし、実行時オプションが違うという問題があるので、実際にはそう簡単
-    ではありません。また、GNU の tool の中には GNU C / cpp 固有の出力形
-    式をあてにしているものもあるので、GNU C ではそちらを選んだほうが無難
-    です（GNU C 用ではそちらをデフォルトにしている）。
+    ではありません。また、GNU の tool の中には困ったことに GNU C / cpp
+    固有の出力形式をあてにしているものもあるので、GNU C ではそちらを選ん
+    だほうが無難です（GNU C 用ではそちらをデフォルトにしている）。
     Visual C++ .net や Borland C のような１パスコンパイラの前段に MCPP
     を使う場合は、組み込みプリプロセッサに出力を渡すことになるので、MCPP
     の出力はＣのソースになっていなければなりません。したがって、行番号の
@@ -1122,31 +1017,27 @@ ONE_PASS
     は、処理系の事前定義マクロはすべてコメントで囲んで出力します。ワンパ
     スコンパイラでは MCPP の出力をこれに与えると再度プリプロセスされるこ
     とになるので、二重定義を避けるためです。
-    ただし、GNU C V.3 はワンパスコンパイラと言えますが、独立したプリプロ
-    セッサを使うこともできるので、このマクロは FALSE としておきます。
+    ただし、GNU C V.3, V.4 はワンパスコンパイラと言えますが、独立したプ
+    リプロセッサを使うこともできるので、このマクロは FALSE としておきま
+    す。
 FNAME_FOLD
     ファイル名の大文字と小文字が区別されないＯＳではこれを TRUE と定義し、
     そうでなければ FALSE とします。
 
         [4.1.1.4]   処理系の言語仕様に応じた設定
 
-HAVE_PRAGMA
-    #pragma を認識する compiler-proper であればこれを TRUE とし、そうで
-    なければ FALSE とします。
 EXPAND_PRAGMA
-    MODE == STANDARD で -V199901L オプションを指定した時に #pragma 行の
-    引数が STDC 以外であればマクロ展開の対象となる処理系では、これを
-    TRUE に定義します。デフォルトでは FALSE としています。Visual C では
-    #pragma 行の引数は常にマクロ展開の対象となるので、これは TRUE としま
-    す。しかし、MCPP は Visual C 用でも、C99 で #pragma の引数が STDC ま
-    たは MCPP で始まらない場合だけマクロ展開の対象とします。
+    #pragma 行の引数が STDC 以外であればマクロ展開の対象となる処理系では、
+    これを TRUE に定義します。デフォルトでは FALSE としています。Visual
+    C では #pragma 行の引数は常にマクロ展開の対象となるので、これは TRUE
+    とします。C99 では #pragma の引数がマクロ展開の対象となるかどうかは
+    implementation-defined で、C90 ではマクロ展開されないのが規定なので
+    すが、しかし、MCPP は Visual C 用に限っては C99 でなくてもマクロ展開
+    の対象とします。
 
 HAVE_DIGRAPHS
     Digraphs 処理が実装されている場合は TRUE、そうでなければ FALSE とし
     ます。
-CAN_CONCAT_STRINGS
-    隣接する文字列リテラルがコンパイラによって連結される処理系では、これ
-    を TRUE とします。
 STDC
     ターゲット処理系の事前定義マクロ __STDC__ のデフォルト値に定義します。
     __STDC__ が定義されていなければ 0 とします。
@@ -1156,48 +1047,40 @@ STDC_VERSION
 
 CHARBIT, UCHARMAX, LONGMAX, ULONGMAX
     ターゲット処理系の <limits.h> の CHAR_BIT, UCHAR_MAX, LONG_MAX,
-    ULONG_MAX の値を書きます。unsigned long のない処理系では ULONGMAX は
-    LONG_MAX の値を使います。<limits.h> がなくても定義は簡単です。
-
-HAVE_C_BACKSLASH_A
-    ターゲット処理系のコンパイラ本体が '\a', '\v' という escape sequence
-    を認識する場合はこれを TRUE にし、そうでない場合は FALSE にします。
+    ULONG_MAX の値を書きます。<limits.h> がなくても定義は簡単です。
 
         [4.1.1.5]   Multi-byte character
 
   MBCHAR というマクロは multi-byte character の encoding を指定するもの
-です。16 ビットシステムでは、指定された１種類の encoding しか使えません。
-しかし、32 ビット以上のシステムでは、下記の数種の encoding がすべて同時
-に実装されます。MBCHAR はデフォルトの encoding を指定するだけで、実行時
-に encoding を環境変数・オプション・#pragma で変更することができます（使
-い方については mcpp-manual.txt の [2.3], [2.8], [3.4] を参照）。
+です。MCPP では下記の数種の encoding がすべて同時に実装されます。MBCHAR
+はデフォルトの encoding を指定するだけで、実行時に encoding を環境変数・
+オプション・#pragma で変更することができます（使い方については mcpp-
+manual.txt の [2.3], [2.8], [3.4] を参照）。
 
 MBCHAR
-    ターゲットの multi-byte character すなわち日本語では漢字の encoding
-    の種類を定義します。
-    16 ビットシステムと 32 ビット以上のシステムのどちらでも指定できる
-    encoding は次の通りです。
+    ターゲットの multi-byte character（日本語では漢字）の encoding の種
+    類を定義します。
+
         EUC_JP  :   日本の extended UNIX code (UJIS)
         SJIS    :   日本の shift-JIS (MS-Kanji)
         GB2312  :   中国の EUC-like な GB-2312（簡体字）
-        BIGFIVE :   台湾の Big Five（繁体字）
+        BIGFIVE :   台湾の Big5（繁体字）
         KSC5601 :   韓国の EUC-like な KSC-5601 (KSX 1001)
-    これらはいずれも shift-states を持たない、１文字が２バイトを占める
-    encoding です。なお、multi-byte character, wide character の
+        ISO2022_JP  :   ISO-2022-JP1 という国際規格の日本語
+        UTF8    :   unicode の encoding の１種である UTF-8
+
+    初めの５つはいずれも shift-states を持たない、１文字が２バイトを占め
+    る encoding です。なお、multi-byte character, wide character の
     encoding が２バイトであるにもかかわらず、wchar_t が４バイトの型にな
     っている処理系もありますが、プリプロセッサは wchar_t の型には関知し
     ません。ソース上では multi-byte character や wide character が２バイ
     トを占めているので、それに従って処理をします。
-    32 ビット以上のシステムでは次の encoding も指定できます。
-        ISO2022_JP  :   ISO-2022-JP1 という国際規格の日本語
-        UTF8    :   unicode の encoding の１種である UTF-8
     ISO-2022-* は shift-states を持つ encoding です。UTF-8 は２バイトの
     unicode を１バイトないし３バイトで encode するものです。漢字は３バイ
     トになります。
-    MBCHAR を 0 に定義した場合、16 ビットシステムでは multi-byte
-    character の処理は実装されませんが、32 ビット以上のシステムでは
-    multi-byte character の処理をしないのがデフォルトの仕様になるだけで、
-    環境変数・オプション・#pragma で実行時に変更されます。
+    MBCHAR を 0 に定義した場合、multi-byte character の処理をしないのが
+    デフォルトの仕様になるだけで、環境変数・オプション・#pragma で実行時
+    に変更されます。
 
 SJIS_IS_ESCAPE_FREE
     コンパイラ本体が shift-JIS の処理をする場合は TRUE とし、しない場合
@@ -1211,7 +1094,7 @@ SJIS_IS_ESCAPE_FREE
     加します。これによって、英語版のコンパイラを一応 shift-JIS に対応さ
     せることができます。
 BIGFIVE_IS_ESCAPE_FREE
-    同様に、コンパイラ本体が Big Five の処理をする場合はこれを TRUE とし、
+    同様に、コンパイラ本体が Big 5 の処理をする場合はこれを TRUE とし、
     しない場合は FALSE とします。
 IS02022_JP_IS_ESCAPE_FREE
     同様に、コンパイラ本体が ISO-2022-JP の処理をする場合はこれを TRUE
@@ -1228,17 +1111,13 @@ IS02022_JP_IS_ESCAPE_FREE
 
   次の４つは便宜上、PART 1 に書いてありますが、ターゲット処理系とホスト
 処理系の双方が指定の型を持つ場合に TRUE とし、そうでない場合は FALSE と
-します。HAVE_LDBL は後述する OK_SIZE が TRUE の場合だけ使われるものです。
+します。
 
-HAVE_UNSIGNED_LONG
-    unsigned long というデータ型を持つ処理系ではこれを TRUE とします。
 HAVE_LONG_LONG
     long long というデータ型を持つ処理系ではこれを TRUE とします。
     Visual C や Borland C 5.5 のように、long long はないが __int64 とい
     う同じサイズの型があり printf() で表示するための length modifier も
     用意されている場合は、これは TRUE とします。
-HAVE_LONG_DOUBLE
-    long double というデータ型を持つ処理系ではこれを TRUE とします。
 HAVE_INTMAX_T
     intmax_t というデータ型が定義されていればこれを TRUE とします。
 
@@ -1246,184 +1125,93 @@ LL_FORM
     ターゲット処理系が long long を持っている場合は、その処理系の最大の
     整数型の値を printf() で表示するための length modifier を文字列リテ
     ラルで定義します。C99 では "j" です。また、C99 では long long の
-    length modifier は "ll" (ell-ell) です。Visual C, Borland C 5.5 では
-    __int64 の値を表示する "I64" を使います。
+    length modifier は "ll" (ell-ell) です。Visual C の 2003 までと
+    Borland C 5.5 では __int64 の値を表示する "I64" を使います。
 
         [4.1.2]     PART 2  ホストシステムの設定
 
-  configed.H ではターゲット処理系とホスト処理系とが同一であると仮定して
-いますが、異なる場合は PART 2 を書き直す必要があります。
+  noconfig.H, configed.H ではターゲット処理系とホスト処理系とが同一であ
+ると仮定していますが、異なる場合は PART 2 を書き直す必要があります。
 
-PROTO
-    Compiler-proper が関数のプロトタイプ宣言のできるものであればこれを
-    TRUE とし、そうでなければ FALSE とします。
-HOST_HAVE_GETENV
-    処理系が getenv() という関数を持っていればこれを TRUE とし、そうでな
-    ければ FALSE とします。ターゲットのＯＳも当然、環境変数を持っている
-    必要があります。
-HOST_HAVE_GETOPT, HOST_HAVE_STPCPY, HOST_HAVE_MEMMOVE, HOST_HAVE_MEMCPY,
-    HOST_HAVE_MEMCMP, HOST_HAVE_STRSTR, HOST_HAVE_STRCSPN
-    ホスト処理系のライブラリに getopt(), stpcpy(), memmove(), memcpy(),
-    memcmp(), strstr(), strcspn() があればそれぞれ TRUE に、なければ
-    FALSE に定義します。FALSE とされた関数には lib.c のものが使われます。
+HOST_HAVE_GETOPT, HOST_HAVE_STPCPY
+    ホスト処理系のライブラリに getopt(), stpcpy() があればそれぞれ TRUE
+    に、なければ FALSE に定義します。FALSE とされた関数には lib.c のもの
+    が使われます。
 FILENAMEMAX
     ホスト処理系の <stdio.h> の FILENAME_MAX の値です。FILENAME_MAX がな
-    い場合は、MS-DOS では 80、他のＯＳでは BUFSIZ としておいてかまいませ
-    ん。
-HOST_HAVE_C_BACKSLASH_A
-    ホスト処理系のコンパイラ本体が '\a', '\v' という escape sequence を
-    認識しない場合は、この定義を FALSE にします。
+    い場合は BUFSIZ としておいてかまいません。
+
+  PART 1 にもホストとターゲットが同一と仮定している部分があるので、必要
+ならそれを書き換えます。例えば次のようにホスト処理系の事前定義マクロを使
+っている行です。
+
+    #if _MSC_VER >= 1200
 
   あとはライブラリ関数の宣言、size_t の型定義等ですが、見ればわかるでし
 ょう。
 
         [4.1.3]     PART 3  MCPP の動作仕様の設定
 
-            [4.1.3.1]   新旧各種のモードの指定
+            [4.1.3.1]   新旧各種の動作モード
 
-MODE
-    マクロの展開方法、使えるディレクティブ、使える predefined マクロ等、
-    プリプロセッサの根幹となる動作の仕様を指定します。PRE_STANDARD,
-    STANDARD の２種があります。これらのマクロはそれぞれ 0, 1 の値を持ち
-    ます。
+  system.H では MCPP の動作仕様を指定するマクロが定義されています。
 
-PRE_STANDARD
-    C90 以前のプリプロセス仕様です。K&R 1st. はこれです。
-STANDARD
+  MCPP には mode という変数があり、これがマクロの展開方法、使えるディレ
+クティブ、使える predefined マクロ等、プリプロセッサの根幹となる動作の仕
+様を決めています。mode には OLD_PREP, KR, STD, POST_STD の４種があります。
+  MCPP の動作モードは実行時オプションで指定されます。MCPP をコンパイルす
+る時には、これらの４つのマクロについては何も設定することはありません。し
+かし、各種の設定を正しく行うためには４つの動作仕様の違いを理解することが
+必要です。
+
+OLD_PREP
+    いわゆる "Reiser" model cpp の動作仕様です。
+KR
+    C90 以前の K&R 1st. のプリプロセス仕様です。
+STD
     Standard C (C90, C99, C++98) のプリプロセス仕様です。
+POST_STD
+    kmatsui が勝手に作ったプリプロセス仕様で、Standard C の首尾一貫しな
+    い規定を整理して単純化したものです。
 
-      STANDARD と PRE_STANDARD のモードとでは、マクロ展開方法の違いが多
-    くあります。Standard C と pre-Standard との違いだと思って間違いあり
-    ません。最も大きな違いは、関数様マクロ（引数付きマクロ）の展開で、引
-    数にマクロが含まれている場合、MODE == STANDARD では引数を先に完全に
-    展開してから元マクロの置換リスト中のパラメータと置き換えるのに対して、
-    PRE_STANDARD では展開せずにパラメータと置換し、再スキャン時に展開す
-    ることです。
-      また、MODE == STANDARD では直接にも間接にもマクロの再帰的展開はし
-    ません。PRE_STANDARD では再帰的なマクロ定義があると、展開時にエラー
-    となります。
+  ここでは KR と OLD_PREP を合わせて pre-Standard モード、STD と
+POST_STD を合わせて Standard モードと呼ぶことにします。各モードの仕様の
+詳細については mcpp-manual.txt [2.1] を参照してください。
 
-      行末にある \ の扱いも MODE によって異なり、MODE == STANDARD では
-    tri-graph 処理の後、tokenization の前に <backslash><newline> の
-    sequence を削除しますが、MODE == PRE_STANDARD では文字列リテラルの中
-    にある場合と #define 行にある場合に限ってこれを削除します。
-
-      いわゆる tokenization（トークン分割、トークンの切り出し）も MODE
-    によって微妙に違います。
-      MODE == STANDARD では「token base での動作」という建前に忠実に
-    tokenization を行います。具体的には、MODE == STANDARD では、マクロを
-    展開するとその前後に space を挿入して、前後の token との意図しない連
-    結が発生するのを防ぎます。MODE == PRE_STANDARD は伝統的・便宜的・暗
-    黙的な tokenization と、「character base でのテキスト置換」によるマ
-    クロ展開方法の痕跡を残しています。
-      これらの点については、cpp-test.txt の [1] をご覧ください。
-
-      MODE == STANDARD では preprocessing number という数値トークンを規
-    定通りに扱います。PRE_STANDARD では、数値トークンはＣの整数定数トー
-    クンおよび浮動小数点数トークンと同じです。整数定数での接尾子 'U',
-    'u', 'LL', 'll'、浮動少数点定数での接尾子 'F', 'f', 'L', 'l' は トー
-    クンの一部として認識しません。
-      ワイド文字の文字列リテラルと文字定数は MODE == STANDARD でしか単一
-    のトークンとして認識されません。
-
-      Digraph, #error, #pragma, _Pragma() operator は MODE == STANDARD
-    でないと使えません。-S <n> オプション（strict-ansi モード）と -+ オ
-    プション（C++ プリプロセッサとして動作する）も MODE == STANDARD でし
-    か使えません。Pre-defined マクロ __STDC__, __STDC_VERSION__ は MODE
-    == STANDARD の時に定義され、PRE_STANDARD の時は定義されません。[4.1.
-    3.2] で述べる OK_DIGRAPHS, CONCAT_STRINGS も MODE == STANDARD でない
-    と TRUE にできません。
-      UCN (universal-character-name) は MODE == STANDARD でしか使えませ
-    ん。
-      Trigraphs も MODE == STANDARD でしか実装できません。
-      #if defined, #elif は PRE_STANDARD では使えません。#include, #line
-    の引数にマクロを使うことは PRE_STANDARD ではできません。Pre-defined
-    マクロ __FILE__, __LINE__, __DATE__, __TIME__ は PRE_STANDARD の時は
-    定義されません。
-      他方で、#assert, #asm (#endasm), #put_defines, #debug は MODE ==
-    PRE_STANDARD の時しか実装できません。
-      #if 式は MODE == STANDARD では long / unsigned long または long
-    long / unsigned long long で評価しますが、MODE == PRE_STANDARD では
-    long だけで評価します。
-
-      診断メッセージの出方もモードによって少し違っています。それについて
-    は mcpp-manual.txt の [5] を見てください。
-
-      以上に述べたこと以外で K&R 1st. に Standard C と異なる明確な規定の
-    ないことがらについては、MODE == PRE_STANDARD では C90 の規定に従いま
-    す。
-
-      コンパイル時の MODE の設定のほかに、実行時オプションで指定されるモ
-    ードもあります。MODE == STANDARD でコンパイルされた MCPP には自称
-    "post-Standard" モードを指定するオプションがあり、MODE ==
-    PRE_STANDARD でコンパイルされた MCPP には "Reiser cpp" モードを指定
-    するオプションがあります。また、MODE == STANDARD には "compat" モー
-    ドという特殊なオプションもあります。しかし、これらはいずれもコンパイ
-    ル時の設定は関係ありません。
-
-                [4.1.3.2]   動作モードの細部の指定
-
-OK_SIZE
-    これを TRUE にすると、#if, #elif 行で sizeof (type) が使えます。
-    これを TRUE にして GNU C でコンパイルする場合は、少なくとも eval.c
-    のコンパイルでは -ansi, -pedantic, -pedantic-errors オプションは付け
-    ないでください。
+            [4.1.3.2]   動作モードの細部の指定
 
 CPLUS
     -+ オプションで C++ のプリプロセッサとして動作させた時に、標準組み込
     みマクロ __cplusplus がこの値に事前定義されます。ISO C++ Standard で
     は 199711L です。-V オプションによって実行時に変更できます。
-OK_TRIGRAPHS
-    Trigraphs 処理を実装する場合は TRUE、そうでなければ FALSE とします。
-    ただし、MODE == PRE_STANDARD ではどちらにしても trigraph は実装でき
-    ません。
 TFLAG_INIT
-    OK_TRIGRAPHS == TRUE の場合の trigraph 処理の初期状態を規定します。
-    これを TRUE にすると、default で trigraph が認識され、-3 オプション
-    で起動すると認識しません。FALSE の場合は逆に default で認識せず、-3
-    オプションで認識するようになります。
-OK_DIGRAPHS
-    Digraphs を実装する場合はこれを TRUE に定義します。MODE == STANDARD
-    では、HAVE_DIGRAPHS == FALSE の処理系の場合、digraphs は MCPP が通常
-    のトークンに変換します。
+    STD モードでの trigraph 処理の初期状態を規定します。これを TRUE にす
+    ると、default で trigraph が認識され、-3 オプションで起動すると認識
+    しません。FALSE の場合は逆に default で認識せず、-3 オプションで認識
+    するようになります。
 DIGRAPHS_INIT
-    OK_DIGRAPHS == TRUE の場合の digraph 処理の初期状態を規定します。こ
-    れを TRUE にすると、default で digraph が認識され、-2 オプションで起
-    動すると認識しません。FALSE の場合は逆に default で認識せず、-2 オプ
-    ションで認識するようになります。
-OK_PRAGMA_OP
-    これを TRUE にすると、__STDC_VERSION__ >= 199901L の時に _Pragma()
-    operator が有効になります。この演算子は C99 のものです。
-    これは MODE == STANDARD でしか TRUE にできません。
+    Standard モードでの digraph 処理の初期状態を規定します。これを TRUE
+    にすると、default で digraph が認識され、-2 オプションで起動すると認
+    識しません。FALSE の場合は逆に default で認識せず、-2 オプションで認
+    識するようになります。
+    HAVE_DIGRAPHS == FALSE の処理系の場合、digraphs は MCPP が通常のトー
+    クンに変換します。
 OK_UCN
-    MODE == STANDARD で -V199901L または -+ オプションを指定した時に UCN
+    STD モード で -V199901L または -+ オプションを指定した時に UCN
     (universal-character-name) を有効にするには、これを TRUE に定義しま
     す。デフォルトでは TRUE としています。
 OK_MBIDENT
-    MODE == STANDARD で -V199901L オプションを指定したときに identifier
-    中に multi-byte character を使えるようにするには、これを TRUE に定義
-    します。デフォルトでは FALSE としています。
-CONCAT_STRINGS
-    隣接する文字列リテラルを MCPP が連結します。そのために必要な最小限の
-    escape sequence の変換も、それに先立ってやります。CAN_CONCAT_STRINGS
-    == FALSE の処理系のためのものです。ただし、CONCAT_STRINGS と OK_UCN
-    を共に TRUE としても、UCN の multi-byte-character への変換はしません。
-    これは MODE == STANDARD の時しか TRUE にできません。
-    なお、この連結では、前の文字列の最後が１６進または８進の escape
-    sequence で、後の文字列の先頭がそのまま連結するとこの escape
-    sequence の一部となってしまう恐れのある場合は、後者の文字を３ケタの
-    ８進 escape sequence に変換した上で連結するという方法で、誤動作を回
-    避しています。ところが、Borland C には８進 escape sequence に関して
-    は微妙なバグや奇怪な仕様があります。MCPP では文字列リテラルの連結が
-    このバグの影響を回避するように工夫しています。
+    STD モード で -V199901L オプションを指定したときに identifier 中に
+    multi-byte character を使えるようにするには、これを TRUE に定義しま
+    す。デフォルトでは FALSE としています。
+DOLLAR_IN_NAME
+    これを TRUE にすると、識別子中に $ を使えるようになります。
 
 expr_t, uexpr_t
     最も大きい整数の型に typedef で定義します。intmax_t, uintmax_t とい
     う型があればそれに、そうでなければ long long, unsigned long long を
     持つ処理系ではそれに、そうでなければ __int64, unsigned __int64 を持
-    つ処理系ではそれに、そうでなければ long, unsigned long に、unsigned
-    long もない処理系では long, long に定義します。なお、C99 では long
-    long, unsigned long long が必須となっています。
+    つ処理系ではそれに、そうでなければ long, unsigned long に定義します。
 EXPR_MAX
     uexpr_t の最大値に定義します。
 
@@ -1431,41 +1219,13 @@ EXPR_MAX
     １６進 escape sequence で表記するものである（mcpp-manual.txt [3.7],
     cpp-test.txt [1.8], [3.5] 参照）。
 
-        [4.1.3.3]   特殊な指定
-
-DOLLAR_IN_NAME
-    これを TRUE にすると、識別子中に $ を使えるようになります。
-TOP_SPACE
-    これを TRUE にすると、行頭のコメントを含む white spaces を（原則とし
-    て a space に圧縮したうえで）出力します。FALSE にすると削除します。
-    Ｃのソースでは行頭の white spaces には何の意味もないので FALSE でか
-    まわないはずなのですが、アセンブラプログラムをＣソース中に置くという
-    規格違反ソースを コンパイルする場合などには、TRUE でコンパイルしてお
-    くことが必要になります。MCPP をＣ以外の何かの言語のプリプロセッサに
-    流用する場合にも、必要になるかもしれません。デフォルトでは TRUE とし
-    ています。PRE_STANDARD で #asm が実装されている場合は、#asm ブロック
-    内では TOP_SPACE がどうであろうと行頭の white spaces は削除せず、
-    tokenization も行いません。
-OK_MAKE
-    これを TRUE にすると、makefile 用依存関係行を出力する -M* オプション
-    が実装されます。
-
-  次の２つは MCPP 自身のデバッグ用のものですが、tokenization やマクロの
-展開機序や #if 行の評価機序をトレースすることができます。
-
-DEBUG
-    これを TRUE にすると、デバッグ用のルーチンを実装します。
-DEBUG_EVAL
-    これを TRUE にすると、#if, #elif 行に関するデバッグ用ルーチンを実装
-    します。
-
-        [4.1.3.4]   Translation limits の指定
+        [4.1.3.3]   Translation limits の指定
 
 RESCAN_LIMIT
-    マクロ展開時の再走査回数の限度を定義します。MODE == PRE_STANDARD で
-    は再帰的なマクロ展開によって無限ループが発生しえますが、それがこのリ
-    ミットにひっかかります。MODE == STANDARD では再走査回数は少ないので、
-    あまり大きな値を設定する必要はありません。
+    マクロ展開時の再走査回数の限度を定義します。pre-Standard モード では
+    再帰的なマクロ展開によって無限ループが発生しえますが、それがこのリミ
+    ットにひっかかります。Standard モード では再走査回数は少ないので、あ
+    まり大きな値を設定する必要はありません。
 NBUFF
     論理行（ソースの物理行の行末の \ を取って接続した行）の最大長 +1 を
     定義します。コメントを a space に変換した後の行（コメントによって複
@@ -1482,11 +1242,10 @@ NWORK
     れる最大行長+1 を越えてはいけません。また、NBUFF, NMACWORK の値を越
     えてもいけません。NWORK < NMACWORK の場合、マクロ展開後の行長がこれ
     を越えた時は、MCPP がこれ以下の行長に分割して出力します。文字列リテ
-    ラル（CONCAT_STRINGS == TRUE の場合は連結後の文字列リテラル）の長さ
-    は NWORK-2 の範囲に収まっていなければなりません（文字列リテラルの長
-    さというのは、char 配列の要素数のことではなく、ソース上での文字列リ
-    テラルというトークンの長さである。両端の " を含み、\n 等は２バイトと
-    数える。ワイド文字列リテラルでは先頭の L も含む）。
+    ラルの長さは NWORK-2 の範囲に収まっていなければなりません（文字列リ
+    テラルの長さというのは、char 配列の要素数のことではなく、ソース上で
+    の文字列リテラルというトークンの長さである。両端の " を含み、\n 等は
+    ２バイトと数える。ワイド文字列リテラルでは先頭の L も含む）。
 IDMAX
     識別子の最大長を定義します。これより長い名前もエラーにはなりませんが、
     この長さに切り詰められます。
@@ -1510,13 +1269,10 @@ SBSIZE
     も動作は正常にしますが、大きいほうが処理はやや速くなります。
 
   それぞれ大きい値にするほど仕様は上等になりますが、NWORK, NBUFF,
-NMACWORK, SBSIZE は大きいとそれだけ大きなメモリを食います。その結果、ア
-ドレス空間の小さいシステムではマクロ定義の数が制限を受けます（正確にはマ
-クロ定義の数そのものではなく、それぞれのマクロ定義の長さの合計が問題。マ
-クロ定義の内部的な形式は internal.H の struct defbuf に書いてある）。
-NWORK 等は system.H の default の値のままで、MS-DOS のスモールモデルでコ
-ンパイルした MCPP の場合、ごく単純なマクロ定義であれば数百個までは大丈夫
-ですが、長大なマクロ定義が多いと限度はずっと下がるでしょう。
+NMACWORK, SBSIZE は大きいとそれだけ大きなメモリを食います。実際のメモリ
+消費はマクロ定義の量によってさらに増えてゆきます（それぞれのマクロ定義の
+長さによって必要メモリが決まる。マクロ定義の内部的な形式は internal.H の
+struct defbuf に書いてある）。
   NMACWORK, NEXP, RESCAN_LIMIT はスタックを消費します。
   他のものはメモリはさほど必要としませんが、system.H のデフォルトの値以
 上にしても実用上の意味はほとんどないでしょう。
@@ -1530,21 +1286,20 @@ NWORK 等は system.H の default の値のままで、MS-DOS のスモールモデルでコ
 
 PATH_DELIM
     ＯＳの path-delimiter を定義しています。PATH_DELIM は \ としてはいけ
-    ません（プログラムのつごうで）。DOS/Windows 系では / としています。
-    ユーザプログラムではもちろん \ も使えますが、それを内部的には / に変
-    換します。
+    ません（プログラムのつごうで）。Windows では / としています。ユーザ
+    プログラムではもちろん \ も使えますが、それを内部的には / に変換しま
+    す。
 OBJEXT
     処理系の生成するいわゆるオブジェクトファイルの接尾子を文字列リテラル
-    で定義します。UNIX 上の処理系の "o"、DOS/Windows 上の処理系の "obj"
-    等です。これは -M* オプションを指定した時の makefile 用依存関係行の
-    出力に使われるものです。
+    で定義します。UNIX 上の処理系の "o"、Windows 上の処理系の "obj" 等で
+    す。これは -M* オプションを指定した時の makefile 用依存関係行の出力
+    に使われるものです。
 
 do_options()
-    MCPP を起動する時のオプションを実装しています。まだ implement されて
-    いない処理系に implement する時には、その処理系付属のコンパイラドラ
-    イバに合わせて、ここに何行か書き足すことが必要でしょう。do_options()
-    に追加した時は、それに対応して次の set_opt_list(), usage() にも書き
-    足します。
+    MCPP を起動する時のオプションを実装しています。まだ移植されていない
+    処理系に移植する時には、その処理系付属のコンパイラドライバに合わせて、
+    ここに何行か書き足すことが必要でしょう。do_options() に追加した時は、
+    それに対応して次の set_opt_list(), usage() にも書き足します。
     do_options() は getopt() を呼び出します。そのため、１つのオプション
     文字は引数なしか引数ありのどちらかに決めなければなりません。-P と -P-
     といったオプションの使い方は原則としてできません（しかし、処理系付属
@@ -1555,7 +1310,8 @@ do_options()
 set_opt_list()
     MCPP のオプション文字を設定します。
 usage()
-    Usage 文が書かれています。アルファベット順になっています。
+    Usage 文が書かれています。モードごとのオプションがアルファベット順に
+    並べられています。
 set_sys_dirs()
     Include directory を設定しています。noconfig.H (configed.H) のマクロ
     C_INCLUDE_DIR?, CPLUS_INCLUDE_DIR? で指定された処理系固有のディレク
@@ -1566,80 +1322,26 @@ set_sys_dirs()
 
 do_pragma()
     #pragma の処理を実装しています。MCPP 自身が処理しない #pragma sub-
-    directive はnoconfig.H (configed.H) のマクロ HAVE_PRAGMA が TRUE の
-    場合はそのまま出力して compiler-proper に渡し、そうでない場合は
-    warning とともに捨てます。MCPP 自身が処理する #pragma MCPP debug 等
-    はここから呼び出す関数で処理します。MCPP 自身が処理する #pragma sub-
-    directive は原則として MCPP という名前で始まるようにしています。その
-    後の扱いは原則として MCPP が処理しない #pragma と同様ですが、ただし、
-    #pragma MCPP put_defines, #pragma once は出力しません。ヘッダの「プ
-    リプリプロセス」の機能を使って、出力を再度プリプロセスする場合のつご
-    うがあるためです（mcpp-manual.txt の [3.1] 参照）。Standard C では処
-    理系固有の拡張 directive は #pragma sub-directive として実装すること
-    になっています。この関数は #if MODE == STANDARD 〜 #endif で囲んであ
-    ります。
+    directive はそのまま出力して compiler-proper に渡します。MCPP 自身が
+    処理する #pragma MCPP debug 等はここから呼び出す関数で処理します。
+    MCPP 自身が処理する #pragma sub-directive は原則として MCPP という名
+    前で始まるようにしています。その後の扱いは原則として MCPP が処理しな
+    い #pragma と同様ですが、ただし、#pragma MCPP put_defines, #pragma
+    once は出力しません。ヘッダの「プリプリプロセス」の機能を使って、出
+    力を再度プリプロセスする場合のつごうがあるためです（mcpp-manual.txt
+    の [3.1] 参照）。Standard C では処理系固有の拡張 directive は #
+    pragma sub-directive として実装することになっています。この関数は #
+    if Standard モード 〜 #endif で囲んであります。
 do_old()
     Standard C に合致しない preprocessing directive （#pragma sub-
     directive でない #assert, #asm, #endasm, #include_next, #warning, #
     put_defines, #debug 等）が必要な場合は、その処理をする関数を書き足し
     たうえで、ここからそれを呼び出すようにします。呼び出される関数の定義
-    は #if MODE == PRE_STANDARD 〜 #endif で囲みます。（ただし、GNU C 用
-    では #include_next, #warning は MODE == STANDARD でも使えるようにし
-    てある）。
+    は #if pre-Standard モード 〜 #endif で囲みます。（ただし、GNU C 用
+    では #include_next, #warning は Standard モード でも使えるようにして
+    ある）。
 
-    [4.3]   mbchar.c
-
-  ここには multi-byte character 処理ルーチンがあります。MCPP の移植では
-このファイルをいじる必要は普通はないはずです。しかし、未実装の multi-
-byte character encoding を実装する場合は、ここに文字タイプのテーブルと処
-理ルーチンを書き加えることになります。
-  Multi-byte character 処理の枠組みは、16 ビットシステム用と 32 ビット以
-上のシステム用とで違っており、メモリーの少ない 16 ビットシステム用は実装
-できる encoding が限定されています。
-
-char type[]
-    16 ビットシステム用の文字タイプのテーブルです。基本文字セットが
-    ASCII であることを前提として、EUC-JP, shift-JIS, KS C 5601, GB 2321-
-    80, Big Five のものが implement されています。これらはユーザ定義文字
-    （外字）のエリアも含んでいます。他の文字セットの場合は、これに書き足
-    す必要があります。Shift-states のない２バイト encoding であれば、
-    system.H の MBCHAR を定義し、このテーブルを対応させるだけですむはず
-    です。
-short type_*[]
-    32 ビット以上のシステム用の文字タイプのテーブルです。次の４つのテー
-    ブルがあり、それぞれ下記の encoding の文字タイプが定義されています。
-    いずれも基本文字セットが ASCII であることを前提としています。
-        type_euc[]  :   EUC_JP, GB2312, KSC5601
-        type_bsl[]  :   SJIS, BIGFIVE
-        type_iso2022_jp[]   :   ISO2022_JP
-        type_utf8[] :   UTF8
-char * encoding_name[][]
-    Multi-byte character encoding の名前のテーブルです。
-
-set_encoding()
-    #pragma MCPP setlocale、-m オプション、および環境変数 LC_ALL,
-    LC_CTYPE, LANG の処理をするルーチンです。
-mb_init()
-    Multi-byte character encoding に応じた初期設定をするルーチンです。
-mb_read_*()
-    Multi-byte character を読むルーチンです。次の３つがあります。これら
-    の関数はそれぞれ下記の encoding の multi-byte character 用のものです。
-        mb_read_2byte() :   EUC_JP, GB2312, KSC5601, SJIS, BIGFIVE
-        mb_read_iso2022_jp()    :   ISO2022_JP
-        mb_read_utf8()  :   UTF8
-mb_eval()
-    Multi-byte character, wide character の文字定数の値を評価するルーチ
-    ンです。#if 式の評価で使われます。
-
-  Multi-byte character の encoding については次の文献を初めとして、いく
-つかの資料を参照しました。
-
-    Ken Lunde "Understanding Japanese Information Processing"
-            , 1993/09, first edition, O'Reilly & Associates, Inc.
-    安岡孝一・安岡素子『文字コードの世界』
-            , 1999/09, 東京電機大学出版局
-
-    [4.4]       lib.c
+    [4.3]       lib.c
 
   処理系によっては持っていないかもしれない、あるいはあっても仕様に問題の
 あるライブラリ関数のソースがここに書いてあります。それぞれ、#if !
@@ -1658,10 +1360,8 @@ malloc(), free(), realloc(), calloc() の portable なソースです。これはメ
 ものです。これをリンクした MCPP がEFREEP, EFREEBLK, EALLOCBLK, EFREEWRT,
 ETRAILWRT というエラー番号で途中で exit することがあれば、それは MCPP の
 バグを意味します。
-  ことに、MS-DOS / Borland C の large data memory model でコンパイルする
-場合は、処理系付属の malloc()（というより free()）は異常に速度が遅いので、
-これらの関数を酷使している MCPP ではなるべく避けてください。WIN32 /
-Visual C++ の malloc() もかなり遅いので、避けたいところです。
+  Visual C++ の malloc() はかなり遅いので、なるべく kmmalloc を使いたい
+ところです。*2
   BSD_MALLOC, DB_MALLOC, MALLOC_DBG というマクロのどれかを 1 に定義して
 MCPP をコンパイルすると、私の malloc() とは別のそれぞれデバッグ機能を持
 った malloc() が使われます。いずれにしても、処理系付属のものではない
@@ -1669,9 +1369,10 @@ malloc() を使うには、コンパイルする前にライブラリを作っておかなければな
 りません。これについては kmmalloc のドキュメントを見てください。
 
   *1 kmmalloc は次のところにある。
-        http://download.vector.co.jp/pack/dos/prog/c/kmmalloc-2.5.lzh
+        http://download.vector.co.jp/pack/dos/prog/c/kmmalloc-2.5.1.lzh
   *2 CygWIN ではライブラリの組み立てが他の malloc() を使えないようになっ
-    ているので、私の malloc() は使っていない。
+    ているので、私の malloc() は使っていない。Visual C 2005 でも同様であ
+    る。
 
 
 ☆　５．バグ報告と移植の報告　☆
@@ -1683,8 +1384,8 @@ MCPP といっしょに公開しています。Standard C のプリプロセスのすべての規定
 を検証できるものにしたつもりです。もちろん、MCPP はこれを使ってチェック
 してあります。それも、上記のすべての処理系でコンパイルしてチェックしてあ
 ります。したがって、バグや誤仕様はほとんどないと思いますが、しかし、まだ
-いくつか残っている恐れもあります。ことにまだ移植されていない処理系に新し
-く移植した場合は、処理系のバグにひっかかる可能性があります。
+いくつか残っている恐れもあります。まだ移植されていない処理系に新しく移植
+した場合は、処理系のバグにひっかかる可能性もあります。
   もし、不可解な動作が発見されたら、ぜひご報告ください。その際には、次の
 点のチェックをお願いします。
 
@@ -1721,7 +1422,6 @@ end_debug ではさんで MCPP の動作をトレースしてみる。この <args> をさらに
 も間違いなく MCPP または処理系のバグです。
   これらのバグが発見されたら、サンプルソースの各部分を #if 0 と #endif
 ではさんでテストを繰り返し、バグを発生する部分を絞り込んでみてください。
-  malloc() 等はなるべく私の版をリンクしてテストしてください。
 
     [5.3]       バグ報告を
 
@@ -1736,9 +1436,8 @@ end_debug ではさんで MCPP の動作をトレースしてみる。この <args> をさらに
 
   MCPP はほとんどの処理系に比較的簡単に移植できるように書いてあるつもり
 です。しかし、私が持っている処理系は少数です。私が持っていない処理系への
-移植がうまくいくものかどうか、不安もあります。それらの処理系への移植の報
-告をお待ちしています。それをソースにフィードバックして、完全なものにして
-いきたいと思います。
+移植ではソースの書き足しが必要なはずです。それらの処理系への移植の報告を
+お待ちしています。それをソースにフィードバックしていきたいと思います。
   移植の報告は次のような形でお願いします。
 
   １．処理系。
@@ -1800,6 +1499,8 @@ testsuite がインストールされていれば、GNU C のプリプロセッサを MCPP に置
   次のデータを付けてくれれば、移植したソースをお返しできるかもしれません。
 Configure の使える環境では、これらのデータのうちのかなりの部分を
 configure によって知ることができます。
+  なお、C90 (ANSI C) に対応していない処理系は、MCPP V.2.6 からは移植の対
+象から外しました。
 
   1.  ＯＳとそのパスリストの形式（私は UNIX 系, DOS/Windows 系, OS-9 し
 か知らない）。
@@ -1818,41 +1519,32 @@ character に含まれる encoding の場合、コンパイラ本体はそれを認識するか。
   8.  その処理系の事前定義マクロとその値。C++ の時はどうなるか（コンパイ
 ラドライバから -D オプション等でプリプロセッサに渡されるマクロと、プリプ
 ロセッサ自身が事前定義するマクロとを区別すること）。
-  9.  関数のプロトタイプ宣言ができるか。
-  10.  unsigned long 型があるか。
-  11.  long long, long double はどうか。long long がある場合、printf()
-での long long の length modifier は何か。long long がなくても同じサイズ
-の型があるか。
-  12.  <limits.h> があるなら、CHAR_BIT, UCHAR_MAX, LONG_MAX, ULONG_MAX
+  9.  long long 型はあるか。long long がある場合、printf() での long
+long の length modifier は何か。long long がなくても同じサイズの型がある
+か。
+  10.  <limits.h> があるなら、CHAR_BIT, UCHAR_MAX, LONG_MAX, ULONG_MAX
 の値。<limits.h> がなければこの４つに相当する値（１バイトが８ビットなら
 system.H のデフォルト値と同じはず）。
-  13.  <stdio.h> に FILENAME_MAX があればその値。
-  14.  #pragma を通す処理系かどうか。#pragma 行の引数はマクロ展開の対象
+  11.  <stdio.h> に FILENAME_MAX があればその値。
+  12.  #pragma を通す処理系かどうか。#pragma 行の引数はマクロ展開の対象
 となるか。
-  15.  getenv() 関数があるか。Include directory を指定する環境変数にはど
-ういう名前を使うか。環境変数で複数のパスを記述する時の separator には何
-を使うか。
-  16.  通常使う include directory。#include でヘッダファイルをサーチする
+  13.  Include directory を指定する環境変数にはどういう名前を使うか。環
+境変数で複数のパスを記述する時の separator には何を使うか。
+  14.  通常使う include directory。#include でヘッダファイルをサーチする
 時の規則。
-  17.  \a, \v は使えるか。
-  18.  const 修飾子は使えるか。
-  19.  ヘッダファイル <string.h>, <stdlib.h>, <stddef.h>, <time.h> はあ
-るか。size_t, time_t 型の定義はどうか。
-  20.  必要な関数で、ライブラリに無いものがあるか。
-  21.  コンパイラ本体で文字列リテラルの連結ができるか。
-  22.  コンパイラ本体は digraph を認識するか。
-  23.  識別子に $ を使うか。
-  24.  #asm, #endasm はあるか。これではさまれたブロックのコンパイラ本体
+  15.  必要な関数で、ライブラリに無いものがあるか。
+  16.  コンパイラ本体は digraph を認識するか。
+  17.  識別子に $ を使うか。
+  18.  #asm, #endasm はあるか。これではさまれたブロックのコンパイラ本体
 への受け渡し形式はどうか。その他の規格外 directive にはどんなものがある
 か。
-  25.  プリプロセッサで処理すべき #pragma sub-directive には何があるか。
-  26.  コンパイラ本体が受け取れる行長はどのくらいまでか（Validation
+  19.  プリプロセッサで処理すべき #pragma sub-directive には何があるか。
+  20.  コンパイラ本体が受け取れる行長はどのくらいまでか（Validation
 Suite にある test-l/l_37_8.c をコンパイルするとわかる）。
-  27.  コンパイラ本体では、識別子は何バイトまで識別されるか。
-  28.  メモリ空間はどのくらいか。
-  29.  コンパイル後、リンク前の「オブジェクトファイル」の接尾子は何か
-（UNIX 上の処理系の .o や MS-DOS 上の処理系の .obj に相当するもの）。
-  30.  次の t_line.c というサンプルをプリプロセッサだけに通した結果（単
+  21.  コンパイラ本体では、識別子は何バイトまで識別されるか。
+  22.  コンパイル後、リンク前の「オブジェクトファイル」の接尾子は何か
+（UNIX 上の処理系の .o や Windows 上の処理系の .obj に相当するもの）。
+  23.  次の t_line.c というサンプルをプリプロセッサだけに通した結果（単
 体プリプロセッサを使うか、またはオプションでプリプロセス後の出力を指定す
 る）。これは行番号とファイル名の情報をコンパイラ本体に渡す方法を見るため
 のものである。<stdio.h> の内容は長すぎるので、途中をカットして最初の１０
@@ -1909,8 +1601,11 @@ Validation Suite、私の Standard C 解釈、ドキュメントの書き方、などについ
 です。
   こういうものに興味を持つ人はかなり限られていると思いますが、多くのコメ
 ントと情報をお待ちしています。
-  ご意見と情報は comp.std.c, fj.comp.lang.c 等の newsgroup、またはメール
-でお願いします。
+  ご意見と情報は
+
+    http://mcpp.sourceforge.net/
+
+の "Open Discussion Forum" またはメールでお願いします。
 
 
 ☆　６．MCPP の長い道のり　☆
@@ -1989,9 +1684,9 @@ Rationale も含めてよく読んでみました。私はプリプロセッサを作ることを通し
 
     [6.2]       V.2.3 へ
 
-  V.2.0 を公開した後、さらに V.2.1, V.2.2, V.2.3 と update を繰り返して
-きています。C99 や正式に承認された ISO / C++ に対応させたり、対応処理系
-を増やしたり、バグをとったりというのがその内容です。
+  V.2.0 を公開した後、さらに V.2.1, V.2.2, V.2.3 と update を繰り返しま
+した。C99 や正式に承認された ISO / C++ に対応させたり、対応処理系を増や
+したり、バグをとったりというのがその内容です。
   V.2.2 までは簡単に update できていました。V.2.2 は V.2.0 から３か月し
 かたっていません。ところが、V.2.3 は V.2.2 から４年あまりもたってしまい
 ました。私の身辺が多忙になり、時間がとれなくなったのが主な原因です。2000
@@ -2069,15 +1764,15 @@ Rationale も含めてよく読んでみました。私はプリプロセッサを作ることを通し
 upgrade する過程でさらにいくつかのトラブルに見舞われました。未経験のソフ
 トウェアの習得にも時間を要し、開発はやはり遅れ気味でした。いったん退院し
 て比較的元気になっていた母の容態が、プロジェクトが大詰めに近づくのと並行
-して以前にも増して悪くなってきたことも、心配の種でした(*)。しかし、伊知
-地ＰＭが目標を無理のないところに設定してくれたおかげで、あわてずにじっく
-りと課題に取り組むことができました。
-  Visual C++ への移植、Plan9 への移植、configure スクリプトの作成、ISO-
-2022-JP, UTF-8 を含む多様な multi-byte character encoding への対応、等の
-課題を達成することができました。また、ソースコードの整理という目立たない
-ながらも作者としてはこだわりのある課題にも取り組みました。日本語版と英語
-版のドキュメントの更新という手間のかかる作業も、ハイウェルの協力を得て達
-成することができました。
+して以前にも増して悪くなってきたことも、心配の種でした（母は 2004 年 2
+月に死去した）。しかし、伊知地ＰＭが目標を無理のないところに設定してくれ
+たおかげで、あわてずにじっくりと課題に取り組むことができました。
+  Visual C++ への移植、configure スクリプトの作成、ISO-2022-JP, UTF-8 を
+含む多様な multi-byte character encoding への対応、等の課題を達成するこ
+とができました。また、ソースコードの整理という目立たないながらも作者とし
+てはこだわりのある課題にも取り組みました。日本語版と英語版のドキュメント
+の更新という手間のかかる作業も、ハイウェルの協力を得て達成することができ
+ました。
   この成果によって、私は伊知地ＰＭから何と「スーパークリエータ」という評
 価を受けることができました。私の実力にとっては過分の評価ですが、長年にわ
 たる MCPP の積み重ねを認めていただいたものと思い、大変喜んでいます。
@@ -2087,9 +1782,7 @@ upgrade する過程でさらにいくつかのトラブルに見舞われました。未経験のソフ
 アプログラマとして非力ながらもよくやったと自分では納得しています。
 
   未踏ソフトウェアのプロジェクトが終わってからも、MCPP の改良作業は続け
-られています。まだいくつもの課題が残っています。これらの課題を達成し、
+られています。まだいくつかの課題が残っています。これらの課題を達成し、
 MCPP を普及させるために、今後も着実に取り組みを続けてゆくつもりです。
-
-  * 母は 2004 年 2 月に死去した。
 
                                                                    [eof]

@@ -1,7 +1,8 @@
 /* e_14_10.c:   Overflow of constant expression in #if directive.    */
 
 /* { dg-do preprocess }
-   { dg-options "-ansi -pedantic-errors -w" }
+   { dg-options "-ansi -pedantic-errors" }
+   { dg-excess-errors "" }
  */
 
 /* 14.10:   */

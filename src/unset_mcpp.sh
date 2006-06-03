@@ -19,8 +19,8 @@ else
     cpp_base=${cpp_name}
 fi
 
-echo "  rm -f ${inc_dir}/mcpp_g*${gcc_maj_ver}${gcc_min_ver}_predef_*.h"
-rm -f ${inc_dir}/mcpp_g*${gcc_maj_ver}${gcc_min_ver}_predef_*.h
+echo "  rm -f ${inc_dir}/mcpp_g*_predef_*.h"
+rm -f ${inc_dir}/mcpp_g*_predef_*.h
 
 echo "  cd ${cpp_path}"
 cd ${cpp_path}
@@ -45,9 +45,9 @@ fi
 
 echo "  cd ${gcc_path}"
 cd ${gcc_path}
-sym_link=`ls -l ${CC}${EXEEXT} | sed 's/^l.*/l/; s/^[^l].*//'`
+sym_link=`ls -l ${CC} | sed 's/^l.*/l/; s/^[^l].*//'`
 if test x${sym_link} = xl; then     # symbolic link
-    clink=`ls -L -i ${CC}${EXEEXT}`                         # dereference
+    clink=`ls -L -i ${CC}`          # dereference
     inode=`echo ${clink} | sed 's/^ *//' | sed 's/ .*//'`
     c_sh=`ls -i | grep ${inode} | sed 's/^[ 0-9]*//' | sed 's/\*$//'`
     if test x${c_sh} = x${CC}.sh; then
@@ -60,7 +60,7 @@ if test x${sym_link} = xl; then     # symbolic link
 fi
 sym_link=`ls -l ${CXX} | sed 's/^l.*/l/; s/^[^l].*//'`
 if test x${sym_link} = xl; then     # symbolic link
-    clink=`ls -L -i ${CXX}${EXEEXT}`
+    clink=`ls -L -i ${CXX}`
     inode=`echo ${clink} | sed 's/^ *//' | sed 's/ .*//'`
     cxx_sh=`ls -i | grep ${inode} | sed 's/^[ 0-9]*//' | sed 's/\*$//'`
     if test x${cxx_sh} = x${CXX}.sh; then
@@ -71,4 +71,3 @@ if test x${sym_link} = xl; then     # symbolic link
         mv -f ${cxx_entity}_proper${EXEEXT} ${cxx_entity}${EXEEXT}
     fi
 fi
-

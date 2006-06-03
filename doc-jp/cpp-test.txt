@@ -37,6 +37,8 @@ V.1.5       2005/03     Moved tests of multi-byte character encoding to
                 Removed test results on older preprocessors (DJGPP,
                     compiler systems on MS-DOS except Borland C 4.0).
                                                                 kmatsui
+V.1.5.1     2006/06     Updated the test results of some preprocessors.
+                                                                kmatsui
 
 
 ０．Ｓｔａｎｄａｒｄ Ｃ と Ｖａｌｉｄａｔｉｏｎ Ｓｕｉｔｅ
@@ -173,21 +175,23 @@ updates を加えたものです。1998/11 に、やはり NIFTY SERVE / FC / LIB 2 お
   V.1.3 は正式に決定した C99 に対応して、V.1.2 に updates を加えたもので
 す。また、動作テストのサンプルは、GNU C / testsuite で利用できるように書
 き直した edition が追加されました。
-  V.1.3 は開発の途中で、MCPP V.2.3 とともに、情報処理振興事業協会 (IPA)
-の平成１４年度「未踏ソフトウェア創造事業」に新部 裕・プロジェクトマネー
-ジャによって採択され、2002/07 - 2003/02 の間は IPA の資金援助と新部ＰＭ
-の助言のもとに開発が進められました。英語版ドキュメントもこのプロジェクト
-の中で、有限会社・ハイウェルに翻訳を委託し、それに私が修正とテキスト整形
-を加えてできあがったものです。2003/02 には MCPP V.2.3 と検証セット V.1.3
-が m17n.org で公開されました。
+  V.1.3 は開発の途中で、MCPP V.2.3 とともに、情報処理推進機構(IPA) の平
+成１４年度「未踏ソフトウェア創造事業」に新部 裕・プロジェクトマネージャ
+によって採択され、2002/07 - 2003/02 の間は IPA の資金援助と新部ＰＭの助
+言のもとに開発が進められました。英語版ドキュメントもこのプロジェクトの中
+で、有限会社・ハイウェルに翻訳を委託し、それに私が修正とテキスト整形を加
+えてできあがったものです。2003/02 には MCPP V.2.3 と検証セット V.1.3 が
+m17n.org で公開されました。
   さらに MCPP と検証セットは平成１５年度「未踏ソフトウェア創造事業」にも
 伊知地 宏・PM によって継続して採択され、それぞれ V.2.4, V.1.4 への
 update 作業が進められました。*2
   その後も MCPP と検証セットはさらに改良の作業が続けられています。2005/
 03 にはそれぞれ V.2.5, V.1.5 がリリースされました。検証セット V.1.5 では
-配点の変更などがありました。
+配点の変更などがありました。2006/06 にはそれぞれ V.2.6-prerelease, V.1.5.
+1-prerelease が公開されました。検証セット V.1.5.1 では各処理系の新しいバ
+ージョンのプリプロセッサのテスト結果が追加されただけです。
 
-  Ｃ言語の規格としては従来 ISO/IEC 9899:1990 (JIS X 3010-1993) が使われ
+  Ｃ言語の規格としては ISO/IEC 9899:1990 (JIS X 3010-1993) が長く使われ
 てきましたが、1999 年には ISO/IEC 9899:1999 が採択されました。ここでは前
 者を C90、後者を C99 と呼びます。前者は ANSI X3.159-1989 が移行したもの
 なので、一般には ANSI C または C89 と呼ばれることもあります。また、ISO/
@@ -208,20 +212,24 @@ IEC 9899:1990 + Amendment 1995 を C95 と呼ぶことがあります。
         ibid.   Technical Corrigendum 2 (2004)
   C++:
     ISO/IEC 14882:1998(E)
+    ISO/IEC 14882:2003(E)
 
   ANSI X3.159 には "Rationale"（理由書）が付属していました。これは ISO
 C90 にはなぜか採用されませんでしたが、ISO C99 では復活しました。この
 "Rationale" も折りに触れて参照します。
+  C++ は 1998 年版のあとで 2003 年版が制定されましたが、細部の文言の修正
+だけでした。少なくともプリプロセスについては変更はありません。そこで、こ
+の文書では 2003 年版も含めて C++98 と呼びます。
   C99, C++ の規格書は PDF でフォーマットされたオンライン版が次のところで
 入手できます。
 
-    C99, C++98
+    C99, C++98, C++03
         http://webstore.ansi.org/ansidocstore/default.asp
     C99 Corrigendum 1
         http://ftp2.ansi.org/download/
             free_download.asp?document=ISO%2FIEC+9899%2FCor1%3A2001
     C99 Rationale 1999/10 final draft
-        http://anubis.dkuug.dk/JTC1/SC22/WG14/www/docs/n897.pdf
+        http://www.open-std.org/jtc1/sc22/wg14/www/docs/n897.pdf
 
   *1  この cpp は V.2.2 までは単に cpp と呼んでいたが、一般の cpp と紛ら
     わしいので、 V.2.3 からは MCPP と呼ぶことにした。Matsui CPP の意味で
@@ -235,27 +243,18 @@ C90 にはなぜか採用されませんでしたが、ISO C99 では復活しました。この
 
         http://www.ipa.go.jp/jinzai/esp/
 
-    なお、情報処理振興事業協会 (IPA) は 2004/01 に独立行政法人・情報処理
-    推進機構 (IPA) に改組された。
-
-    MCPP V.2.3 以降のソースおよびドキュメントと検証セット V.1.3 以降は最
-    新バージョンを含めて、次の CVS repository に置いている。ここから tar-
-    ball を download できる。
-
-        http://cvs.m17n.org/cgi-bin/viewcvs/?cvsroot=matsui-cpp
-
-    次のところからは anonymous ftp できる。
-
-        ftp://ftp.m17n.org/pub/mcpp/
-
-    また、次のところには案内の web page がある。
+    MCPP V.2.3 以降のソースおよびドキュメントと検証セット V.1.3 以降は次
+    のところに置いてきたが、
 
         http://www.m17n.org/mcpp/
 
+    2006/04/28 に次のところに移った。
+
+        http://mcpp.sourceforge.net/
+
     cpp V.2.2 および検証セット V.1.2 はベクター社のサイトの次のところに
-    ある。「PACK for WIN GOLD」という CD-ROM にも収録されていた。dos/
-    prog/c というディレクトリに入れられているが、MS-DOS 専用ではない。ソ
-    ースは UNIX, WIN32/MS-DOS, OS-9 等に対応している。
+    ある。dos/prog/c というディレクトリに入れられているが、MS-DOS 専用で
+    はない。ソースは UNIX, WIN32/MS-DOS, OS-9 等に対応している。
 
         http://download.vector.co.jp/pack/dos/prog/c/cpp22src.lzh
         http://download.vector.co.jp/pack/dos/prog/c/cpp22bin.lzh
@@ -264,29 +263,10 @@ C90 にはなぜか採用されませんでしたが、ISO C99 では復活しました。この
     http://download.vector.co.jp/ は ftp://ftp.vector.co.jp/ でも同じよ
     うである。
 
-    旧版は次のところにもある（ここは会員制の closed なフォーラムである）。
-
-        @nifty / FC / lib 2
-
     これらのアーカイブファイル中のテキストファイルは、Vector のものは
     DOS/Windows 系に合わせて改行コードは [CR]+[LF]、漢字は shift-JIS で
-    encode してある。m17n.org のものは UNIX 系に合わせて改行コードは [LF]、
-    漢字は EUC-JP である。他のＯＳで使う場合は変換が必要である。
-    拙作の convf というツールを使うと、全ファイルを一括して変換コピーで
-    きるので簡単である（バイナリファイルは自動的に判別して無変換でコピー
-    する。Time-stamp や mode は保存される）。ただし、MCPP のパッケージに
-    は特定の multi-byte character encoding をテストするためのファイルも
-    含まれているので、それらは encoding を変換してはいけない。まず全ファ
-    イルを改行コードだけ変換して一括コピーし、さらに doc ディレクトリだ
-    け改行コードと漢字 encoding の双方を変換して上書きコピーするのが良い。
-    Convf そのものも MCPP を移植したのと同じ処理系に対応している。ただし、
-    ファイルを DOS/Windows 系から他のＯＳに持っていく場合は、MS-DOS や
-    Windows95 上で解凍すると大文字と小文字の区別がなくなってしまうので、
-    アーカイブファイルのまま移してから、解凍して変換すること。Convf は次
-    のところにある。
-
-        http://download.vector.co.jp/pack/dos/util/text/conv/code/
-                                                        convf-1.8.lzh
+    encode してある。SourceForge のものは V.2.5 までは UNIX 系に合わせて
+    改行コードは [LF]、漢字は EUC-JP である。
 
 
            ☆　１．Ｓｔａｎｄａｒｄ Ｃ プリプロセスの特徴　☆
@@ -399,19 +379,15 @@ phase 4 までです。*3
     仕様があいまいであるうえに、処理系にとっては負担の大きいことである。
     しかし、幸いなことに 1999/01 draft で phase 1 の処理は削除され、C99
     正規版でもその通りとなった。
-  *3  ただし、MCPP では CONCAT_STRINGS というマクロを TRUE と定義してコ
-    ンパイルしておくと、phase 6 もプリプロセッサでやる。しかし、phase 5
-    をとばすと escape sequence を含む文字列リテラルが連結された時に間違
-    った結果になる恐れがあるので、phase 5 の代わりに文字列リテラルにちょ
-    っとした手を加えている。実際の動作は misc.t / PART 6 参照。
-    また MCPP では、SJIS_IS_ESCAPE_FREE というマクロを FALSE と定義して
-    コンパイルしておくと、shift-JIS 漢字を認識しないコンパイラ本体のため
-    に、phase 4（または 6）が終わってから、文字列リテラルおよび文字定数
-    中の shift-JIS 漢字の２バイト目が 0x5c (\) であった場合はそこにもう
-    １つ 0x5c を挿入する。[2.4.36] 参照。
-    これらはいずれも、phase 5, 6 の処理が不十分なコンパイラ本体のための
-    機能である。こうした処理を早い phase でやってしまうと間違いが起こる
-    が、phase 4 まで完全に終わってからであれば問題はない。
+  *3  MCPP では、SJIS_IS_ESCAPE_FREE というマクロを FALSE と定義してコン
+    パイルしておくと、shift-JIS 漢字を認識しないコンパイラ本体のために、
+    phase 4（または 6）が終わってから、文字列リテラルおよび文字定数中の
+    shift-JIS 漢字の２バイト目が 0x5c (\) であった場合はそこにもう１つ
+    0x5c を挿入する。big5 や iso2022-jp という encoding についても、同様
+    の処理をする。[2.4.36] 参照。
+    これは phase 5, 6 の処理が不十分なコンパイラ本体のための機能である。
+    こうした処理を早い phase でやってしまうと間違いが起こるが、phase 4
+    まで完全に終わってからであれば問題はない。
 
         [1.2.1]     行接続は tokenization の前に
 
@@ -552,7 +528,7 @@ token ではありません。したがって、それらはプリプロセスの終わるまでに消滅
 
   *1  ANSI C 3.1.8 (C90 6.1.8) Preprocessing numbers 前処理数
       C99 6.4.8 Preprocessing numbers
-  *2 C99 では浮動小数点数の１６進表記を可能にするために、pp-number p
+  *2  C99 では浮動小数点数の１６進表記を可能にするために、pp-number p
     sign, pp-number P sign という sequence が追加されている。
     また、上記の nondigit が identifier-nondigit に置き換えられた。これ
     は identifier 中に UCN (universal character name) と処理系定義の
@@ -654,11 +630,10 @@ Standard C のプリプロセスでは起こってはならないことだと考えられます。*
 でしょうから、問題とはならないでしょう。
 
   MCPP ももちろん、こうした Standard C プリプロセスの仕様が処理系本体か
-ら独立していることを制作の動機としています（しかし、MCPP は pre-Standard
-の処理系でコンパイルすることも、pre-Standard の処理系に移植することも、
-また pre-Standard や post-Standard の各種プリプロセッサを作ることも目的
-にしているので、portability 確保のための #if section がかなり多くなって
-いるが）。
+ら独立していることを制作の動機としています（しかし、MCPP は多くの処理系
+に移植することを目的としており、また pre-Standard や post-Standard の各
+種プリプロセッサを作ることも目的にしているので、portability 確保のための
+#if section がかなり多くなっているが）。
 
     [1.6]       関数様マクロの展開方法
 
@@ -1655,7 +1630,7 @@ constraint があるが、これはすべての定数式に適用されるものなのかどうか不
     ftp できる（SC というのは steering committee の略で、WG は working
     group である。SC22 というのはプログラム言語の規格を審議するところで、
     WG14 は C の規格を担当している）。
-        http://osiris.dkuug.dk/JTC1/SC22/WG14/
+        http://www.open-std.org/jtc1/sc22/wg14/
 
 
             ☆　２．Ｖａｌｉｄａｔｉｏｎ Ｓｕｉｔｅ 解説　☆
@@ -1837,13 +1812,6 @@ assertion が失敗したのかがわかりません。# 演算子が実装されていない処理系
 は、しょうがないのでこれを使います。
   <limits.h> という標準ヘッダファイルがない古い処理系では、これを書いて
 おく必要があります（[4.1.3] 参照）。
-  void という keyword の存在しない古い処理系では <stdio.h> の最後に臨時
-に
-
-    #undef  void
-    #define void
-
-と書いてからテストをしてください。
   Multi-byte character の処理は実行時環境によって処理系の動作仕様が変わ
 る場合があるので、m_* のテストには注意が必要です（[3.1] 参照）。
 
@@ -1892,17 +1860,14 @@ test-c ディレクトリで動かすと、C90 の n_*.c, i_*.c のテストを自動的に行
 うことができます。ただし、これは○×をつけるだけで、詳細を知ることはでき
 ません。e_*.? 等のテストも含まれていません。プリプロセッサの C90 準拠度
 について簡単に見当をつけるためのものです。C99 についてのテストも含まれて
-いません。現在はまだコンパイラの大半が C99 には対応していないからです。*
-1
-  cpp_test.c をコンパイルする時は、__MSDOS__ というマクロが事前定義され
-ない MS-DOS 上の処理系の場合は -D__MSDOS__ というオプションを付けてコン
-パイルしてください。*2
+いません。現在はまだコンパイラの大半が C99 には高々半分しか対応していな
+いからです。*1, *2
   実行する前に、m_33_*.c, m_34_*.c のうちの適当な encoding のものをそれ
 ぞれ i_33.c, i_34.c にコピーしておいてください。*3
 
-  cpp_test の使い方は Visual C++ .net 2003 を例にとると、次の通りです。
+  cpp_test の使い方は Visual C++ 2005 を例にとると、次の通りです。
 
-    cpp_test VC2003 "cl -Za -Tc -Fe%s %s.c" "del %s.exe" < n_i_.lst
+    cpp_test VC2005 "cl -Za -TC -Fe%s %s.c" "del %s.exe" < n_i_.lst
 
   第二引数以下はそれぞれ " と " で囲む必要があります（shell が ", " をは
 がしてしまう場合は、第二引数から最後の引数までの全体を ' と ' でさらに囲
@@ -1924,15 +1889,15 @@ test-c ディレクトリで動かすと、C90 の n_*.c, i_*.c のテストを自動的に行
 
   こうして cpp_test を実行すると、n_*.c, i_*.c が順次コンパイルされ、実
 行されてゆきます。n_*.err, i_*.err というファイルに、サンプルプログラム
-の stderr への出力が記録されます。そして、VC2003.sum にその採点結果が縦
+の stderr への出力が記録されます。そして、VC2005.sum にその採点結果が縦
 １列に書き込まれます。と言っても、次の３種類の採点しかありません。
 
     *:  合格
     o:  コンパイルはできたが、実行結果が不合格
     -:  コンパイルできなかった
 
-  VC2003.out に cpp_test の呼び出したコマンドラインが記録され、処理系が
-stdout に出したメッセージがあればそれもそこに記録されます。VC2003.err に
+  VC2005.out に cpp_test の呼び出したコマンドラインが記録され、処理系が
+stdout に出したメッセージがあればそれもそこに記録されます。VC2005.err に
 は、処理系が stderr に出したメッセージがあれば、それが記録されます。これ
 らを見ることによって、もう少し何かを知ることができるでしょう。
 
@@ -1965,15 +1930,15 @@ cpp_test.sum より多くのプリプロセッサをテストしています。それらのプリプ
             [2.2.3.1]   TestSuite とは
 
   GNU C には testsuite というものがあります。GNU C のソースをコンパイル
-した後で、make -k check とすると、この testsuite のサンプルが次々とチェ
-ックされ、結果が報告されます。
+した後で、make check とすると、この testsuite のサンプルが次々とチェック
+され、結果が報告されます。
   私の検証セットは V.1.3 からは、GNU C の testsuite としても使える形に書
 き直した edition が追加されました。これを testsuite に入れておくと、make
 check で自動的にチェックされます。[2.2.2] の cpp_test というツールでは
 n_*, i_* という名前のサンプルしかテストできませんが、testsuite では e_*,
 w_*, u_* 等の診断メッセージを要するサンプルも自動的にテストできます。こ
-の版は GNU C 2.9x / cpp, GNU C 3.x / cpp (cc1, cc1plus), MCPP のテストを
-することができます。
+の版は GNU C 2.9x 以降の cpp (cc1, cc1plus) と MCPP のテストをすることが
+できます。
   ここでは、GNU C / testsuite での検証セットの使い方を説明します。
 
   検証セットの cpp-test ディレクトリは test-t, test-l ディレクトリを GNU
@@ -1988,7 +1953,7 @@ C / testsuite に対応して書き直したもので、cpp-test の中に test-t, test-l
 が必要になります。ことに診断メッセージが追加されたり変更されたりした場合
 は、testcase にそれを取り込む必要があります。しかし、今のところは GNU C
 のバージョンがひどく古くない限り、大幅な修正は必要ないと思われます。cpp-
-test の testcases は GNU C 2.95.3, 2.95.4, 3.2R, 3.3.2, 3.4.3 の各 cpp
+test の testcases は GNU C 2.95.3, 3.2, 3.3.2, 3.4.3, 4.0.2 の各 cpp
 (cpp0, cc1, cc1plus) および MCPP で動作を確かめてあります。
   testsuite では実行時オプションを処理系によって変えることはできません。
 複数の規格が事実上併存している現在の状況では std= というオプションで規格
@@ -1996,10 +1961,6 @@ test の testcases は GNU C 2.95.3, 2.95.4, 3.2R, 3.3.2, 3.4.3 の各 cpp
 ージョンには存在しません。したがって、私の testsuite の適用範囲は GNU C
 2.9x 以降と MCPP V.2.3 以降ということになります。
 
-  なお、testsuite は egcs-1.1.2 (GNU C 2.91.66) までは存在していましたが、
-GNU C 2.95.3 には存在していません。この時期は testsuite の一部に著作権の
-問題があったために、公開が保留されていたものです。しかし、GNU C 3.0 では
-復活したようです。
   Testsuite はサンプルプログラム中に書かれた次のような形式のコメントを解
 釈して実行されます。これはコメントなので、他の処理系のテストには影響しま
 せん。
@@ -2019,7 +1980,7 @@ shell-script です。DejaGnu の設定は *.exp という名前のいくつかのファイル
 くのツールの適切なバージョンのものがそろっていなければなりません。これは
 私の検証セットを使う場合でも、使わない場合と同じです。
 
-  * 実際には環境変数を設定しても GNU C は正しく動作しない。
+  *  実際には環境変数を設定しても GNU C は正しく動作しない。
 
             [2.2.3.2]   TestSuite へのインストールとテスト
 
@@ -2034,20 +1995,20 @@ shell-script です。DejaGnu の設定は *.exp という名前のいくつかのファイル
 DejaGnu, Tcl の問題でそれができないので、compile & run するためのサンプ
 ルになっています（*_run.c という名前のもの）。この２つのサンプルには
 { dg-options "-ansi -no-integrated-cpp" } という行があります。-no-
-integrated-cpp というのは GNU C 3 のためのオプションです。GNU C 2 にはこ
-のオプションはないので、GNU C 2 でテストする場合はこのオプションをはずさ
-なければなりません。そのために、この２つの testcase については *_run.c.
-gcc2, *_run.c.gcc3 という２種のファイルを用意しています。その適当なほう
-を *_run.c にリンクして使ってください。
+integrated-cpp というのは GNU C 3, 4 のためのオプションです。GNU C 2 に
+はこのオプションはないので、GNU C 2 でテストする場合はこのオプションをは
+ずさなければなりません。そのために、この２つの testcase については *_run.
+c.gcc2, *_run.c.gcc3 という２種のファイルを用意しています。その適当なほ
+うを *_run.c にリンクして使ってください。
 
-  以下では、私のところの GNU C 3.2 を例にとって説明します。GNU C 3.2 の
-ソースが /usr/local/gcc-3.2-src に置かれているとします。また、GNU C のコ
-ンパイルは /usr/local/gcc-3.2-objs で行うとします。
+  以下では、私のところの GNU C 3.4.3 を例にとって説明します。GNU C 3.4.3
+のソースが /usr/local/gcc-3.4.3-src に置かれているとします。また、GNU C
+のコンパイルは /usr/local/gcc-3.4.3-objs で行うとします。
 
-    cp -r cpp-test /usr/local/gcc-3.2-src/gcc/testsuite/gcc.dg
+    cp -r cpp-test /usr/local/gcc-3.4.3-src/gcc/testsuite/gcc.dg
 
   これで、gcc.dg ディレクトリに cpp-test 以下のファイルがコピーされます。
-  こうしておくと、/usr/local/gcc-3.2-objs で
+  こうしておくと、/usr/local/gcc-3.4.3-objs で
 
     make bootstrap
 
@@ -2057,21 +2018,16 @@ gcc2, *_run.c.gcc3 という２種のファイルを用意しています。その適当なほう
 
 とすると、cpp-test の testcases を含めたすべての testsuite がテストされ
 ます。
-  また、cpp-test だけ使ってテストするには、/usr/local/gcc-3.2-objs/gcc
+  また、cpp-test だけ使ってテストするには、/usr/local/gcc-3.4.3-objs/gcc
 ディレクトリで次のようにします。
 
     make check-gcc RUNTESTFLAGS=cpp-test.exp
 
   Testsuite の log は ./testsuite ディレクトリの gcc.log, gcc.sum に記録
 されます。
-  make check する時は、GNU C のソースの INSTALL/test.html に説明があるよ
-うに、DEJAGNULIBS, TCL_LIBRARY という環境変数の設定が必要です。たとえば、
-私のところの VineLinux では /etc/profile で次のようにしています。
-
-    TCL_LIBRARY=/usr/lib/tcl8.0jp
-    DEJAGNULIBS=/usr/share/dejagnu
-    export TCL_LIBRARY DEJAGNULIBS
-
+  make check する時は、環境によっては GNU C のソースの INSTALL/test.html
+に説明があるように、DEJAGNULIBS, TCL_LIBRARY という環境変数の設定が必要
+です。
   また、GNU C 3 では環境変数 LANG, LC_ALL を C として英語環境にしなけれ
 ばなりません。
   GNU C のコンパイル時に make check で使われるのは、すでにインストールさ
@@ -2079,7 +2035,7 @@ gcc2, *_run.c.gcc3 という２種のファイルを用意しています。その適当なほう
 cc1plus, cpp0 等であることに注意してください。
   cpp-test によるテストは次のようにしてもできます。
 
-    runtest --tool gcc --srcdir /usr/local/gcc-3.2-src/gcc/testsuite  \
+    runtest --tool gcc --srcdir /usr/local/gcc-3.4.3-src/gcc/testsuite \
                                                         cpp-test.exp
 
 この場合は、実行するディレクトリは任意です。ログはカレントディレクトリに
@@ -2107,12 +2063,12 @@ GNU C のプリプロセッサはそれらの半分以下しか PASS しませんが、通らないか
 とすると、MCPP の自動チェックがされます。任意のディレクトリで runtest を
 直接呼び出して実行することもできます。
 
-    runtest --tool gcc --srcdir /usr/local/gcc-3.2-src/gcc/testsuite  \
+    runtest --tool gcc --srcdir /usr/local/gcc-3.4.3-src/gcc/testsuite \
                                                         cpp-test.exp
 
-  MCPP は GNU C 3 で実行した場合、cpp-test の testcases が１件を除いてす
-べてが PASS するはずです。GNU C 2 で実行した場合はもう１件、通らないもの
-がありますが、それは gcc が -D__cplusplus=1 というオプションを付けて
+  MCPP は GNU C 3, 4 で実行した場合、cpp-test の testcases が１件を除い
+てすべてが PASS するはずです。GNU C 2 で実行した場合はもう１件、通らない
+ものがありますが、それは gcc が -D__cplusplus=1 というオプションを付けて
 MCPP を呼び出すからであり、MCPP のせいではありません。
   プリプロセスを MCPP に置き換える方法については、manual.txt [3.9.5], [3.
 9.7] を見てください。Testsuite を適用する時は、MCPP の起動に -23j という
@@ -2156,47 +2112,47 @@ C 2 / cpp にさえも適用できないものが多く含まれています。プリプロセス出力
 をテストするように書き直されました。多くのサンプルが全体としてシステマテ
 ィックに構成されています。こうしたシステマティックな testcases が GNU C
 / testsuite に追加されることは、少なくない意味を持つと思われます。
-  また、私の testsuite 版検証セットは GNU C 2.9x / cpp, GNU C 3.x / cpp,
-MCPP という３つのプリプロセッサのテストができるように書かれています。す
-なわち、DejaGnu, Tcl の正規表現の機能を活用すれば、処理系によるプリプロ
-セス出力の spacing の差異や診断メッセージの差異を吸収することができるの
-です。*
+  また、私の testsuite 版検証セットは GNU C 2.9x / cpp0, GNU C 3.x, 4.x
+/ cc1, MCPP という３つのプリプロセッサのテストができるように書かれていま
+す。すなわち、DejaGnu, Tcl の正規表現の機能を活用すれば、処理系によるプ
+リプロセス出力の spacing の差異や診断メッセージの差異を吸収することがで
+きるのです。*
 
   Testsuite 化した検証セットをこの３つのプリプロセッサに適用した結果を以
-下に載せておきます（2005/03 のテスト）。
-  GNU C 3.4.3 でプリプロセッサを標準モードの MCPP V.2.5 に置き換えて実行
-した場合はこうなります。
+下に載せておきます（2006/05 のテスト）。
+  GNU C 3.3.2 でプリプロセッサを MCPP V.2.6 に置き換えて実行した場合はこ
+うなります。
 
                 === gcc Summary ===
 
-# of expected passes            266
+# of expected passes            264
 # of unexpected failures        1
-# of expected failures          2
-gcc version 3.4.3
+# of expected failures          4
+/usr/bin/gcc version 3.3.2
 
   １つだけ FAIL があるのは、C++98 での universal-character-name <=>
 multi-byte character の変換を実装していないことによるものです。
-  GNU C 3.2 / cpp0 ではこうなります。
-
-                === gcc Summary ===
-
-# of expected passes            217
-# of unexpected failures        52
-# of unexpected successes       1
-# of expected failures          1
-/usr/local/gcc-3.2/bin/gcc version 3.2
-
-  FAIL の多くは、ウォーニングを出してほしいところで出してくれないという
-ものです。
-  GNU C 3.4.3 / cc1 もほとんど変わりません。
+  GNU C 3.3.2 / cc1 ではこうなります。
 
                 === gcc Summary ===
 
 # of expected passes            215
-# of unexpected failures        54
-# of unexpected successes       1
-# of expected failures          1
-/usr/local/bin/gcc version 3.4.3
+# of unexpected failures        52
+# of unexpected successes       2
+# of expected failures          2
+/usr/bin/gcc version 3.3.2 20031218 (Vine Linux 3.3.2-0vl8)
+
+  FAIL の多くは、ウォーニングを出してほしいところで出してくれないという
+ものです。
+  GNU C 4.0.2 / cc1 もほとんど変わりません。
+
+                === gcc Summary ===
+
+# of expected passes            214
+# of unexpected failures        53
+# of unexpected successes       2
+# of expected failures          2
+/usr/bin/gcc version 4.0.2 20050901 (prerelease) (SUSE Linux)
 
   GNU C 2.95.3 / cpp0 ではこうなります。
 
@@ -2204,12 +2160,12 @@ multi-byte character の変換を実装していないことによるものです。
 
 # of expected passes            181
 # of unexpected failures        87
-# of unexpected successes       1
+# of unexpected successes       3
 # of expected failures          1
 gcc version 2.95.3 20010315 (release)
 
-  GNU C 3 / cpp よりもさらにウォーニングが少なく、ピントの外れた診断メッ
-セージもいくつかあります。C99, C++98 の新しい仕様も半分が未実装です。
+  GNU C 3, 4 / cc1 よりもさらにウォーニングが少なく、ピントの外れた診断
+メッセージもいくつかあります。C99, C++98 の新しい仕様も半分が未実装です。
   GNU C のバージョンによって件数が少し違うのは、１つの testcase 中で複数
 の FAIL が発生することがあるからです。
 
@@ -2271,13 +2227,13 @@ rule or constraint" といった）しか出さない処理系もあるかもしれません。ま
 必要な場合はサンプルをバラして再テストしてください。品質の問題は [3] で
 別にとりあげます。
 
-  *1 ANSI C 1.6 (C90 3) Definitions of Terms 用語の定義及び規約
-     ANSI C 1.7 (C90 4) Compliance 規格合致性
-     ANSI C 2.1.1.3 (C90 5.1.1.3) Diagnostics 診断メッセージ
-     C99 3 Terms, definitions, and symbols
-     C99 4 Conformance
-     C99 5.1.1.3 Diagnostics
-  *2 C++98 では C90, C99 とは用語がかなり違っているが、主旨は特に違わな
+  *1  ANSI C 1.6 (C90 3) Definitions of Terms 用語の定義及び規約
+      ANSI C 1.7 (C90 4) Compliance 規格合致性
+      ANSI C 2.1.1.3 (C90 5.1.1.3) Diagnostics 診断メッセージ
+      C99 3 Terms, definitions, and symbols
+      C99 4 Conformance
+      C99 5.1.1.3 Diagnostics
+  *2  C++98 では C90, C99 とは用語がかなり違っているが、主旨は特に違わな
     い。
 
     [2.4]       詳細
@@ -2410,13 +2366,9 @@ Standard C ではトークン連結には ## 演算子を使います。
   しかし、C99 では C++ の // もコメントとして扱うことになりました。*2
   配点  : 4。
   C90 ではこれはコメントではなく単なる // という pp-token sequence とし
-て処理すべきものであり、この Validation Suite でも V.1.2 まではそれをテ
-ストしていた。しかし、C99 以前から // をコメントとして処理する処理系が一
-般的で、それを期待しているソースも多く、C99 で公認されたことでもあるので、
-このテストは V.1.3 からははずした。
-  MCPP でも、V.2.2 までは C90 モードでは // をコメントとして扱っていなか
-ったが、V.2.3 からは C90 モードでもこれをコメントとして処理した上でウォ
-ーニングを出すようにした。
+て処理すべきものであるが、C99 以前から // をコメントとして処理する処理系
+が一般的であった。MCPP では C90 モードでもこれをコメントとして処理した上
+でウォーニングを出す。
 
   *1  ANSI C 3.1.9 (C90 6.1.9) Comments コメント
   *2  C99 6.4.9 Comments
@@ -2522,7 +2474,7 @@ tab を認めない処理系がありました。
 
   *  ANSI C 3.8 (C90 6.8) Preprocessing directives 前処理指令 --
     Description 補足規定, Constraints 制約
-      C99 6.10 Preprocesssing directives -- Description, Constraints
+     C99 6.10 Preprocesssing directives -- Description, Constraints
 
         [2.4.6]     #include
 
@@ -2894,13 +2846,13 @@ tifier は単なる identifier として扱われる。したがって、キャストや sizeof
 ストができるように、n.13 ではすべて小さい値しか使っていません。また、演
 算子 defined, >= は n.13 に出てきませんが、他のどこかに出てきています。
 
-  *1 C++ Standard では true, false は特別扱いされ、それぞれ 1, 0 と評価
+  *1  C++ Standard では true, false は特別扱いされ、それぞれ 1, 0 と評価
     される。これはマクロではなく keyword であるが、プリプロセスでは
     boolean literal として扱われることになっている。
-  *2 ANSI C 3.3 (C90 6.3) Expressions 式
-     ANSI C 3.4 (C90 6.4) Constant expressions 定数式
-     C99 6.5 Expressions
-     C99 6.6 Constant expressions
+  *2  ANSI C 3.3 (C90 6.3) Expressions 式
+      ANSI C 3.4 (C90 6.4) Constant expressions 定数式
+      C99 6.5 Expressions
+      C99 6.6 Constant expressions
 
             [n.13.1]    <<, >>
 
@@ -3717,7 +3669,7 @@ sequence の開始となります。開始されたら最後、この ( に対応する ) がなけ
     走査と再置換
     C99 6.10.3.4 Rescanning and further replacement
   *2 [1.7.6] 参照。
-  *3 再帰的マクロの展開に関する規格の仕様については、主に２通りの解釈が
+  *3  再帰的マクロの展開に関する規格の仕様については、主に２通りの解釈が
     あり、newsgroup comp.std.c で論争が何回か行われている。recurs.t はこ
     の論争の素材の１つである。recurs.t 中のコメントを参照されたい。この
     サンプルは評点の対象とはしない。
@@ -4096,7 +4048,7 @@ tion-defined であるので、範囲チェックも implementation-defined であると
   ワイド文字の multi-character constant というものも存在します。評価の仕
 方はやはり全面的に implementation-defined ですが、対応する multi-byte
 character の multi-character constant と合っている必要があります。
-  配点  : 2。
+  配点  : なし。
 
         [2.4.37]    Translation limits
 
@@ -4504,14 +4456,14 @@ character を UCN に変換してしまうので、#if 式中の文字定数は UCN としてで
   規格と実装のいささか混乱した状況と、一般に #if 式中の文字定数というも
 のの portability の無さと意味の無さを踏まえて、この Validation Suite で
 は V.1.5 からは #if 式中の multi-byte/wide character の文字定数のテスト
-は評点の対象からはずしました（m.33.1, m.34, m.36.1）。
+は評点の対象からはずしました（m.33, m.34, m.36.1）。
 
   Visual C++ には #pragma setlocale という便利なディレクティブがあるので、
 これが使えます。Windows では「地域と言語のオプション」によって使用言語を
 変更できることになっていますが、中途半端でありやっかいです。#pragma
 setlocale は Windows をいじらずに使えるので、プログラマにとっては便利な
-ものです（Visual C++ 自身がそれをどこまで正しく実装しているかは別である
-が）。
+ものです（ただし、Visual C++ 自身は #pragma setlocale の指定は Windows
+の「言語と地域」に一致していなければならないとしている）。
   私のテストした他の処理系では今のところ、その処理系でのデフォルトの
 encoding にしか対応していないようです。ライブラリに setlocale() 等の関数
 を持つ処理系は多くありますが、それはソースのプリプロセスやコンパイルには
@@ -5473,7 +5425,7 @@ UNIX 系では file, ldd コマンドも参考にする。tcsh の time コマンドの出力
 
     [3.6]       C++ のプリプロセス
 
-  Ｃ処理系が C++ 処理系といっしょに提供されることが多くなってきましたが、
+  Ｃ処理系が C++ 処理系といっしょに提供されることが多くなっていますが、
 その場合はプリプロセッサはＣと C++ とで同じものが使われているようです。
 確かに両者のプリプロセスはほとんど同じなので、わざわざ別のプリプロセッサ
 を用意する必要はないでしょう。しかし、両者はまったく同じではありません。
@@ -6044,8 +5996,8 @@ int であれば、その結果も int です。したがって、~INT_MAX も 1<<15 も結果
         #define USHRT_MAX   65535U
   *2  最近の処理系では *_MIN は (-*_MAX - 1) という形の定義が一般的にな
     り、間違いは少なくなっている。しかし、まだ時に間違いが見られる。
-    Visual C++ .net 2003 の Vc7/include/limits.h, Vc7/crt/src/include/
-    limits.h には次のようなものがある。
+    Visual C++ 2003 の Vc7/include/limits.h, Vc7/crt/src/include/limits.
+    h には次のようなものがある。
         #define LLONG_MIN   0x8000000000000000
     0x8000000000000000 は unsigned long long で評価される。この型は最高
     位ランクであるので、integer promotion の結果も同じ型である。マイナス
@@ -6053,7 +6005,8 @@ int であれば、その結果も int です。したがって、~INT_MAX も 1<<15 も結果
         #if LLONG_MAX > LLONG_MIN
     は期待した結果にはならない。
 
-    LCC-Win32 V.3.2 の include/limits.h の LLONG_MIN はこうなっている。
+    LCC-Win32 V.3.2, V.3.8 の include/limits.h の LLONG_MIN はこうなって
+    いる。
         #define LLONG_MIN   -9223372036854775808LL
     9223372036854775808LL はこのトークンの値がすでに signed long long の
     範囲を overflow しており violation of constraint である。
@@ -6067,6 +6020,7 @@ int であれば、その結果も int です。したがって、~INT_MAX も 1<<15 も結果
     ろうか。
         #define LLONG_MIN   (-LLONG_MAX - 1LL)
     とすれば何も問題はない。
+    Visual C++ 2005 ではこれは修正された。
   *3  C89 Rationale 3.1.2.5 Types
       C99 Rationale 6.2.6.2 Integer types
   *4  C99 では、特定のビットパターンを例外処理を引き起こす "trap
@@ -6130,16 +6084,7 @@ readability に欠けるので、iso646.h はそれに代わって１１種の演算子をトー
     このテストで使ったのは、kmatsui がオリジナル版に手を加えて Linux /
     GNU C でコンパイルしたもの。Translation limits がなるべく規定をクリ
     アするようマクロを書き換えた。
-2   :   MS-DOW      / Borland C++ V.4.02J   / cpp
-        C95:    cpp -A -w -i250
-                bcc -A -w -i250
-    1993 年。日本語版は 1994/12 のもの。Trigraph は cpp も bcc も処理せ
-    ず、その代わりに trigraph.exe という変換プログラムが用意されている。
-    「規格準拠」と称するためのアリバイ作りである。Borland C では、これを
-    使って予め変換したサンプルでテストした（甘いテスト）。ところが、この
-    trigraph.exe は <backslash><newline> による行接続まで処理してしまう。
-    そのため、行番号がズレる（q.1.2 のほうで減点）。
-3   :   FreeBSD 2.2.7   / GNU C V.2.7.2.1   / cpp (V.2.0)
+2   :   FreeBSD 2.2.7   / GNU C V.2.7.2.1   / cpp (V.2.0)
         GO32        / DJGPP V.1.12          / cpp (V.2.0)
         WIN32       / BC 4.0                / cpp (V.2.0)
         MS-DOS      / BC 4.0, TC 2.0        / cpp (V.2.0)
@@ -6158,14 +6103,18 @@ readability に欠けるので、iso646.h はそれに代わって１１種の演算子をトー
     した版を使った場合のものである。当時はこのバージョンは上記の処理系に
     対応していたが、今回は Linux 上で GNU C V.3.3 でリコンパイルしたもの
     を使ってテストした。
-4   :   WIN32       / Borland C++ V.5.5J    / cpp32 (2000/08)
+3   :   WIN32       / Borland C++ V.5.5J    / cpp32 (2000/08)
         C95:    cpp32 -A -w
                 bcc32 -A -w
         C99:    cpp32 -A -w
         C++:    cpp32 -A -w
-    Trigraph については V.4.0 と同様。Free の処理系となったが、そのかわ
-    りドキュメントは help だけとなった。
-5  :    Vine Linux 3.1, CygWIN 1.3.10
+    Trigraph は cpp も bcc も処理せず、その代わりに trigraph.exe という
+    変換プログラムが用意されている。「規格準拠」と称するためのアリバイ作
+    りである。Borland C では、これを使って予め変換したサンプルでテストし
+    た（甘いテスト）。ところが、この trigraph.exe は <backslash><newline>
+    による行接続まで処理してしまう。そのため、行番号がズレる（q.1.2 のほ
+    うで減点）。
+4  :    Vine Linux 3.2, CygWIN 1.3.10
                         / GNU C V.2.95.3 (2001/03)  / cpp0
         C95:    cpp0 -D__STRICT_ANSI__ -std=iso9899:199409 -$ -pedantic
                                                                 -Wall
@@ -6176,26 +6125,26 @@ readability に欠けるので、iso646.h はそれに代わって１１種の演算子をトー
     仕様は移植者が用意すべきであるが、そうした独自のドキュメントは提供さ
     れていない。cpp のドキュメントとしてはやはり GNU の cpp.info しか存
     在しない。
-6   :   Vine Linux 3.1  / GNU C V.3.2R (2002/08)    / cpp0
+5   :   Vine Linux 3.2  / GNU C V.3.2 (2002/08)     / cpp0
         C95:    cpp0 -D__STRICT_ANSI__ -std=iso9899:199409 -$ -pedantic
                                                                 -Wall
-                gcc -std=iso9898:199409 -pedantic -Wall
+                gcc -std=iso9899:199409 -pedantic -Wall
         C99:    cpp0 -std=c99 -$ -Wall
         C++:    g++ -E -trigraphs -$ -Wall
     ソースから kmatsui がコンパイルしたもの。--enable-c-mbchar というオ
     プションを付けて configure している。
-7  :    Vine Linux 3.1 /                    / ucpp (V.1.3)
-        C95:    ucpp -wa
+6  :    Vine Linux 3.2 /                    / ucpp (V.1.3)
+        C95:    ucpp -wa -c90
         C99:    ucpp -wa
     Thomas Pornin による free software (2003/01)。Portable な単体プリプ
     ロセッサ。Linux / GNU C でコンパイルしてテストした。
-8  :   WIN32        / Visual C++ .net 2003  / cl
+7  :   WIN32        / Visual C++ 2003       / cl
         C95:    cl -Za -E -Wall -Tc
         C99:    cl -E -Wall -Tc
         C++:    cl -E -Wall -Tp
     -E オプションではコメントや <backslash><newline> が正しく処理されな
     いので、コンパイルによるテストを併用 (2003/04)。
-9  :    WIN32       / LCC-Win32 V.3.2       / lcc
+8  :    WIN32       / LCC-Win32 V.3.2       / lcc
         C95:    lcc -A -E
                 lcc -A
         C99:    lcc -A -E
@@ -6203,365 +6152,390 @@ readability に欠けるので、iso646.h はそれに代わって１１種の演算子をトー
     Jacob Navia が C. W. Fraser & Dave Hanson の free software である
     lcc を元に書いた統合開発環境 (2003/08)。ソースは shareware。プリプロ
     セス部分のソースは Dennis Ritchie が Plan9 のために書いたもの。
-10 :    WIN32            /                   / wave (V.1.0.0)
+9  :    WIN32            /                   / wave (V.1.0.0)
         C95:    wave
         C99:    wave --c99
         C++:    wave
     Hartmut Kaiser による free software。Stand-alone のプリプロセッサ。
     Boost preprocessor library なるものを使って実装されている。WIN32 用
     の実行プログラム (2004/01) でテストした。
-11 :    VineLinux 3.1   / GNU C V.3.4.3 (2004/11)   / cc1, cc1plus
-        C95:    gcc -E -std=iso9898:199409 -pedantic -Wall
-        C99:    gcc -E -std=c99 -$ -Wall
-        C++:    g++ -E -std=c++98 -$ -Wall
-    ソースを筆者が GNU C 3.3.2 でコンパイルしたもの。
-12 :    FreeBSD, Linux, CygWIN   / GNU C        / mcpp_std (V.2.5)
-   :    WIN32, MS-DOS   / BCC, LCC-Win32, ...   / mcpp32_std (V.2.5)
+10 :    FreeBSD, Linux, CygWIN   / GNU C 2.95, 3.
+   :    WIN32, MS-DOS   / Visual C 2003, BCC, etc.  / mcpp_std (V.2.4)
         C95:    mcpp_std -23 (-S1 -V199409L) -W31
                 gcc -ansi -Wp,-2,-W31
         C99:    mcpp_std -23 (-S1) -V199901L -W31
         C++:    mcpp_std -23+ -V199711L -W31
-    MCPP V.2.5 (2005/03) の Standard モード。
+    MCPP V.2.4 (2004/02) の Standard モード。Linux / GNU C 2.95.3 でコン
+    パイルしたものでテスト。
+11 :    VineLinux 3.2   / GNU C V.3.4.3 (2004/11)   / cc1, cc1plus
+        C95:    gcc -E -std=iso9899:199409 -pedantic -Wall
+        C99:    gcc -E -std=c99 -$ -Wall
+        C++:    g++ -E -std=c++98 -$ -Wall
+    ソースを筆者が GNU C 3.3.2 でコンパイルしたもの。
+12 :    openSUSE Linux 10.0 / GNU C V.4.0.2 (2005/09)   / cc1, cc1plus
+        C95:    gcc -E -std=iso9899:199409 -pedantic -Wall
+        C99:    gcc -E -std=c99 -$ -Wall
+        C++:    g++ -E -std=c++98 -$ -Wall
+    openSUSE 10.0 にバンドルされているもの。
+13 :   WIN32        / Visual C++ 2005       / cl
+        C95:    cl -Za -E -Wall -Tc
+        C99:    cl -E -Wall -Tc
+        C++:    cl -E -Wall -Tp
+    -E オプションではコメントや <backslash><newline> が正しく処理されな
+    いので、コンパイルによるテストを併用 (2005/09)。
+14 :    WIN32       / LCC-Win32 V.3.8       / lcc
+        C95:    lcc -A -E
+                lcc -A
+        C99:    lcc -A -E
+        C++:    lcc -A -E
+    LCC-Win32 V.3.8 (2006/03)。
+15 :    FreeBSD, Linux, CygWIN   / GNU C 2.95-4.
+   :    WIN32  / Visual C 2003-2005, BCC, LCC-Win32     / mcpp (V.2.6)
+        C95:    mcpp -23 (-S1 -V199409L) -W31
+                gcc -ansi -Wp,-2,-W31
+        C99:    mcpp -23 (-S1) -V199901L -W31
+        C++:    mcpp -23+ -V199711L -W31
+    MCPP V.2.6-prerelease (2006/06) の Standard モード。
 
     [5.2]       採点表
 
-                D   B   M   B   G   G   u   V   L   W   G   M
-                E   C   C   C   C   C   c   C   C   a   C   C
-                C   4   P   C   C   C   p   2   C   v   C   P
-                U   C   P   5   2   3   p   0   W   e   3   P
-                S   P   2   5   9   2   1   0   i   1   4   2
-                C   P   0   C   5   R   3   3   n   0   2   5
-                P   1       P   3               3   0    
-                P   6       P                   2
+                D   M   B   G   G   u   V   L   W   M   G   G   V   L   M
+                E   C   C   C   C   c   C   C   a   C   C   C   C   C   C
+                C   P   C   C   C   p   2   C   v   P   C   C   2   C   P
+                U   P   5   2   3   p   0   W   e   P   3   4   0   W   P
+                S   2   5   9   2   1   0   i   1   2   4   0   0   i   2
+                C   0   C   5       3   3   n   0   4   3   2   5   n   6
+                P       P   3               3   0                   3    
+                P       P                   2                       8    
 
-        max     1   2   3   4   5   6   7   8   9  10  11  12
+        max     1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
 
 [K&R: Processing of sources conforming to K&R and C90] (31 items)
-n.2.1     4     4   4   4   4   4   4   4   4   4   4   4   4
-n.2.2     2     2   2   2   2   2   2   2   2   2   2   2   2
-n.2.3     2     0   2   2   2   2   2   2   2   2   2   2   2
-n.6.1    10    10  10  10  10  10  10  10  10  10   4  10  10
-n.7.2     4     4   4   4   4   4   4   4   4   4   4   4   4
-n.10.2    6     0   6   6   6   6   6   6   6   6   6   6   6
-n.12.3    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.12.4    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.12.5    2     0   2   2   2   2   2   2   2   2   2   2   2
-n.12.7    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.13.1    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.13.2    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.13.3    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.13.4    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.13.7    6     6   4   6   4   6   6   6   4   6   0   6   6
-n.13.8    2     0   2   2   2   2   2   2   2   2   0   2   2
-n.13.9    2     2   2   2   2   2   2   2   0   2   0   2   2
-n.13.10   2     2   2   2   2   2   2   2   0   0   2   2   2
-n.13.11   2     0   2   2   2   2   2   2   0   0   0   2   2
-n.13.12   2     0   2   2   2   2   2   2   2   0   0   2   2
-n.15.1    6     6   6   6   6   6   6   6   6   6   6   6   6
-n.15.2    6     6   6   6   6   6   6   6   6   6   6   6   6
-n.18.1   30    30  30  30  30  30  30  30  30  30  30  30  30
-n.18.2   20    20  20  20  20  20  20  20  20  20  20  20  20
-n.18.3   10    10  10  10  10  10  10  10  10  10  10  10  10
-n.27.1    6     6   6   6   6   6   6   6   6   6   6   6   6
-n.27.2    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.29.1   10    10  10  10  10  10  10  10  10  10  10  10  10
-n.32.1    2     2   2   2   2   2   2   2   2   2   0   2   2
-i.32.3    2     2   2   2   2   2   2   2   2   2   0   2   2
-i.35.1    2     2   2   2   2   2   2   2   0   2   0   2   2
-stotal  166   150 164 166 164 166 166 166 156 160 140 166 166
+n.2.1     4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.2.2     2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.2.3     2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.6.1    10    10  10  10  10  10  10  10  10   4  10  10  10  10  10  10
+n.7.2     4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.10.2    6     0   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.12.3    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.12.4    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.12.5    2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.12.7    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.13.1    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.13.2    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.13.3    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.13.4    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.13.7    6     6   6   4   6   6   6   4   6   0   6   6   6   4   4   6
+n.13.8    2     0   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+n.13.9    2     2   2   2   2   2   2   0   2   0   2   2   2   0   2   2
+n.13.10   2     2   2   2   2   2   2   0   0   2   2   2   2   2   0   2
+n.13.11   2     0   2   2   2   2   2   0   0   0   2   2   2   2   0   2
+n.13.12   2     0   2   2   2   2   2   2   0   0   2   2   2   2   0   2
+n.15.1    6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.15.2    6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.18.1   30    30  30  30  30  30  30  30  30  30  30  30  30  30  30  30
+n.18.2   20    20  20  20  20  20  20  20  20  20  20  20  20  20  20  20
+n.18.3   10    10  10  10  10  10  10  10  10  10  10  10  10  10  10  10
+n.27.1    6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.27.2    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.29.1   10    10  10  10  10  10  10  10  10  10  10  10  10  10  10  10
+n.32.1    2     2   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+i.32.3    2     2   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+i.35.1    2     2   2   2   2   2   2   0   0   0   2   2   2   0   0   2
+stotal  166   150 166 164 166 166 166 156 158 140 166 166 166 160 156 166
 
 [C90: Processing of strictly conforming sources] (76 items)
-n.1.1     6     0   6   6   6   6   6   6   6   6   0   6   6
-n.1.2     2     0   2   2   2   2   2   2   2   2   0   2   2
-n.1.3     2     0   2   2   2   2   2   2   2   2   0   2   2
-n.2.4     2     2   2   2   2   2   2   2   2   2   2   2   2
-n.2.5     2     0   2   2   2   2   2   2   2   2   0   2   2
-n.3.1     6     6   6   6   6   6   6   6   6   6   6   6   6
-n.3.3     4     4   4   4   4   4   4   4   4   4   4   4   4
-n.3.4     2     0   0   2   0   2   2   0   2   2   2   2   2
-n.4.1     6     0   0   6   0   6   6   6   6   0   0   6   6
-n.4.2     2     0   0   2   0   2   2   2   2   0   0   2   2
-n.5.1     6     6   6   6   6   6   6   6   6   6   6   6   6
-n.6.2     6     6   6   6   6   6   6   6   6   6   6   6   6
-n.6.3     2     0   0   2   0   2   2   2   2   2   2   2   2
-n.7.1     6     6   6   6   6   6   6   6   6   6   6   6   6
-n.7.3     4     0   4   4   4   4   4   4   4   4   4   4   4
-n.8.1     8     0   8   8   8   8   8   8   8   8   8   8   8
-n.8.2     2     0   2   2   2   2   2   2   2   2   2   2   2
-n.9.1    10    10  10  10  10  10  10  10  10  10  10  10  10
-n.10.1   10    10  10  10  10  10  10  10  10  10  10  10  10
-n.11.1    8     8   8   8   8   8   8   8   8   8   8   8   8
-n.11.2    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.12.1    6     0   6   6   6   6   6   6   6   6   6   6   6
-n.12.2    4     0   4   4   4   4   4   4   4   4   0   4   4
-n.12.6    6     6   6   6   6   6   6   6   6   6   6   6   6
-n.13.5    2     2   2   2   2   2   2   2   2   2   0   2   2
-n.13.6    6     0   6   6   6   6   6   4   6   4   0   6   6
-n.13.13   4     4   4   4   4   4   4   4   4   4   4   4   4
-n.13.14   2     0   2   2   2   2   2   2   2   2   2   2   2
-n.19.1    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.19.2    4     2   4   4   4   4   4   4   4   4   2   4   4
-n.20.1    6     6   6   6   6   6   6   6   6   6   6   6   6
-n.21.1    4     0   0   4   0   4   4   4   0   4   4   4   4
-n.21.2    2     0   0   2   0   2   2   2   0   2   2   2   2
-n.22.1    4     0   0   4   0   4   4   4   4   4   0   4   4
-n.22.2    2     0   0   2   0   2   2   2   2   2   0   2   2
-n.22.3    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.23.1    6     2   6   6   6   6   6   6   6   6   6   6   6
-n.23.2    2     2   2   2   2   2   2   2   2   2   0   2   2
-n.24.1    6     6   6   6   6   6   6   6   6   6   6   6   6
-n.24.2    4     0   4   4   4   4   4   4   4   4   4   4   4
-n.24.3    6     0   0   6   0   6   6   6   6   6   6   6   6
-n.24.4    2     0   2   2   2   2   2   2   2   2   2   2   2
-n.24.5    2     0   2   2   2   2   2   2   2   2   2   2   2
-n.25.1    4     2   4   4   4   4   4   4   4   4   4   4   4
-n.25.2    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.25.3    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.25.4    6     0   6   6   6   6   6   6   6   6   6   6   6
-n.25.5    4     0   4   4   4   4   4   4   4   4   4   4   4
-n.26.1    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.26.2    2     0   2   2   2   2   2   2   2   2   2   2   2
-n.26.3    2     0   2   2   2   2   2   2   2   2   2   2   2
-n.26.4    2     0   2   2   2   2   2   2   2   2   2   2   2
-n.26.5    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.27.3    2     0   2   2   2   2   2   2   2   2   2   2   2
-n.27.4    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.27.5    2     2   2   2   2   2   2   2   0   2   0   2   2
-n.27.6    2     0   2   0   2   2   2   2   2   2   2   2   2
-n.28.1    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.28.2    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.28.3    4     0   4   4   4   4   4   2   4   4   4   4   4
-n.28.4    4     0   4   4   4   4   4   4   4   4   4   4   4
-n.28.5    4     0   4   4   4   4   4   4   4   4   4   4   4
-n.28.6    4     0   0   4   0   4   4   2   0   0   4   4   4
-n.28.7    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.29.2    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.30.1    6     6   6   6   6   6   6   6   6   6   6   6   6
-n.32.2    2     2   2   2   2   2   2   2   2   2   0   2   2
-n.37.1    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.37.2    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.37.3    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.37.4    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.37.5    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.37.6    2     2   0   2   2   2   2   2   2   2   2   2   2
-n.37.7    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.37.8    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.37.9    4     4   4   4   4   4   4   4   4   4   4   4   4
-stotal  286   160 250 284 252 286 286 278 274 272 240 286 286
+n.1.1     6     0   6   6   6   6   6   6   6   0   6   6   6   6   6   6
+n.1.2     2     0   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+n.1.3     2     0   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+n.2.4     2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.2.5     2     0   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+n.3.1     6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.3.3     4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.3.4     2     0   2   0   2   2   0   2   2   2   2   2   2   2   2   2
+n.4.1     6     0   6   0   6   6   6   6   0   0   6   6   6   6   0   6
+n.4.2     2     0   2   0   2   2   2   2   0   0   2   2   2   2   0   2
+n.5.1     6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.6.2     6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.6.3     2     0   2   0   2   2   2   2   2   2   2   2   2   2   2   2
+n.7.1     6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.7.3     4     0   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.8.1     8     0   8   8   8   8   8   8   8   8   8   8   8   8   8   8
+n.8.2     2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.9.1    10    10  10  10  10  10  10  10  10  10  10  10  10  10  10  10
+n.10.1   10    10  10  10  10  10  10  10  10  10  10  10  10  10  10  10
+n.11.1    8     8   8   8   8   8   8   8   8   8   8   8   8   8   8   8
+n.11.2    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.12.1    6     0   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.12.2    4     0   4   4   4   4   4   4   4   0   4   4   4   4   4   4
+n.12.6    6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.13.5    2     2   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+n.13.6    6     0   6   6   6   6   4   6   4   0   6   6   6   4   4   6
+n.13.13   4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.13.14   2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.19.1    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.19.2    4     2   4   4   4   4   4   4   4   2   4   4   4   4   4   4
+n.20.1    6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.21.1    4     0   4   0   4   4   4   0   4   4   4   4   4   0   4   4
+n.21.2    2     0   2   0   2   2   2   0   2   2   2   2   2   0   2   2
+n.22.1    4     0   4   0   4   4   4   4   4   0   4   4   4   4   4   4
+n.22.2    2     0   2   0   2   2   2   2   2   0   2   2   2   2   2   2
+n.22.3    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.23.1    6     2   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.23.2    2     2   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+n.24.1    6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.24.2    4     0   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.24.3    6     0   6   0   6   6   6   6   6   6   6   6   6   6   6   6
+n.24.4    2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.24.5    2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.25.1    4     2   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.25.2    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.25.3    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.25.4    6     0   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.25.5    4     0   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.26.1    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.26.2    2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.26.3    2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.26.4    2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.26.5    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.27.3    2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.27.4    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.27.5    2     2   2   2   2   2   2   0   2   0   2   2   2   0   2   2
+n.27.6    2     0   0   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.28.1    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.28.2    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.28.3    4     0   4   4   4   4   2   4   4   4   4   4   4   4   4   4
+n.28.4    4     0   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.28.5    4     0   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.28.6    4     0   4   0   4   4   2   0   0   4   4   4   4   0   0   4
+n.28.7    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.29.2    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.30.1    6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.32.2    2     2   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+n.37.1    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.37.2    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.37.3    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.37.4    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.37.5    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.37.6    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.37.7    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.37.8    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.37.9    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+stotal  286   160 284 252 286 286 278 274 272 240 286 286 286 272 272 286
 
 [C90: Processing of implementation defined portions] (1 item)
-i.32.4    2     2   2   2   2   2   2   2   2   2   2   2   2
-stotal    2     2   2   2   2   2   2   2   2   2   2   2   2
+i.32.4    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+stotal    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
 
 [C90: Diagnosing of violation of syntax rule or constraint] (50 items)
-e.4.3     2     2   1   2   1   2   2   2   2   2   2   2   2
-e.7.4     2     0   2   2   2   2   2   2   2   2   2   2   2
-e.12.8    2     0   0   2   2   2   2   2   2   0   2   2   2
-e.14.1    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.14.2    4     2   2   4   2   4   4   2   2   4   4   4   4
-e.14.3    2     2   2   2   2   2   2   1   2   2   2   2   2
-e.14.4    2     2   2   2   2   2   2   1   2   2   2   2   2
-e.14.5    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.14.6    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.14.7    2     0   2   2   2   2   2   2   2   2   2   2   2
-e.14.8    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.14.9    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.14.10   4     0   2   4   2   0   0   0   0   0   0   0   4
-e.15.3    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.15.4    2     2   1   2   1   2   2   2   1   2   2   2   2
-e.15.5    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.16.1    2     2   1   2   1   2   2   2   1   2   2   2   2
-e.16.2    2     2   1   2   1   2   2   2   1   2   2   2   2
-e.17.1    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.17.2    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.17.3    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.17.4    2     2   2   2   2   2   2   2   2   2   0   2   2
-e.17.5    2     0   2   2   2   2   2   2   2   2   0   2   2
-e.17.6    2     0   2   2   2   2   2   2   2   2   0   2   2
-e.17.7    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.18.4    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.18.5    2     2   2   2   2   0   2   2   2   2   2   2   2
-e.18.6    2     0   2   2   2   2   2   2   2   2   0   2   2
-e.18.7    2     0   2   2   2   2   2   2   2   2   2   2   2
-e.18.8    2     2   2   2   2   2   2   2   2   2   0   2   2
-e.18.9    2     0   0   2   0   2   2   2   2   0   0   0   2
-e.19.3    4     4   4   4   4   4   4   4   4   4   4   4   4
-e.19.4    4     4   4   4   4   4   4   4   4   4   4   4   4
-e.19.5    4     4   4   4   4   4   4   4   4   4   4   4   4
-e.19.6    2     0   2   2   2   2   2   2   2   2   2   2   2
-e.19.7    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.23.3    2     0   2   2   2   2   2   2   2   0   0   2   2
-e.23.4    2     2   2   2   2   2   2   2   2   0   0   2   2
-e.24.6    2     2   2   2   2   2   2   2   2   0   0   2   2
-e.25.6    4     0   0   4   0   4   4   4   4   4   4   4   4
-e.27.7    2     0   2   2   2   2   2   2   0   2   2   2   2
-e.29.3    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.29.4    2     2   1   2   1   2   2   2   1   2   2   2   2
-e.29.5    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.31.1    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.31.2    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.31.3    2     2   0   2   0   2   2   2   2   2   2   2   2
-e.32.5    2     0   2   2   2   2   2   0   2   0   0   2   2
-e.33.2    2     0   0   2   0   0   2   0   2   0   0   2   2
-e.35.2    2     0   1   2   1   2   2   0   2   0   2   2   2
-stotal  112    74  90 112  92 104 108  98 100  92  86 106 112
+e.4.3     2     2   2   1   2   2   2   2   2   2   2   2   2   2   2   2
+e.7.4     2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.12.8    2     0   2   2   2   2   2   2   0   2   2   2   2   2   0   2
+e.14.1    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.14.2    4     2   4   2   4   4   2   2   4   4   4   4   4   4   4   4
+e.14.3    2     2   2   2   2   2   1   2   2   2   2   2   2   2   2   2
+e.14.4    2     2   2   2   2   2   1   2   2   2   2   2   2   2   2   2
+e.14.5    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.14.6    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.14.7    2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.14.8    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.14.9    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.14.10   4     0   4   2   0   0   0   0   0   0   4   0   0   0   0   4
+e.15.3    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.15.4    2     2   2   1   2   2   2   1   2   2   2   2   2   2   2   2
+e.15.5    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.16.1    2     2   2   1   2   2   2   1   2   2   2   2   2   2   2   2
+e.16.2    2     2   2   1   2   2   2   1   2   2   2   2   2   2   2   2
+e.17.1    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.17.2    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.17.3    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.17.4    2     2   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+e.17.5    2     0   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+e.17.6    2     0   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+e.17.7    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.18.4    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.18.5    2     2   2   2   0   2   2   2   2   2   2   2   2   2   2   2
+e.18.6    2     0   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+e.18.7    2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.18.8    2     2   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+e.18.9    2     0   2   0   2   2   2   2   0   0   2   0   2   2   0   2
+e.19.3    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+e.19.4    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+e.19.5    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+e.19.6    2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.19.7    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.23.3    2     0   2   2   2   2   2   2   0   0   2   2   2   2   0   2
+e.23.4    2     2   2   2   2   2   2   2   0   0   2   2   2   2   0   2
+e.24.6    2     2   2   2   2   2   2   2   0   0   2   2   2   2   0   2
+e.25.6    4     0   4   0   4   4   4   4   4   4   4   4   4   4   4   4
+e.27.7    2     0   2   2   2   2   2   0   2   2   2   2   2   0   2   2
+e.29.3    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.29.4    2     2   2   1   2   2   2   2   2   2   2   2   2   2   2   2
+e.29.5    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.31.1    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.31.2    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.31.3    2     2   2   0   2   2   2   1   2   2   2   2   2   1   2   2
+e.32.5    2     0   2   2   2   2   0   2   0   0   2   2   2   2   0   2
+e.33.2    2     0   2   0   0   2   0   2   0   0   2   2   2   2   0   2
+e.35.2    2     0   2   1   2   2   0   2   0   2   2   2   2   2   0   2
+stotal  112    74 112  92 104 108  98 100  92  86 112 106 108 105  92 112
 
 [C90: Documents on implementation defined behaviors] (13 items)
-d.1.1     2     0   0   2   0   0   2   0   0   0   0   2   2
-d.1.2     4     2   4   4   4   4   4   0   4   0   0   4   4
-d.1.3     2     0   0   2   0   0   2   0   0   2   2   2   2
-d.1.4     4     0   4   4   4   4   4   0   4   4   4   4   4
-d.1.5     4     2   4   4   4   2   4   4   4   4   4   2   4
-d.1.6     2     0   0   2   0   0   1   0   0   0   0   1   2
-d.2.1     2     0   2   2   2   2   2   2   0   0   0   2   2
-d.2.2     2     0   2   2   2   0   2   0   0   0   0   2   2
-d.2.3     2     0   2   2   0   0   0   0   0   0   0   0   2
-d.2.4     2     0   0   2   0   0   0   0   0   0   0   0   2
-d.2.5     2     0   2   2   0   0   0   0   2   0   0   0   2
-d.2.6     2     0   2   2   2   0   0   0   2   0   0   0   2
-d.2.7     2     0   2   2   2   0   2   0   2   0   0   2   2
-stotal   32     4  24  32  20  12  23   6  18  10  10  21  32
+d.1.1     2     0   2   0   0   2   0   0   0   0   2   2   2   0   0   2
+d.1.2     4     2   4   4   4   4   0   4   0   0   4   4   4   4   0   4
+d.1.3     2     0   2   0   0   2   0   0   2   2   2   2   2   2   0   2
+d.1.4     4     0   4   4   4   4   0   4   4   4   4   4   4   4   4   4
+d.1.5     4     2   4   4   2   4   4   4   4   4   4   2   2   4   4   4
+d.1.6     2     0   2   0   0   1   0   0   0   0   2   1   1   0   0   2
+d.2.1     2     0   2   2   2   2   2   0   0   0   2   2   2   0   0   2
+d.2.2     2     0   2   2   0   2   0   0   0   0   2   2   2   0   0   2
+d.2.3     2     0   2   0   0   0   0   0   0   0   2   0   0   0   0   2
+d.2.4     2     0   2   0   0   0   0   0   0   0   2   0   0   0   0   2
+d.2.5     2     0   2   0   0   0   0   2   0   0   2   0   0   2   0   2
+d.2.6     2     0   2   2   0   0   0   2   0   0   2   0   0   2   0   2
+d.2.7     2     0   2   2   0   2   0   2   0   0   2   2   2   2   0   2
+stotal   32     4  32  20  12  23   6  18  10  10  32  21  21  20   8  32
 
 [C90: Degree of Standard C conformance] (171 items)
-mttl90  598   390 530 596 530 570 585 550 550 536 478 581 598
+mttl90  598   390 596 530 570 585 550 550 534 478 598 581 583 559 530 598
 
 [C99: Conformance to new features] (20 items)
-n.dslcom  4     0   4   4   4   4   4   4   4   4   4   4   4
-n.ucn1    8     0   0   0   0   0   6   8   6   0   2   6   8
-n.ucn2    2     0   0   0   0   0   0   2   0   0   0   2   2
-n.ppnum   4     0   0   4   0   4   4   4   0   0   0   4   4
-n.line    2     0   0   2   2   2   2   2   2   0   2   2   2
-n.pragma  6     0   0   6   0   0   6   6   0   0   2   6   6
-n.llong  10     0   0   0   0  10  10   8  10   0   0  10  10
-n.vargs  10     0   0  10   0  10  10  10   0   0  10  10  10
-n.stdmac  4     0   0   2   0   0   4   4   0   0   4   4   4
-n.nularg  6     0   0   6   0   6   6   6   2   0   6   6   6
-n.tlimit 18     0  10  18  14  18  18  17  18  14  18  18  18
-e.ucn     4     0   0   0   0   0   0   2   0   0   2   0   4
-e.intmax  2     0   0   0   0   2   2   2   0   0   0   1   2
-e.pragma  2     0   0   2   0   0   2   2   0   0   2   2   2
-e.vargs1  2     0   0   0   0   0   2   1   0   0   1   2   2
-e.vargs2  2     0   0   2   0   0   0   0   0   0   0   0   2
-d.pragma  2     0   0   2   0   0   2   2   0   0   0   2   2
-d.predef  6     0   0   0   0   0   6   6   0   0   0   6   6
-d.ucn     2     0   0   0   0   0   0   0   0   0   0   0   2
-d.mbiden  2     0   0   0   0   0   2   2   1   0   0   2   2
-mttl99   98     0  14  58  20  56  86  88  43  18  53  87  98
+n.dslcom  4     0   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.ucn1    8     0   0   0   0   6   8   6   0   2   8   6   6   8   0   8
+n.ucn2    2     0   0   0   0   0   2   0   0   0   2   2   2   2   0   2
+n.ppnum   4     0   4   0   4   4   4   0   0   0   4   4   4   0   4   4
+n.line    2     0   2   2   2   2   2   2   0   2   2   2   2   2   0   2
+n.pragma  6     0   6   0   0   6   6   0   0   2   6   6   6   0   0   6
+n.llong  10     0   0   0  10  10   8  10   0   0  10  10  10  10   0  10
+n.vargs  10     0  10   0  10  10  10   0   0  10  10  10  10  10   2  10
+n.stdmac  4     0   2   0   0   4   4   0   0   4   4   4   4   0   0   4
+n.nularg  6     0   6   0   6   6   6   2   0   6   6   6   6   6   0   6
+n.tlimit 18     0  18  14  18  18  17  18  14  18  18  18  18  18  12  18
+e.ucn     4     0   0   0   0   0   2   0   0   2   4   0   0   2   0   4
+e.intmax  2     0   0   0   2   2   2   0   0   0   2   1   1   0   0   2
+e.pragma  2     0   2   0   0   2   2   0   0   2   2   2   2   0   0   2
+e.vargs1  2     0   0   0   0   2   1   0   0   1   2   2   2   2   0   2
+e.vargs2  2     0   2   0   0   0   0   0   0   0   2   0   0   0   0   2
+d.pragma  2     0   2   0   0   2   2   0   0   0   2   2   2   0   0   2
+d.predef  6     0   0   0   0   6   6   0   0   0   6   6   6   0   0   6
+d.ucn     2     0   0   0   0   0   0   0   0   0   2   0   0   0   0   2
+d.mbiden  2     0   0   0   0   2   2   1   0   0   2   2   2   1   0   2
+mttl99   98     0  58  20  56  86  88  43  18  53  98  87  87  65  22  98
 
 [C++: Conformance to new features not in C90] (9 items)
-n.dslcom  4     0   4   4   4   4   4   4   4   4   4   4   4
-n.ucn1    4     0   0   0   0   0   4   4   2   0   2   4   4
-n.cnvucn  4     0   0   0   0   0   0   1   0   0   0   0   0
-n.bool    2     0   0   0   0   0   2   0   0   0   2   2   2
-n.token1  2     0   0   2   0   0   2   0   2   2   2   2   2
-n.token2  2     0   0   0   0   0   2   0   2   0   2   2   2
-n.cplus   4     0   2   2   2   2   2   0   4   0   4   2   4
-e.operat  2     0   0   0   0   0   2   0   0   0   2   2   2
-d.tlimit  2     0   0   2   0   0   2   0   1   0   0   2   2
-mttl++   26     0   6  10   6   6  20   9  15   6  18  20  22
+n.dslcom  4     0   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.ucn1    4     0   0   0   0   4   4   2   0   2   4   4   4   4   0   4
+n.cnvucn  4     0   0   0   0   0   1   0   0   0   0   0   0   0   0   0
+n.bool    2     0   0   0   0   2   0   0   0   2   2   2   2   0   0   2
+n.token1  2     0   2   0   0   2   0   2   2   2   2   2   2   2   2   2
+n.token2  2     0   0   0   0   2   0   2   0   2   2   2   2   2   0   2
+n.cplus   4     0   2   2   2   2   0   4   0   4   4   2   2   4   0   4
+e.operat  2     0   0   0   0   2   0   0   0   2   2   2   2   0   0   2
+d.tlimit  2     0   2   0   0   2   0   1   0   0   2   2   2   1   0   2
+mttl++   26     0  10   6   6  20   9  15   6  18  22  20  20  17   6  22
 
 [C90: Qualities / 1 : handling of multibyte character] (1 item)
-m.36.2    7     0   2   2   2   0   0   0   4   0   0   5   7
-stotal    7     0   2   2   2   0   0   0   4   0   0   5   7
+m.36.2    7     0   2   2   0   0   0   4   0   0   7   5   7   2   0   7
+stotal    7     0   2   2   0   0   0   4   0   0   7   5   7   2   0   7
 
 [C90: Qualities / 2 : diagnosis of undefined behaviors] (29 items)
-u.1.1     1     0   0   1   0   1   1   0   0   0   1   1   1
-u.1.2     1     0   0   1   0   1   1   0   1   0   1   1   1
-u.1.3     1     0   1   1   1   1   1   1   1   1   1   1   1
-u.1.4     1     0   0   1   1   1   1   1   1   1   1   1   1
-u.1.5     1     1   1   1   1   1   1   1   1   1   0   1   1
-u.1.6     1     0   0   1   0   1   1   0   0   1   0   1   1
-u.1.7     7     0   0   1   0   0   0   0   0   0   0   6   7
-u.1.8     1     1   0   1   0   1   1   0   0   0   0   0   1
-u.1.9     1     1   0   1   0   1   1   1   0   1   0   0   1
-u.1.10    1     1   1   1   1   1   1   1   1   1   1   1   1
-u.1.11    1     1   1   1   1   0   1   1   1   1   1   1   1
-u.1.12    1     1   1   1   1   1   1   1   1   1   1   1   1
-u.1.13    1     0   1   1   1   1   1   1   1   1   1   1   1
-u.1.14    1     0   1   1   1   1   1   1   1   1   1   1   1
-u.1.15    1     0   1   1   1   1   1   1   1   1   1   1   1
-u.1.16    1     0   1   1   1   1   1   1   1   1   0   1   1
-u.1.17    2     0   0   2   0   1   1   0   0   1   0   1   2
-u.1.18    1     0   0   1   0   1   1   1   0   0   0   1   1
-u.1.19    2     0   0   2   0   0   1   1   0   0   1   1   2
-u.1.20    1     0   1   1   1   1   1   1   1   0   1   1   1
-u.1.21    2     0   1   2   1   0   1   2   2   2   2   1   2
-u.1.22    1     0   0   1   0   0   1   1   0   1   0   1   1
-u.1.23    1     1   0   1   0   0   1   0   0   0   0   1   1
-u.1.24    2     0   0   2   0   0   0   0   0   0   0   0   2
-u.1.25    1     0   0   1   0   0   1   0   0   0   0   1   1
-u.1.27    1     1   1   1   1   0   1   1   1   1   0   1   1
-u.1.28    1     1   1   1   1   0   1   1   1   1   0   1   1
-u.2.1     1     1   0   1   1   1   1   0   1   0   1   1   1
-u.2.2     1     0   0   1   1   0   1   1   0   0   0   1   1
-stotal   39    10  13  33  16  18  27  20  17  18  15  31  39
+u.1.1     1     0   1   0   1   1   0   0   0   1   1   1   1   0   0   1
+u.1.2     1     0   1   0   1   1   0   1   0   1   1   1   1   0   0   1
+u.1.3     1     0   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+u.1.4     1     0   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+u.1.5     1     1   1   1   1   1   1   1   1   0   1   1   1   1   1   1
+u.1.6     1     0   1   0   1   1   0   0   1   0   1   1   1   0   1   1
+u.1.7     7     0   1   0   0   0   0   0   0   0   7   6   0   0   0   7
+u.1.8     1     1   1   0   1   1   0   0   0   0   1   0   0   0   1   1
+u.1.9     1     1   1   0   1   1   1   0   1   0   1   0   0   0   1   1
+u.1.10    1     1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+u.1.11    1     1   1   1   0   1   1   1   1   1   1   1   1   1   1   1
+u.1.12    1     1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+u.1.13    1     0   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+u.1.14    1     0   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+u.1.15    1     0   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+u.1.16    1     0   1   1   1   1   1   1   1   0   1   1   1   1   1   1
+u.1.17    2     0   2   0   1   1   0   0   1   0   2   1   1   0   1   2
+u.1.18    1     0   1   0   1   1   1   0   0   0   1   1   1   0   0   1
+u.1.19    2     0   2   0   0   1   1   0   0   1   2   1   1   0   0   2
+u.1.20    1     0   1   1   1   1   1   1   0   1   1   1   1   1   1   1
+u.1.21    2     0   2   1   0   1   2   2   2   2   2   1   1   2   2   2
+u.1.22    1     0   1   0   0   1   1   0   1   0   1   1   1   0   0   1
+u.1.23    1     1   1   0   0   1   0   0   0   0   1   1   0   0   0   1
+u.1.24    2     0   2   0   0   0   0   0   0   0   2   0   0   0   0   2
+u.1.25    1     0   1   0   0   1   0   0   0   0   1   1   1   0   0   1
+u.1.27    1     1   1   1   0   1   1   1   1   0   1   1   1   1   1   1
+u.1.28    1     1   1   1   0   1   1   1   1   0   1   1   1   1   1   1
+u.2.1     1     1   1   1   1   1   0   1   0   1   1   1   1   1   0   1
+u.2.2     1     0   1   1   0   1   1   0   0   0   1   1   1   0   0   1
+stotal   39    10  33  16  18  27  20  17  18  15  39  31  24  16  19  39
 
 [C90: Qualities / 3 : Diagnosis of unspecified behaviors] (2 items)
-s.1.1     2     0   0   2   0   0   0   2   0   0   0   0   2
-s.1.2     2     0   0   2   0   0   0   0   0   0   2   0   2
-stotal    4     0   0   4   0   0   0   2   0   0   2   0   4
+s.1.1     2     0   2   0   0   0   2   0   0   0   2   0   0   0   0   2
+s.1.2     2     0   2   0   0   0   0   0   0   2   2   0   0   0   0   2
+stotal    4     0   4   0   0   0   2   0   0   2   4   0   0   0   0   4
 
 [C90: Qualities / 4 : Diagnosis of suspicious cases] (12 items)
-w.1.1     4     4   0   4   0   4   4   0   0   0   0   4   4
-w.1.2     4     0   0   4   0   0   0   0   0   0   2   0   4
-w.2.1     2     0   0   2   1   0   0   0   0   0   0   2   2
-w.2.2     1     0   0   1   0   0   0   0   0   0   0   0   1
-w.3.1     1     1   0   1   0   0   0   0   0   0   0   0   1
-w.3.3     1     0   0   1   0   0   0   0   0   0   0   0   1
-w.3.4     1     0   0   1   0   0   0   0   0   0   0   0   1
-w.3.5     1     0   0   1   0   0   0   0   0   0   0   0   1
-w.3.6     1     0   0   1   0   0   0   0   0   0   0   0   1
-w.3.7     1     0   0   1   0   0   0   0   0   0   0   0   1
-w.3.8     1     0   0   1   0   0   0   0   0   0   0   0   1
-w.3.9     1     0   0   1   0   0   0   0   0   0   0   0   1
-stotal   19     5   0  19   1   4   4   0   0   0   2   6  19
+w.1.1     4     4   4   0   4   4   0   0   0   0   4   4   4   0   0   4
+w.1.2     4     0   4   0   0   0   0   0   0   2   4   0   0   0   0   4
+w.2.1     2     0   2   1   0   0   0   0   0   0   2   2   2   0   0   2
+w.2.2     1     0   1   0   0   0   0   0   0   0   1   0   0   0   0   1
+w.3.1     1     1   1   0   0   0   0   0   0   0   1   0   0   0   1   1
+w.3.3     1     0   1   0   0   0   0   0   0   0   1   0   0   0   0   1
+w.3.4     1     0   1   0   0   0   0   0   0   0   1   0   0   0   0   1
+w.3.5     1     0   1   0   0   0   0   0   0   0   1   0   0   0   0   1
+w.3.6     1     0   1   0   0   0   0   0   0   0   1   0   0   0   0   1
+w.3.7     1     0   1   0   0   0   0   0   0   0   1   0   0   0   0   1
+w.3.8     1     0   1   0   0   0   0   0   0   0   1   0   0   0   0   1
+w.3.9     1     0   1   0   0   0   0   0   0   0   1   0   0   0   0   1
+stotal   19     5  19   1   4   4   0   0   0   2  19   6   6   0   1  19
 
 [C90: Qualities / 5 : Other features] (17 items)
-q.1.1     9     0   5   9   6   9   9   8   7   4   9   9   9
-q.1.2    10     6   4  10   4   8  10   4   4   4   4  10  10
-q.1.3     4     4   2   4   2   4   4   4   4   4   4   4   4
-q.1.4    20    10  10  20  10  20  20  20  10  20  10  20  20
-q.2.1     4     2   2   4   2   4   4   4   4   2   4   4   4
-q.2.2     4     4   4   4   4   4   4   4   4   4   4   4   4
-q.2.3     2     2   2   2   2   2   2   2   2   2   2   2   2
-q.2.4     2     2   0   2   0   2   2   0   0   0   0   2   2
-q.2.5     2     0   0   2   0   0   0   0   0   0   0   0   2
-q.2.6     4     0   2   4   2   4   4   2   4   2   0   4   4
-q.2.7    10     4   2   6   4   8   8   4   4   4   2   8   8
-q.2.8    10     0   2   6   2   2   2   0   6   4   4   2   8
-q.2.9     6     2   0   2   0   2   2   0   0   0   4   2   2
-q.3.1    20    10   8   8   8  14  12   8  10  10   6  12   8
-q.3.2    20    20  18  20  18  16  16  18  16  20  14  14  18
-q.3.3    20    10   0  14   0  10  12   8   0  10   8  12  16
-q.4.1    10     2   6   6   6   4   6   2   4   6   4   6   6
-stotal  157    78  67 123  70 113 117  88  79  96  79 115 127
+q.1.1     9     0   9   6   9   9   8   7   4   9   9   9   9   7   5   9
+q.1.2    10     6  10   4   8  10   4   4   4   4  10  10  10   4   4  10
+q.1.3     4     4   4   2   4   4   4   4   4   4   4   4   4   4   4   4
+q.1.4    20    10  20  10  20  20  20  10  20  10  20  20  20  10  20  20
+q.2.1     4     2   4   2   4   4   4   4   2   4   4   4   4   4   2   4
+q.2.2     4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+q.2.3     2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+q.2.4     2     2   2   0   2   2   0   0   0   0   2   2   2   0   0   2
+q.2.5     2     0   2   0   0   0   0   0   0   0   2   0   0   0   0   2
+q.2.6     4     0   4   2   4   4   2   4   2   0   4   4   4   4   2   4
+q.2.7    10     4   6   4   8   8   4   4   4   2   8   8   8   4   4   8
+q.2.8    10     0   6   2   2   2   0   6   4   4   8   2   2   6   4   8
+q.2.9     6     2   2   0   2   2   0   0   0   4   2   2   2   0   0   2
+q.3.1    20    10   8   8  14  12   8  10  10   6   8  12  12   8  10   8
+q.3.2    20    20  20  18  16  16  18  16  18  14  18  14  14  14  18  18
+q.3.3    20    10  14   0  10  12   8   0  10   8  16  12  12   0  10  16
+q.4.1    10     2   6   6   4   6   2   4   6   4   6   6   6   4   6   6
+stotal  157    78 123  70 113 117  88  79  94  79 127 115 115  75  95 127
 
 [C90: Qualities] (61 items)
-mttl90  226    93  82 181  89 135 148 110 100 114  98 157 196
+mttl90  226    93 181  89 135 148 110 100 112  98 196 157 152  93 115 196
 
 [C99: Qualities of new features] (3 items)
-u.line    2     0   0   2   0   1   1   0   0   0   0   1   2
-u.concat  1     0   0   1   0   0   1   0   0   0   0   1   1
-w.tlimit  8     0   0   8   0   0   0   3   2   0   0   0   8
-mttl99   11     0   0  11   0   1   2   3   2   0   0   2  11
+u.line    2     0   2   0   1   1   0   0   0   0   2   1   1   0   0   2
+u.concat  1     0   1   0   0   1   0   0   0   0   1   1   1   0   0   1
+w.tlimit  8     0   8   0   0   0   3   2   0   0   8   0   0   2   0   8
+mttl99   11     0  11   0   1   2   3   2   0   0  11   2   2   2   0  11
 
 [C++: Qualities of features not in C90] (1 item)
-u.cplus   1     0   1   1   1   0   0   0   1   0   1   0   1
-mttl++    1     0   1   1   1   0   0   0   1   0   1   0   1
+u.cplus   1     0   1   1   0   0   0   1   0   1   1   0   0   1   0   1
+mttl++    1     0   1   1   0   0   0   1   0   1   1   0   0   1   0   1
 
 [Overall] (265 items)
-gtotal  960   483 633 857 646 768 841 760 711 674 648 847 926
+gtotal  960   483 857 646 768 841 760 711 670 648 926 847 844 737 673 926
 
-                D   B   M   B   G   G   u   V   L   W   G   M
-                E   C   C   C   C   C   c   C   C   a   C   C
-                C   4   P   C   C   C   p   2   C   v   C   P
-                U   C   P   5   2   3   p   0   W   e   3   P
-                S   P   2   5   9   2   1   0   i   1   4   2
-                C   P   0   C   5   R   3   3   n   0   2   5
-                P   1       P   3               3   0
-                P   6       P                   2
+                D   M   B   G   G   u   V   L   W   M   G   G   V   L   M
+                E   C   C   C   C   c   C   C   a   C   C   C   C   C   C
+                C   P   C   C   C   p   2   C   v   P   C   C   2   C   P
+                U   P   5   2   3   p   0   W   e   P   3   4   0   W   P
+                S   2   5   9   2   1   0   i   1   2   4   0   0   i   2
+                C   0   C   5       3   3   n   0   4   3   2   5   n   6
+                P       P   3               3   0                   3    
+                P       P                   2                       8    
 
-        max     1   2   3   4   5   6   7   8   9  10  11  12
+        max     1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
 
     [5.3]       各プリプロセッサの特徴
 
@@ -6573,8 +6547,7 @@ gtotal  960   483 633 857 646 768 841 760 711 674 648 847 926
 た。お手本のように読みやすいソースで、読むだけでも勉強になります。私が
 MCPP のベースにしたのはこのソースです。
 
-2   :   MS-DOS      / Borland C++ V.4.02J       / cpp
-4   :   WIN32       / Borland C++ V.5.5J        / cpp32
+3   :   WIN32       / Borland C++ V.5.5J        / cpp32
   C90 の規格準拠度は比較的高く、やっかいな shift-JIS にもまともに対応し
 ています。ドキュメントも整っています。しかし、e_* では診断メッセージはた
 いてい出ますが、間に合わせ的なものが多く、質は良くありません。
@@ -6584,16 +6557,13 @@ MCPP のベースにしたのはこのソースです。
   速度は Turbo C と違って、速いほうではなくなりました。すでに１パス・コ
 ンパイラのメリットはなくなってデメリットだけが残っていると思われますが、
 いつまでこの流儀を続けてゆくのでしょうか。
-  BC 5.5 のプリプロセッサは BC 4.0 に比べて、ほんの少ししか改善されてい
-ません。Free になったことによって、逆にドキュメントが不足する状態となっ
-ています。
 
-5   :   Linux, CygWIN   / GNU C V.2.95.3        / cpp0
+4   :   Linux, CygWIN   / GNU C V.2.95.3        / cpp0
   C90, C95 の規格準拠度はかなり高く、診断メッセージも的確です。動作はほ
 ぼ安定しており、かつきわめて高速です。豊富すぎるくらい豊富なオプションも
 特徴です。MCPP でも、それらのオプションのいくつかをまねています。
   かつてはいくつかの痛いバグもありましたが、V.2.95 ではバグはほとんどな
-くなっています。
+くなりました。
   残る問題は、C99, C++98 の新仕様の多くが未実装であること、診断メッセー
 ジがまだまだ足りないこと、ドキュメントがかなり不足していること、#pragma
 を使わない規格違反の拡張機能が多いこと、pre-Standard の obsolete な仕様
@@ -6607,7 +6577,7 @@ CygWIN, FreeBSD, Linux のどれにも存在しないのは残念です。「移植」という
 ロプロセッサの構造を引きずっています。しかし、 GNU C 処理系の全体が優れ
 ているため、多くのシステムに移植されています。
 
-6   :   Linux       / GNU C V.3.2               / cpp0
+5   :   Linux       / GNU C V.3.2               / cpp0
   GNU C V.3 ではプリプロセスは V.2 からソースが一新されました。同時にド
 キュメントも一新されました。Token-based な原則が徹底され、pre-Standard
 な仕様はまだ許容しながらもウォーニングが出るようになり、undocumented な
@@ -6615,8 +6585,7 @@ CygWIN, FreeBSD, Linux のどれにも存在しないのは残念です。「移植」という
 す。プログラム構造が一新されたことで、今後の改良もしやすくなったものと思
 われます。
   診断メッセージ・ドキュメント・C99 対応・multi-byte character への対応
-はまだ不十分ですが、今後、改良されてゆくことでしょう。速度はやや遅くなり
-ましたが、それでもまだ速いほうです。
+はまだ不十分です。速度はやや遅くなりましたが、それでもまだ速いほうです。
   ただ、ヘッダファイルが複雑化して include directory のサーチ順の設定も
 複雑になってきているのは、やっかいな問題です。また、古いオプションが使わ
 れなくなってきた一方で多くの新しいオプションが増えており、なかなか整理す
@@ -6624,20 +6593,22 @@ CygWIN, FreeBSD, Linux のどれにも存在しないのは残念です。「移植」という
 たが、プリプロセス部分とコンパイル部分との内部的な interface がなぜか複
 雑なものになっているのも、残念なことです。
 
-7   :   Linux       /                           / ucpp (V.1.3)
+6   :   Linux       /                           / ucpp (V.1.3)
   C99 に対応していること、オープンソースで portable であることが特徴です。
 規格準拠度はかなり高くなっています。UCN と UTF-8 に対応していることにな
 っていますが、これはきわめて不十分です。診断メッセージはやや漠然としてい
 ます。ドキュメントもかなり不足しています。
 
-8   :   WIN32       / Visual C++ .net 2003  / cl
-  C99 の仕様はまだほとんど実装されていません。C90 以前からの仕様にもいく
-つかのバグが残っています。Translation phase の混乱していることが最も根本
-的な問題です。非常に古いソースに部分的に手を入れながらバージョンアップを
-繰り返してきていることが想像されます。
+7   :   WIN32       / Visual C++ 2003           / cl
+13  :   WIN32       / Visual C++ 2005           / cl
+  C99 の仕様は 2003 ではほとんど実装されていませんでしたが、2005 ではだ
+いぶ実装が進みました。
+  しかし、C90 以前からの仕様にいくつかのバグが残っています。Translation
+phase の混乱していることが最も根本的な問題です。非常に古いソースに部分的
+に手を入れながらバージョンアップを繰り返してきていることが想像されます。
   診断メッセージはややピントのずれたものがしばしば見られます。エラーが起
 こると処理を中断してしまうことが多いのも、使いにくい点です。ドキュメント
-は実装に比べて更新がかなり遅れているようです。
+は実装に比べて更新が遅れているようです。
   Translation limits が大きいことと #pragma が比較的多いことがとりえと言
 えます。ことに #pragma setlocale は便利なものです。しかし、C90 でも #
 pragma 行がマクロ展開されること、にもかかわらず #pragma sub-directive が
@@ -6645,20 +6616,22 @@ pragma 行がマクロ展開されること、にもかかわらず #pragma sub-directive が
   添付されているシステムヘッダには、例外はありますが全体としては問題は少
 ないようです。
 
-9   :   WIN32       / LCC-Win32 V.3.2           / lcc
+8   :   WIN32       / LCC-Win32 V.3.2           / lcc
+14  :   WIN32       / LCC-Win32 V.3.8           / lcc
   プリプロセスの部分は Dennis Ritchie の Plan9 用のソースに Jacob Navia
 が手を加えたものですが、デバッグが不足しており、#if 式の評価などにかなり
 のバグがあります。C95 以降の仕様には対応していません。ドキュメントも不足
 しています。
+  V.3.2 と V.3.8 とではプリプロセスに関してはほとんど違いはありません。
 
-10  :   WIN32       /                           / wave (V.1.0.0)
+9   :   WIN32       /                           / wave (V.1.0.0)
   C++ の STL のための "meta-programming" に使うことを第一の目的に作られ
 たもので、そのための拡張機能をいくつか持っています。実装の大半が C++ の
 ライブラリでできていて、ソースの大半がヘッダファイルで成り立っているとい
 う特異なプリプロセッサです。"Meta-programming" の実例では再帰的マクロが
-多用されており、その展開では MCPP の -c オプションや GNU C / cpp と同様
-の、「再置換禁止ルール」の適用範囲を狭く限定する方法をとっています（[2.4.
-26] 参照）。
+多用されており、その展開では MCPP の -@compat オプションや GNU C / cpp
+と同様の、「再置換禁止ルール」の適用範囲を狭く限定する方法をとっています
+（[2.4.26] 参照）。
   一般の C/C++ プリプロセッサとしても使えることを意図しており、C++98,
 C99 対応を標榜していますが、完成度はまだかなり低いものです。しかし、V.1.
 0.0 のあとで、MCPP 2.4 に付属する検証セットでテストして多くのバグを修正
@@ -6670,6 +6643,7 @@ C99 対応を標榜していますが、完成度はまだかなり低いものです。しかし、V.1.
 格の解釈の間違いが見られます。
 
 11  :   Linux       / GNU C V.3.4.3             / cc1, cc1plus
+12  :   Linux       / GNU C V.4.0.2             / cc1, cc1plus
   スコアは V.3.2 とほとんど変わりません。しかし、プリプロセスの組み立て
 はかなり変わりました。V.3.2 ではスッキリした方向性を示していた GNU C で
 すが、V.3.3, 3.4 では方向が変わったようです。単体のプリプロセッサを廃止
@@ -6678,54 +6652,52 @@ C99 対応を標榜していますが、完成度はまだかなり低いものです。しかし、V.1.
 して改善と言えるかどうか疑問のあるところです。Multi-byte character の
 encoding で UTF-8 に特権的な位置を与えたことも、multi-lingualization の
 多様な可能性を狭めることになるのではないでしょうか。
+  V.4.0 はプリプロセスに関しては V.3.4 とほとんど違いがありません。
 
-3   :   FreeBSD, WIN32, MS-DOS      /               / MCPP (V.2.0)
-12  :   FreeBSD, Linux, CygWIN, WIN32, MS-DOS   /   / MCPP (V.2.5)
+2   :   FreeBSD, WIN32, MS-DOS      /               / MCPP (V.2.0)
+10  :   FreeBSD, Linux, CygWIN, WIN32, MS-DOS   /   / MCPP (V.2.4)
+15  :   FreeBSD, Linux, CygWIN, WIN32   /           / MCPP (V.2.6)
   私が自分で作って自分でテストしているものなので、規格準拠度は当然、最高
 です。世界一正確なプリプロセッサのはずです。診断メッセージの豊富さと的確
 さ、ドキュメントの詳細さも随一です。有用なオプションと #pragma も一通り
-持っています。C99 の仕様にもすべて対応しています。
+持っています。V.2.3 以降は C99 の仕様にもすべて対応しています。
   ソースの移植性の良さも一番でしょう。移植の実績が限られていることだけが
 問題です。皆さん、よろしくお願いします。
 
     [5.4]       総評
 
-  こうして多くのプリプロセッサをテストしてみると、最近では C90 規格準拠
-度はかなり高いものが多くなってきていることがわかります。しかし、各処理系
-ともまだまだ多くの問題を持っています。なお、MCPP はほとんどの項目が満点
-なので、一々言及しません。
+  こうして多くのプリプロセッサをテストしてみると、現在は C90 規格準拠度
+はかなり高いものが多くなってきていることがわかります。しかし、各処理系と
+もまだまだ多くの問題を持っています。なお、MCPP はほとんどの項目が満点な
+ので、一々言及しません。
 
-  n_* のサンプルに関しては正しく処理するものが増えており、GNU C 2.95,3.2,
-3.4, BC (Borland C) 4.0,5.5 , LCC-Win32 3.2, ucpp 1.3, Visual C++ .net
-2003 は実用上はあまり問題のないレベルに達しています。しかし、どの処理系
-にも意外なバグが見られます。
+  n_* のサンプルに関しては正しく処理するものが増えており、GNU C 2.95 以
+降, BC (Borland C) 5.5 , LCC-Win32 3.*, ucpp 1.3, Visual C++ 2003,2005
+は実用上はあまり問題のないレベルに達しています。しかし、どの処理系にも意
+外なバグが見られます。
   最も驚いたのは、n_13_7.t (n_13_7.c) が division by 0 のエラーになって
 しまう処理系が Visual C を含めてしばしば見られることです。&&, || や３項
 演算子での「評価の打ち切り」というＣの基本的な仕様を満たしていないのです。
-BC 4.0,5.5 は n_13_7.c ではウォーニングにとどめていますが、e_14_9.c の本
+Borland C は n_13_7.c ではウォーニングにとどめていますが、e_14_9.c の本
 当の division by 0 でも同じウォーニングしか出ません。Turbo C では本当の
 0 除算でも評価をスキップされる部分式でもどちらも同じエラーとなっていまし
 たが、Borland C はその診断メッセージをウォーニングに格下げしただけなので
 す。この処理系の「間に合わせ診断メッセージ」の一例です。
-  Standard C で新しく規定された仕様では、# 演算子による文字列化の実装の
-間違っているものが時々あります。引数中に文字列リテラルや文字定数があって、
-その中に escape sequence のあるものは、いまだに移植性が保証される状況に
-なっていません。これは特殊な例のように思えるかもしれませんが、assert()
-マクロ等を使うと「二重の文字列化」がしばしば発生するので、さほど特殊なこ
-とではありません。
+  C90 の仕様では、# 演算子による文字列化の実装の間違っているものが時にあ
+ります。
   そのほか、各処理系ごとにバグの一つや二つは必ず見出されます。
   Amendment 1, Corrigendum 1 で追加された仕様は、ある程度実装しているの
-は GNU C 2.95,3.2,3.4, ucpp, Visual C .net です。
-  C99 の仕様は、ucpp だけがほぼ実装しています。// コメントは多くの処理系
-が以前から実装しています。そのほか GNU C / cpp は long long を持ち、
-translation limits にかなりの余裕があり、マクロのカラ引数も適切に処理し
-ます。可変引数マクロは GNU C 独自の仕様のものを持っていますが、2.95 では
-C99 の仕様のものも実装されました。3.2 では _Pragma() も実装されました。
-UCN は ucpp だけが実装しています。GNU C 3.2,3.4 は文字列リテラルおよび文
-字定数の中の UCN だけを実装しています。Wave は C99 の仕様の半分を実装し
-ています。
-  C++98 では UCN 以外の仕様を GNU C 3.2,3.4, wave が実装しており、Visual
-C .net も半分だけ実装しています。
+は GNU C 2.95 以降, ucpp, Visual C 2003,2005 です。
+  C99 の仕様は、GNU C 3.2 以降, ucpp だけがほぼ実装しています。// コメン
+トは多くの処理系が以前から実装しています。そのほか GNU C / cpp は long
+long を持ち、translation limits にかなりの余裕があり、マクロのカラ引数も
+適切に処理します。可変引数マクロは GNU C 独自の仕様のものを持っています
+が、2.95 では C99 の仕様のものも実装されました。3.2 では _Pragma() も実
+装されました。UCN は ucpp, Visual C 2005 だけが実装しています。GNU C 3.2,
+3.4 は文字列リテラルおよび文字定数の中の UCN だけを実装しています。Wave
+は C99 の仕様の半分を実装しています。
+  C++98 の仕様は GNU C 3.2 以降, wave, Visual C 2005 がほぼ実装していま
+す。
   C++98 の extended-character を UCN に変換するという奇怪な仕様を実装し
 ているものは、まだ見当たりません。
 
@@ -6736,22 +6708,23 @@ C .net も半分だけ実装しています。
 です。
   Multi-byte character については、Visual C が多くの国の encoding に不十
 分ながら対応していますが、他の処理系は貧弱です。GNU C 2.9, 3.2 は実装が
-中途半端で、実用レベルに達していません。GNU C 3.4 ではすべての encoding
-を UTF-8 に変換してから処理するようになり、それによって多くの encoding
-に対応できるようになりましたが、実装はまだ実用レベルではありません。
+中途半端で、実用レベルに達していません。GNU C 3.4,4.0 ではすべての
+encoding を UTF-8 に変換してから処理するようになり、それによって多くの
+encoding に対応できるようになりましたが、実装はまだ実用レベルではありま
+せん。
   Shift-JIS や BIG-5 を使うシステムでは、リテラルの tokenization や # 演
 算子による文字列化に注意が必要です。Visual C はこれにうまく対応していま
-す。Borland C 4.0J,5.5J も shif-JIS には対応しています。
+す。Borland C 5.5J も shif-JIS には対応しています。
 
-  e_* に対する診断メッセージでは、GNU C 2.95,3.2,3.4 が最も優れています。
+  e_* に対する診断メッセージでは、GNU C 2.95 以降が最も優れています。
 Visual C, ucpp では診断メッセージは比較的出るものの、漠然としていたりピ
 ントが外れていたりします。#if 式の overflow に対する診断メッセージの出る
 ものは少なく、BC, ucpp がある程度診断するだけです。
 
-  処理系定義部分のドキュメントでは、BC 4.0, GNU C 3.2,3.4 がまずまずのレ
-ベルで、他はどれもお粗末です。
+  処理系定義部分のドキュメントでは、GNU C 3.2 以降がまずまずのレベルで、
+他はどれもお粗末です。
 
-  u_* に対する診断メッセージでは、GNU C 3.2,3.4 がまずまずですが、他はお
+  u_* に対する診断メッセージでは、GNU C 3.2 以降がまずまずですが、他はお
 粗末です。Undefined だから処理系は何もしなくて良いというものではないと思
 いますが。
 
@@ -6761,8 +6734,8 @@ Visual C, ucpp では診断メッセージは比較的出るものの、漠然としていたりピ
   「その他の各種品質」では、GNU C がその豊富なオプション、診断メッセージ
 の的確さ、高速性、移植性とで抜きん出ています。
 
-  総合すると、GNU C / cpp、ことに V.3 のものが、規格準拠度の高さ、使い勝
-手の良さ、あまり大きな穴のない安定性等で、最も優れています。
+  総合すると、GNU C / cpp、ことに V.3.2 のものが、規格準拠度の高さ、使い
+勝手の良さ、あまり大きな穴のない安定性等で、最も優れています。
   もちろん、MCPP は速度だけは劣るものの、他のほとんどの面でこれを上回っ
 ていることは言うまでもありません。
 
@@ -6778,23 +6751,27 @@ Visual C, ucpp では診断メッセージは比較的出るものの、漠然としていたりピ
     [5.5]       テスト報告とご意見を
 
   この Validation Suite についてのご意見や、これを使った各種処理系のプリ
-プロセスのテスト報告をお待ちしています。comp.std.c, fj.comp.lang.c 等の
-newsgroup またはメールでお願いします。
+プロセスのテスト報告をお待ちしています。
+
+    http://mcpp.sourceforge.net/
+
+の "Open Discusssion Forum" またはメールでお願いします。
   プリプロセッサの詳細テストを行った場合は、[5.2] 採点表を切り取って、こ
 れに書き込んでお送りください。合計点の計算には tool/total.c をコンパイル
 して使います。採点表を cpp_test.old とすると、
 
-    total 13 cpp_test.old cpp_test.new
+    total 16 cpp_test.old cpp_test.new
 
 とすると、stotal (sub-total), mtotal (mid-total), gtotal (grand-total)
-の各欄が書き込まれて cpp_test.new に出力されます。"13" のところは処理系
+の各欄が書き込まれて cpp_test.new に出力されます。"16" のところは処理系
 の数を指定します。
   GNU C の場合は、検証セットの testsuite 版による自動テストができます。
 各種バージョンの GNU C のテスト結果をお送りください。ログファイル (gcc.
 sum, gcc.log) を送っていただくと、診断メッセージのバージョンによる違いを
 検証セットの testsuite 版に採り入れることができます。
 
-  また、Validation Suite や MCPP の開発は CVS repository で進められてい
-ます。開発に参加してみようという方は、ぜひメールをください。
+  また、Validation Suite や MCPP の開発は SourceForge の上記 mcpp
+project で進められています。開発に参加してみようという方は、ぜひメールを
+ください。
 
                                                                    [eof]

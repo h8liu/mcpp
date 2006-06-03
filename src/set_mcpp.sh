@@ -22,45 +22,52 @@ else
     cpp_base=${cpp_name}
 fi
 
-echo "  cp -f mcpp_g*${gcc_maj_ver}${gcc_min_ver}_predef_*.h ${inc_dir}"
-cp -f mcpp_g*${gcc_maj_ver}${gcc_min_ver}_predef_*.h ${inc_dir}
+echo "  cd ${inc_dir}"
+cd ${inc_dir}
+if test ! -f mcpp_gcc${gcc_maj_ver}${gcc_min_ver}_predef_std.h; then
+    echo "  generating mcpp_g*.h header files"
+    echo '' | ${CC} -E -xc -dM - | sort | grep ' *#define *_'       \
+            > mcpp_gcc${gcc_maj_ver}${gcc_min_ver}_predef_std.h
+    echo '' | ${CC} -E -xc -dM - | sort | grep -E ' *#define *[A-Za-z]+'    \
+            > mcpp_gcc${gcc_maj_ver}${gcc_min_ver}_predef_old.h
+    echo '' | ${CXX} -E -xc++ -dM - | sort | grep ' *#define *_'    \
+            > mcpp_gxx${gcc_maj_ver}${gcc_min_ver}_predef_std.h
+    echo '' | ${CXX} -E -xc++ -dM - | sort | grep -E ' *#define *[A-Za-z]+' \
+            > mcpp_gxx${gcc_maj_ver}${gcc_min_ver}_predef_old.h
+fi
 
 # write shell-script to call of 'cpp0', 'cc1 -E' or so is replaced to call of
-# mcpp_std
+# mcpp
 echo "  cd ${cpp_path}"
 cd ${cpp_path}
 echo '#!/bin/sh'        >  mcpp.sh
 
-# for GNU C V.2, V.3.3 and later
-if test x${gcc_maj_ver} = x2 || test x${cpp_base} = xcc1; then
+# for GNU C V.3.3 and later
+if test x${cpp_base} = xcc1; then
     echo 'for i in $@'  >> mcpp.sh
     echo '    do'       >> mcpp.sh
     echo '    case $i in'           >> mcpp.sh
-    echo '        -traditional*| -fpreprocessed)'           >> mcpp.sh
+    echo '        -fpreprocessed)'          >> mcpp.sh
     echo "            ${cpp_path}/${cpp_base}_gnuc"' "$@"'  >> mcpp.sh
     echo '            exit ;;'      >> mcpp.sh
     echo '    esac'     >> mcpp.sh
     echo 'done'         >> mcpp.sh
-fi
-
-# for GNU C V.3.3 and later
-if test x${cpp_base} = xcc1; then
     echo '#!/bin/sh'    >  mcpp_plus.sh
     echo 'for i in $@'  >> mcpp_plus.sh
     echo '    do'       >> mcpp_plus.sh
     echo '    case $i in'           >> mcpp_plus.sh
-    echo '        -traditional*| -fpreprocessed)'       >> mcpp_plus.sh
+    echo '        -fpreprocessed)'  >> mcpp_plus.sh
     echo "            ${cpp_path}/cc1plus_gnuc"' "$@"'  >> mcpp_plus.sh
     echo '            exit ;;'      >> mcpp_plus.sh
     echo '    esac'     >> mcpp_plus.sh
     echo 'done'         >> mcpp_plus.sh
 fi
 
-# for GNU C V.2 and V.3
-echo ${cpp_path}/mcpp_std -23j '"$@"'   >>  mcpp.sh
+# for GNU C V.2, V.3 and V.4
+echo ${cpp_path}/mcpp '"$@"'   >>  mcpp.sh
 chmod a+x mcpp.sh
 if test x${cpp_base} = xcc1; then
-    echo ${cpp_path}/mcpp_std -+23j '"$@"'  >> mcpp_plus.sh
+    echo ${cpp_path}/mcpp -+ '"$@"'  >> mcpp_plus.sh
     chmod a+x mcpp_plus.sh
 fi
 
@@ -96,7 +103,8 @@ if test x${gcc_maj_ver} = x2; then
     exit 0
 fi
 
-# for GNU C V.3 make ${CC}.sh and ${CXX}.sh to add -no-integrated-cpp option
+# for GNU C V.3 or V.4 make ${CC}.sh and ${CXX}.sh to add -no-integrated-cpp
+# option
 echo "  cd ${gcc_path}"
 cd ${gcc_path}
 
@@ -120,6 +128,7 @@ else                                # not symbolic link
     echo "  mv ${CC}${EXEEXT} ${CC}_proper${EXEEXT}"
     mv -f ${CC}${EXEEXT} ${CC}_proper${EXEEXT}
     c_entity=${CC}${EXEEXT}
+    c_entity_base=${CC}
 fi
 
 sym_link=`ls -l ${CXX}${EXEEXT} | sed 's/^l.*/l/; s/^[^l].*//'`
@@ -142,16 +151,19 @@ else
     echo "  mv ${CXX}${EXEEXT} ${CXX}_proper${EXEEXT}"
     mv -f ${CXX}${EXEEXT} ${CXX}_proper${EXEEXT}
     cxx_entity=${CXX}${EXEEXT}
+    cxx_entity_base=${CXX}
 fi
 
 echo '#!/bin/sh' > ${CC}.sh
-echo ${gcc_path}/${c_entity}_proper -no-integrated-cpp '"$@"'   >> ${CC}.sh
+echo ${gcc_path}/${c_entity_base}_proper -no-integrated-cpp '"$@"'      \
+        >> ${CC}.sh
 echo '#!/bin/sh' > ${CXX}.sh
-echo ${gcc_path}/${cxx_entity}_proper -no-integrated-cpp '"$@"' >> ${CXX}.sh
+echo ${gcc_path}/${cxx_entity_base}_proper -no-integrated-cpp '"$@"'    \
+        >> ${CXX}.sh
 chmod a+x ${CC}.sh ${CXX}.sh
 
-echo "  ${LN_S} ${CC}.sh ${c_entity}"
-${LN_S} ${CC}.sh ${c_entity}
-echo "  ${LN_S} ${CXX}.sh ${cxx_entity}"
-${LN_S} ${CXX}.sh ${cxx_entity}
+echo "  ${LN_S} ${CC}.sh ${c_entity_base}"
+${LN_S} ${CC}.sh ${c_entity_base}
+echo "  ${LN_S} ${CXX}.sh ${cxx_entity_base}"
+${LN_S} ${CXX}.sh ${cxx_entity_base}
 
