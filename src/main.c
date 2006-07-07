@@ -57,7 +57,7 @@
  *      Implemented #error directive.  The error message is output to the
  *          stderr.                                     (control.c)
  *      Implemented #pragma __once directive, -i option and -M* option,
- *          imported from GNU C / cpp.                  (control.c & others)
+ *          imported from GCC.                          (control.c & others)
  *      Implemented #pragma __put_defines, #pragma __debug directives and the
  *          old style directives corresponding to them. (system.c & others)
  *      Made #pragma lines to be output with warning to the stderr for the
@@ -144,9 +144,8 @@
  *          five (OR of 1, 2, 4, 8, 16).
  *      Changed some errors to warnings.
  *      Changed some options on invoking.               (system.c)
- *      Added the options for compatibility to GNU C / cpp.
- *                                                      (system.c, support.c)
- *      Added implementation for Linux, Cygwin / GNU C, LCC-Win32.
+ *      Added the options for compatibility to GCC.     (system.c, support.c)
+ *      Added implementation for Linux, Cygwin / GCC, LCC-Win32.
  *                                          (system.H, control.c, system.c)
  *      Fixed a few bugs.                   (control.c, expand.c, support.c)
  *      Renamed functions and some variables using underscore to separate
@@ -154,7 +153,7 @@
  *
  * CPP Version 2.3 pre-release 2
  * 2002/12      kmatsui
- *      Added implementation for GNU C 3.2.             (system.H, system.c)
+ *      Added implementation for GCC 3.2.               (system.H, system.c)
  *      Fixed a few bugs.                               (system.c, expand.c)
  *
  * CPP Version 2.3 release
@@ -202,7 +201,7 @@
  *
  * MCPP Version 2.4.1
  * 2004/03      kmatsui
- *      Added -c option (compatible mode to GNU C expansion of recursive
+ *      Added -c option (compatible mode to GCC expansion of recursive
  *          macro).                                     (expand.c, system.c)
  */
 
@@ -213,20 +212,20 @@
  *          (POST_STD mode).                            (all the files)
  *      Absorbed OLD_PREPROCESSOR into PRE_STANDARD as an execution time
  *          mode (OLD_PREP mode).                       (all the files)
- *      Revised STD mode macro expansion routine using GNU C 3.2 testsuite
+ *      Revised STD mode macro expansion routine using GCC 3.2 testsuite
  *          and Wave 1.0 testcases.                     (expand.c)
  *      Revised OLD_PREP mode to follow "Reiser cpp model".   (control.c)
  *      Removed FOLD_CASE settings.                     (system.c)
  *      Renamed most of #pragma __* as #pragma MCPP *.  (system.c)
- *      Updated to cope with GNU C V.3.3 and 3.4, and changed some options.
+ *      Updated to cope with GCC V.3.3 and 3.4, and changed some options.
  *                                                      (system.c)
  */
 
 /*
  * MCPP Version 2.6
- * 2006/06      kmatsui
+ * 2006/07      kmatsui
  *      Integrated STANDARD and PRE_STANDARD modes into one executable,
- *          differentiating by execution time options.
+ *          differentiating the modes by execution time options.
  *      Removed settings for pre-C90 compiler (string concatenation by
  *          preprocessor, '\a' and '\v' handling, no unsigned long #if, no
  *          Standard library functions, non-prototype declarations,
@@ -304,7 +303,7 @@
 
 /*
  * MCPP Version 2.6 / main.c
- * 2006/06      kmatsui
+ * 2006/07      kmatsui
  *      Removed pre-C90 compiler settings.
  *      Removed conv_esc(), is_last_esc(), conv2oct().
  */
@@ -420,7 +419,7 @@
 
 /*
  *   compat_mode is set to TRUE, if recursive macro call is expanded more
- * than Standard's specification.  This mode is compatible to GNU C and
+ * than Standard's specification.  This mode is compatible to GCC and
  * some other implementations.
  */
     int     compat_mode = FALSE;

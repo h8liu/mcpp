@@ -1,4 +1,4 @@
-.TH MCPP "1" "June 2006" "alternative CPP" "User Commands"
+.TH MCPP "1" "July 2006" "alternative CPP" "User Commands"
 .SH NAME
 mcpp \- Matsui CPP, an alternative C preprocessor
 .SH SYNOPSIS
@@ -8,9 +8,7 @@ mcpp [\fIoptions\fP] [\fI<infile>\fP [\fI<outfile>\fP]]
 \fBmcpp\fR has plentiful diagnostics and many #pragmas. 
 It is useful to check portability of your program, and also useful to debug complicated macro.
 This is a man-page for \fBmcpp\fR of stand-alone-build.
-
 .SH OPTIONS
-
 \fBmcpp\fR expects two file names as arguments, \fI<infile>\fR and
 \&\fI<outfile>\fR.  If not specified, \fI<infile>\fR defaults to standard input
 and \fI<outfile>\fR defaults to standard output.
@@ -87,36 +85,33 @@ Enable trigraphs.
 Options available with -@std (default), -@kr or -@oldprep options:
 .IP \fB-a
 Process "assembler" source.
-
 .SH PRAGMA
 \fBmcpp\fR has the following #pragma directives.
-.PP
-#pragma once
-.PP
-#pragma __setlocale
-.PP
-#pragma MCPP put_defines
-.PP
-#pragma MCPP debug <args>
+.IP "#pragma once"
+Read the header file only once even if multiply #included.
+.IP "#pragma __setlocale( ""encoding"")"
+Specify the multibyte character encoding to "encoding".
+See -e option for the encodings.
+.IP "#pragma MCPP put_defines"
+Putout all the macro definitions currently valid.
+.IP "#pragma MCPP debug <args>"
+Start to putout debugging informations.
     <args> should be one or more of:
     token expand path if expression memory getc
-.PP
-#pragma MCPP end_debug <args>
+.IP "#pragma MCPP end_debug <args>"
+Stop to putout debugging informations.
     <args> are the same with 'debug'.
     No argument specifies all arguments.
-.PP
-#pragma MCPP push_macro
-.PP
-#pragma MCPP pop_macro
-.PP
-#pragma MCPP preprocess
-.PP
-#pragma MCPP preprocessed
-.PP
-#pragma MCPP warning
-
+.IP "#pragma MCPP push_macro( ""MACRO"")"
+Save the macro definition to the stack.
+.IP "#pragma MCPP pop_macro( ""MACRO"")"
+Retrieve the macro definition from the stack.
+.IP "#pragma MCPP preprocess"
+"Pre-preprocess" the following header files for \fBmcpp\fR.
+.IP "#pragma MCPP warning    any message"
+Putout warning "any message".
 .SH "VERSION"
-MCPP V.2.6 (2006/06) stand-alone-build
+MCPP V.2.6 (2006/07) stand-alone-build
 .SH "SEE ALSO"
 Do 'man mcpp-gcc' for \fBmcpp\fR of GCC-specific-build.
 The full documentation for \fBmcpp\fR are maintained as text files.

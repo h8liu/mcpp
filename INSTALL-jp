@@ -5,11 +5,11 @@
 
   MCPP の実行プログラムには次の２種類あります。
 
-  1、stand-alone build: 処理系からは独立して単体で動くプリプロセッサです。
+  1、stand-alone-build: 処理系からは独立して単体で動くプリプロセッサです。
     実行時オプションなどの仕様は処理系のいかんによらず一定です。プリプロ
     セスだけすることができますが、処理系の一部として動作することはできま
     せん。
-  2、compiler-specific build: 特定の処理系のプリプロセッサを代替するため
+  2、compiler-specific-build: 特定の処理系のプリプロセッサを代替するため
     のものです。その処理系に専用の仕様を持ち、その処理系の専用のディレク
     トリにインストールされます。
 
@@ -20,7 +20,7 @@ configure スクリプトを使うことができます。configure と make は任意のディ
 レクトリで実行できます。以下の説明では mcpp-2.6 ディレクトリのある path
 を ${mcpp-dir} と表記します。
 
-2、1、stand-alone build
+2、1、stand-alone-build
 
     ${mcpp-dir}/configure; make; make install
 
@@ -60,58 +60,59 @@ configure スクリプトを使うことができます。configure と make は任意のディ
 
     make DESTDIR=/tmp install
 
-とすると、/tmp/usr/local/bin/ に mcpp がインストールされ、
+とすると、/tmp/usr/local/bin/ に mcpp がインストールされます（存在しない
+ディレクトリは作成される）。
 
     make DESTDIR=/tmp install-data
 
 とすると、/tmp/usr/local/share/doc/mcpp/ 等にドキュメントがインストール
-されます（configure で --prefix=DIR オプションを指定していると
-'/usr/local' の部分が 'DIR' に置き換わる）。バイナリ・パッケージを作るに
-はこの方法を使います。
+されます（configure で --prefix=DIR オプションを指定していると '/usr/
+local' の部分が 'DIR' に置き換わる）。バイナリ・パッケージを作るにはこの
+方法を使います。
 
-2、2、compiler-specific build
+2、2、compiler-specific-build
 
     ${mcpp-dir}/configure --enable-replace-cpp; make; make install
 
 とすると、compiler-specific 版の実行プログラムが生成されて、その処理系の
 専用のディレクトリにインストールされます。
   make install-strip, make install-data, make uninstall, make uninstall-
-data は stand-alone build と同じです。configure の --prefix オプションも
+data は stand-alone-build と同じです。configure の --prefix オプションも
 同じですが、これは実行プログラムのインストールディレクトリには関係しませ
 ん。また、make での DESTDIR オプションも、実行プログラムのインストールに
 は関係しません。
 
-  ただし、GNU C 以外の処理系では先に移植作業を行い、configure でさらにい
-くつかのオプションを指定しないと、適切なコンパイルとインストールがされま
-せん。
+  ただし、GCC 以外の処理系では先に移植作業を行い、configure でさらにいく
+つかのオプションを指定しないと、適切なコンパイルとインストールがされませ
+ん。
 
-2、2、1、処理系が GNU C の場合
+2、2、1、処理系が GCC の場合
 
 2、2、1、1、make install
   --enable-replace-cpp オプションで configure した場合、make install で
 はコンパイラの置かれるディレクトリ（/usr/libexec, /usr/lib/gcc-lib/i686-
 pc-linux-gnu/VERSION 等）に実行プログラムがインストールされます。これは
 gcc の呼び出す cpp0 (cc1) が置かれているディレクトリです。make install
-は GNU C / cpp0 (cc1) を保存した上で、gcc から mcpp が呼び出されるように
-適切な設定をします。この設定は GNU C が V.2.* であるか V.3.*, 4.* である
-かによって違っています（mcpp-manual.txt [3.9.5], [3.9.7] を参照のこと）。
+は GCC / cpp0 (cc1) を保存した上で、gcc, g++ から mcpp が呼び出されるよ
+うに適切な設定をします。この設定は GCC が V.2.* であるか V.3.*, 4.* であ
+るかによって違っています（mcpp-manual.txt [3.9.5], [3.9.7] を参照のこと）。
 
 2、2、1、2、make check
-  MCPP の検証セットには GNU C の testsuite に対応した edition があります。
-GNU C / testsuite がインストールされている場合は、make check によってこ
-の testsuite 版検証セットで Standard モードの mcpp のテストをすることが
-できます。Testsuite 版検証セットは GNU C / testsuite の一部として使うよ
-うになっているので、あらかじめ GNU C / testsuite がインストールされ実行
-できる状態になっていることが必要です。GNU C / testsuite は通常は GNU C
-のソースの一部となっています（別のパッケージとなっている場合もある）。
-  また、configure する時に GNU C / testsuite の置かれているディレクトリ
-を指定しておく必要があります。そのためには次のようにします。
+  MCPP の検証セットには GCC の testsuite に対応した edition があります。
+GCC / testsuite がインストールされている場合は、make check によってこの
+testsuite 版検証セットで mcpp の Standard モードのテストをすることができ
+ます。Testsuite 版検証セットは GCC / testsuite の一部として使うようにな
+っているので、あらかじめ GCC / testsuite がインストールされ実行できる状
+態になっていることが必要です。GCC / testsuite は通常は GCC のソースの一
+部となっています（別のパッケージとなっている場合もある）。
+  また、configure する時に GCC / testsuite の置かれているディレクトリを
+指定しておく必要があります。そのためには次のようにします。
 
     ${mcpp-dir}/configure --with-gcc-testsuite-dir=DIR  \
             --enable-replace-cpp
 
-この 'DIR' は GNU C のソースが置かれているディレクトリを ${gcc-source}
-とすると、
+この 'DIR' は GCC のソースが置かれているディレクトリを ${gcc-source} と
+すると、
 
     ${gcc-source}/gcc/testsuite
 
@@ -120,36 +121,36 @@ GNU C / testsuite がインストールされている場合は、make check によってこ
 
     make check
 
-とすると、検証セットの testsuite 版が GNU C / testsuite の中にコピーされ、
-GNU C が V.2.* であるかそれとも V.3.*, 4.* であるかに応じて必要な設定が
-され、そして testsuite が実行されます。通常のソフトウェアでは make
-install の前に make check しますが、MCPP の場合は順序が逆になります。gcc
-から mcpp が呼び出されるようにしておかないと testsuite が mcpp に適用で
-きないからです。また、このため --enable-replace-cpp オプションも必要です。
-  Testsuite 版検証セットは MCPP だけでなく、GNU C V.2.95 以降の cpp0
-(cc1) にも適用することができます（cpp-test.txt [2.2.3] 参照）。
+とすると、検証セットの testsuite 版が GCC / testsuite の中にコピーされ、
+GCC が V.2.* であるかそれとも V.3.*, 4.* であるかに応じて必要な設定がさ
+れ、そして testsuite が実行されます。通常のソフトウェアでは make install
+の前に make check しますが、MCPP の場合は順序が逆になります。gcc から
+mcpp が呼び出されるようにしておかないと testsuite が mcpp に適用できない
+からです。また、このため --enable-replace-cpp オプションも必要です。
+  Testsuite 版検証セットは MCPP だけでなく、GCC V.2.95 以降の cpp0 (cc1)
+にも適用することができます（cpp-test.txt [2.2.3] 参照）。
 
 2、2、1、3、make uninstall
   make uninstall とすると、MCPP の実行プログラムは削除されます。gcc,
-cpp0 (cc1) の設定は初期状態に戻ります。mcpp_g*.h というファイルも削除さ
-れます。何かのつごうで make install した後で configure を再実行する場合
-は、その前に make uninstall しなければなりません。Configure が調査すべき
-なのは GNU C であり MCPP ではないからです。
-  検証セットがインストールされていれば、それも make uninstall で削除され
-ます。GNU C に検証セットを適用するには、手動で検証セットをコピーしてくだ
-さい。
+cpp0 (cc1) の設定は初期状態に戻ります。make install で生成された
+mcpp_g*.h というファイルも削除されます。何かのつごうで make install した
+後で configure を再実行する場合は、その前に make uninstall しなければな
+りません。Configure が調査すべきなのは GCC であり MCPP ではないからです。
+  GCC / testsuite の中に検証セットがインストールされていれば、それも
+make uninstall で削除されます。GCC に検証セットを適用するには、手動で検
+証セットをコピーしてください。
 
-2、2、2、処理系が GNU C でない場合
+2、2、2、処理系が GCC でない場合
 
-  処理系が GNU C でない場合は configure でいくつかのオプションを指定しな
-ければなりません。また、その処理系のプリプロセッサと置換できるように、ソ
-ースコードを書き足す「移植」作業が必要です。作者自身は Linux, FreeBSD,
-CygWIN 等で GNU C を使っているので移植がすんでおり、configure で情報を収
-集することもできるのですが、UNIX 系システムの他の処理系については知らな
-いので、移植はおろが configure で何をどう調べれば良いのかもわからないか
-らです。
-  UNIX 系システムの GNU C 以外の処理系では、次のような手順でコンパイルを
-進めてください。
+  処理系が GCC でない場合は configure でいくつかのオプションを指定しなけ
+ればなりません。また、その処理系のプリプロセッサと置換できるように、ソー
+スコードを書き足す「移植」作業が必要です。作者自身は Linux, FreeBSD,
+CygWIN 等で GCC を使っているので移植がすんでおり、configure で情報を収集
+することもできるのですが、UNIX 系システムの他の処理系については知らない
+ので、移植はおろが configure で何をどう調べれば良いのかもわからないから
+です。
+  UNIX 系システムの GCC 以外の処理系では、次のような手順でコンパイルを進
+めてください。
 
 2、2、2、1、オプションを指定して configure
   まず、いくつかのオプションを指定して configure してみます。例えば次の
@@ -161,15 +162,15 @@ CygWIN 等で GNU C を使っているので移植がすんでおり、configure で情報を収
 
   --bindir で指定するのは、コンパイラドライバから呼び出されるプリプロセ
 ッサが置かれるディレクトリです。さらに C++ 固有のインクルードディレクト
-リを --with-cxx-include-dir で、また処理系固有の事前定義マクロを --
-enable-SYSTEM-STD-macro その他のオプションで指定します。
+リを --with-cxx-include-dir で、また処理系固有の事前定義マクロを
+--enable-SYSTEM-STD-macro その他のオプションで指定します。
 
     ${mcpp-dir}/configure --help
 
 とするとオプションが表示されます。
   そして make; make install して、さらにコンパイラドライバから mcpp が呼
-び出されるように細工をします。その方法については、GNU C での設定方法を参
-考にしてください。
+び出されるように細工をします。その方法については、GCC での設定方法を参考
+にしてください。
 
 2、2、2、2、「移植」作業
   処理系のプリプロセッサを MCPP に置き換えて使うためには、ソースコードを
@@ -186,7 +187,7 @@ enable-SYSTEM-STD-macro その他のオプションで指定します。
 
 2、2、3、configure の制約
 
-  compiler-specific build の MCPP のコンパイルではターゲット処理系（MCPP
+  compiler-specific-build の MCPP のコンパイルではターゲット処理系（MCPP
 をプリプロセッサとして使う予定の処理系）の仕様を詳しく知る必要があります。
 同時に、コンパイルする処理系についても別の側面の仕様を知る必要があります。
 MCPP のソースはこの両者の処理系が違っていてもかまわないように、両者の設
@@ -212,8 +213,8 @@ configure ではこの両者を同時に調べることができません。そのため、ターゲッ
 
 3、1、パッチをあてる
   noconfig というディレクトリに各種処理系用の差分ファイルと makefile が
-用意されています。MCPP のソースはデフォルトでは FreeBSD / GNU C 3.4 用の
-設定になっています。差分ファイルはこれを別の処理系用に修正するものです。
+用意されています。MCPP のソースはデフォルトでは FreeBSD / GCC 3.4 用の設
+定になっています。差分ファイルはこれを別の処理系用に修正するものです。
 Makefile は各処理系に付属する make を使うように書かれています。
   src ディレクトリに入って次のようにします。以下の作業はすべて src ディ
 レクトリで行います。
@@ -237,20 +238,20 @@ BINDIR という変数に書きます。Visual C 用の Makefile では次の行の # を削
 
     #install :
 
-3、3、stand-alone build
+3、3、stand-alone-build
   これで  make して make install すると、stand-alone 版の実行プログラム
 が生成されてインストールされます（Visual C++ では make ではなく nmake を
 使う）。
 
-3、4、compiler-specific build
+3、4、compiler-specific-build
   compiler-specific 版を生成するためには、まず Makefile の BINDIR をその
 処理系の実行プログラムの置かれているディレクトリに書き換えます。そして、
 noconfig.H の次の行の 'STAND_ALONE' をそのコンパイラを表すマクロに書き換
 えて、'make' し 'make install' します。'COMPILER' は make のオプションで
-上書きすることもできます。例えば、Visual C では 'nmake COMPILER=MSC' と
-して 'nmake COMPILER=MSC install' します。Borland C では
-'make -DCOMPILER=BORLANDC' として 'make -DCOMPILER=BORLANDC install' し
-ます。
+上書きすることもできるので、noconfig.H は必ずしも書き換える必要はありま
+せん。例えば、Visual C では 'nmake COMPILER=MSC' として 'nmake COMPILER=
+MSC install' します。Borland C では 'make -DCOMPILER=BORLANDC' として
+'make -DCOMPILER=BORLANDC install' します。
 
   もし、ターゲット処理系とコンパイルする処理系とが違っている場合は、
 noconfig.H / Part 1 をターゲット処理系の仕様に合わせ、Part 2 をコンパイ
@@ -262,16 +263,16 @@ noconfig.H / Part 1 をターゲット処理系の仕様に合わせ、Part 2 をコンパイ
 できません。そうした処理系で MCPP を使うためには、そのように makefile を
 書く必要があります。noconfig ディレクトリの各 makefile には、MCPP を使っ
 て MCPP をリコンパイルする設定が書いてあるので、それを参考にしてください。
-  Visual C++ .net ではそうした makefile を使って、IDE で「メイクファイル
-プロジェクト」を作成すると、IDE のソースレベルデバッグ等の機能がすべて使
-えます（mcpp-manual.txt [2.10] 参照）。
+  Visual C++ ではそうした makefile を使って、IDE で「メイクファイルプロ
+ジェクト」を作成すると、IDE のソースレベルデバッグ等の機能がすべて使えま
+す（mcpp-manual.txt [2.10] 参照）。
 
 3、5、テスト
-  Windows では GNU C / testsuite は使えないので、test-t, test-c, test-l
-ディレクトリにあるテスト用サンプルを直接、プリプロセスして確かめます。
-tool/cpp_test.c を使うと、一部のテストだけですが、自動的に実行できます
-（cpp-test.txt [2.2.2] 参照）。
-  compiler-specific build では、MCPP 自身をプリプロセッサとして使って、
+  Windows では GCC / testsuite は使えないので、test-t, test-c, test-l デ
+ィレクトリにあるテスト用サンプルを直接、プリプロセスして確かめます。tool
+/cpp_test.c を使うと、一部のテストだけですが、自動的に実行できます（cpp-
+test.txt [2.2.2] 参照）。
+  compiler-specific-build では、MCPP 自身をプリプロセッサとして使って、
 MCPP の "pre-preprocess" という機能を使って MCPP をリコンパイルしてみる
 と、その処理系でとりあえず使えるようになったかどうかを確かめることができ
 ます（mcpp-porting.txt [3.7] 参照）。
@@ -280,8 +281,8 @@ MCPP の "pre-preprocess" という機能を使って MCPP をリコンパイルしてみる
 
   MCPP をまだ移植されてない処理系に移植するためには、多くの情報が必要で
 す。みなさんの情報をお待ちしています。
-  GNU C 以外の処理系について configure のオプションで指定する値がおわか
-りのかたは教えてください。configure.ac に取り込んでゆきたいと思います。
+  GCC 以外の処理系について configure のオプションで指定する値がおわかり
+のかたは教えてください。configure.ac に取り込んでゆきたいと思います。
 
 5、「検証セット」とは
 
@@ -290,6 +291,6 @@ MCPP の "pre-preprocess" という機能を使って MCPP をリコンパイルしてみる
 MCPP だけでなく任意のプリプロセッサに適用することができます。その使い方
 については、cpp-test.txt [2.1], [2.2] を参照してください。
 
-2006/06
+2006/07
                                          松井　潔 <kmatsui@t3.rim.or.jp>
 

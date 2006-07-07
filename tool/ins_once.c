@@ -8,7 +8,7 @@
  *          other than '/'.
  *  2004/11     kmatsui
  *      Changed '#pragma __once' to '#pragma once'.
- *  2006/06     kmatsui
+ *  2006/07     kmatsui
  *      Removed -o option.
  *      Changed non-prototype declarations to prototype ones.
  */
@@ -60,7 +60,8 @@ int main( int argc, char **argv) {
     extern char     *optarg;
     int     opt;
     char    *except[] = { "assert.h", "cassert", "cassert.h", NULL};
-    char    *g_except[] = { "stddef.h", NULL};
+    char    *g_except[] = { "stddef.h", "stdio.h", "signal.h", "errno.h"
+                    , NULL};
     char    *arg;
     char    **ep;
 
@@ -113,12 +114,12 @@ void    usage( void)
 {
     static char     *mes[] = {
    "ins_once: Insert '#pragma once' to header files except \"assert.h\"\n",
-   "            and \"stddef.h\" (for GNU C).\n",
+   "            and \"stddef.h\" and some others (for GCC).\n",
    "Usage: ins_once [-DPATH_DELIM=\\] [-t|-p|-g] [header1.h [header2.h [...]]]\n",
    "    -t : Only test files whether beginning with #ifndef or #if !defined.\n",
    "    -p : Prepend the line to the file\n",
-   "        (default: insert after the first #ifndef line -- for GNU C).\n",
-   "    -g : Do not convert \"stddef.h\".\n",
+   "        (default: insert after the first #ifndef line -- for GCC).\n",
+   "    -g : Do not convert stddef.h, stdio.h, signal.h, errno.h.\n",
         NULL,
     };
     char    **mesp = mes;

@@ -101,7 +101,7 @@
 
 /*
  * MCPP Version 2.6
- * 2006/06      kmatsui
+ * 2006/07      kmatsui
  *      Removed pre-Standard compiler settings (no unsigned long, no long
  *          double, no '\a' nor '\v', non-prototype declarations).
  *      Integrated STANDARD and PRE_STANDARD into one executable.

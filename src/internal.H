@@ -58,7 +58,7 @@
  * 2005/03      MCPP Version 2.5 / internal.H
  *              Absorbed POST_STANDARD into STANDARD and OLD_PREPROCESSOR
  *                  into PRE_STANDARD.                  by kmatsui
- * 2006/06      MCPP Version 2.6 / internal.H
+ * 2006/07      MCPP Version 2.6 / internal.H
  *              Integrated STANDARD and PRE_STANDARD modes into one executable.
  *              Removed non-prototype declarations.
  *              Absorbed DEBUG, DEBUG_EVAL, OK_MAKE, OK_TRIGRAPHS,

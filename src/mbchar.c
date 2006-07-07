@@ -53,7 +53,7 @@
 
 /*
  * MCPP Version 2.6
- * 2006/06      kmatsui
+ * 2006/07      kmatsui
  *      Removed non-prototype declarations.
  *      Removed settings for MS-DOS compilers.
  */
@@ -319,8 +319,8 @@ static short    type_utf8[ UCHARMAX + 1] = {
 
 /*
  * Names of encoding recognized.  Table for search_encoding().
- * Note: GNU C documents that LANG=C-EUCJP (C-SJIS, C-JIS) is effective,
- * though this feature is not fully enabled in GNU C.
+ * Note: GCC documents that LANG=C-EUCJP (C-SJIS, C-JIS) is effective,
+ * though this feature is not fully enabled in GCC.
  */
 static const char * const   encoding_name[ NUM_ENCODING][ NUM_ALIAS] = {
     /* normalized LANG, Visual C full, Visual C short

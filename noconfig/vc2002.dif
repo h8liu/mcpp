@@ -1,5 +1,5 @@
-*** noconfig.H	2006-05-29 00:21:45.000000000 +0900
---- noconfig.H.vc2002	2006-06-01 18:57:10.000000000 +0900
+*** noconfig.H	2006-07-03 00:29:27.000000000 +0900
+--- noconfig.H.vc2002	2006-07-03 00:50:36.000000000 +0900
 ***************
 *** 27,33 ****
    */
@@ -18,34 +18,32 @@
   /* Define target compiler.          */
   #ifndef COMPILER
 ***************
-*** 38,49 ****
+*** 38,48 ****
   #define HOST_SYSTEM         SYSTEM
   
   /* Define host compiler.            */
 ! #define HOST_COMPILER       GNUC
   
   /* Version message.                 */
-  /* "MCPP V.2.* (200y/mm) " precedes VERSION_MSG */
-  #define VERSION_MSG     \
-!     "compiled by GNU C 3.4"
+  /* "MCPP V.2.* (200y/mm) compiled by " precedes VERSION_MSG */
+! #define VERSION_MSG         "GCC 3.4"
   #if     0
-      "compiled by LCC-Win32 V.3.8"
-      "compiled by Visual C 2005"
---- 38,49 ----
+      "LCC-Win32 V.3.8"
+      "Visual C 2005"
+--- 38,48 ----
   #define HOST_SYSTEM         SYSTEM
   
   /* Define host compiler.            */
 ! #define HOST_COMPILER       MSC
   
   /* Version message.                 */
-  /* "MCPP V.2.* (200y/mm) " precedes VERSION_MSG */
-  #define VERSION_MSG     \
-!     "compiled by Visual C 2002"
+  /* "MCPP V.2.* (200y/mm) compiled by " precedes VERSION_MSG */
+! #define VERSION_MSG         "Visual C 2002"
   #if     0
-      "compiled by LCC-Win32 V.3.8"
-      "compiled by Visual C 2005"
+      "LCC-Win32 V.3.8"
+      "Visual C 2005"
 ***************
-*** 243,253 ****
+*** 242,252 ****
   #define ONE_PASS            TRUE
   #endif
   #define COMPILER_EXT        "_MSC_VER"
@@ -57,7 +55,7 @@
   /* VC 6.0:12008804, VC 2002:13009466, VC 2003:13103077, VC 2005: "140050320"*/
   #define COMPILER_SP1        "_MSC_EXTENSIONS"
   #define COMPILER_SP1_VAL    "1"
---- 243,253 ----
+--- 242,252 ----
   #define ONE_PASS            TRUE
   #endif
   #define COMPILER_EXT        "_MSC_VER"

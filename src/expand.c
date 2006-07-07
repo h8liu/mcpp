@@ -81,7 +81,7 @@
  *
  * MCPP Version 2.4.1
  * 2004/03      kmatsui
- *      Added compat_mode (compatible mode to GNU C's expansion of recursive
+ *      Added compat_mode (compatible mode to GCC's expansion of recursive
  *          macro).
  */
 
@@ -97,7 +97,7 @@
 
 /*
  * MCPP Version 2.6
- * 2006/06      kmatsui
+ * 2006/07      kmatsui
  *      Removed non-prototype declarations.
  *      Integrated STANDARD and PRE_STANDARD modes into one executable,
  *          renamed functions and some variables accordingly, created

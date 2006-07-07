@@ -7,14 +7,14 @@
  * 2004/02  Extended multi-byte character handling.
  *          Added configuration for Plan 9 / pcc.           by kmatsui
  *
- * 2005/03  Changed default setting to FreeBSD 5.* / GNU C 3.4.
+ * 2005/03  Changed default setting to FreeBSD 5.* / GCC 3.4.
  *                                                          by kmatsui
- * 2006/06  Created settings for stand-alone (compiler-independent) build.
+ * 2006/07  Created settings for stand-alone (compiler-independent) build.
  *          Removed settings for pre-C90 compiler, rearranged using #elif
  *              directive.
  *          Removed settings for MS-DOS compilers.
  *          Removed configurations for OS-9, DJGPP and Plan 9.
- *          Changed default setting to FreeBSD 5.* / stand-alone / GNU C 3.4.
+ *          Changed default setting to FreeBSD 5.* / stand-alone / GCC 3.4.
  *                                                          by kmatsui
  *
  * WARNING: These are default settings.  To configure for your system, you
@@ -41,14 +41,13 @@
 #define HOST_COMPILER       GNUC
 
 /* Version message.                 */
-/* "MCPP V.2.* (200y/mm) " precedes VERSION_MSG */
-#define VERSION_MSG     \
-    "compiled by GNU C 3.4"
+/* "MCPP V.2.* (200y/mm) compiled by " precedes VERSION_MSG */
+#define VERSION_MSG         "GCC 3.4"
 #if     0
-    "compiled by LCC-Win32 V.3.8"
-    "compiled by Visual C 2005"
-    "compiled by Visual C 2003"
-    "compiled by BCC V.5.5"
+    "LCC-Win32 V.3.8"
+    "Visual C 2005"
+    "Visual C 2003"
+    "BCC V.5.5"
 #endif
 
 /*
@@ -292,7 +291,7 @@
 #endif  /* SYS_FAMILY == SYS_WIN    */
 
 #if     COMPILER_FAMILY == GNUC
-#define CMP_NAME            "GNU C"
+#define CMP_NAME            "GCC"
 #define COMPILER_EXT        "__GNUC__"
 #define COMPILER_EXT_VAL    "3"     /* "2" for V.2.*, "3" for V.3.* */
 #define COMPILER_EXT2       "__GNUC_MINOR__"
@@ -315,12 +314,9 @@
 #ifndef ENV_C_INCLUDE_DIR
 #define ENV_C_INCLUDE_DIR   "C_INCLUDE_PATH"
 #define ENV_CPLUS_INCLUDE_DIR   "CPLUS_INCLUDE_PATH"
-#define ENV_VERSION         "GCC_VERSION"
-            /* The name of environment variable to specify GNU C VERSION    */
 #endif
 /*
- * __SIZE_TYPE__, __PTRDIFF_TYPE__ and __WCHAR_TYPE__ are predefines of
- * GNU C / cpp.
+ * __SIZE_TYPE__, __PTRDIFF_TYPE__ and __WCHAR_TYPE__ are predefines of GCC.
  */
 #define COMPILER_SP1        "__SIZE_TYPE__"
 #define COMPILER_SP2        "__PTRDIFF_TYPE__"
@@ -467,7 +463,7 @@
  * BIGFIVE_IS_ESCAPE_FREE means similar case on BIGFIVE encoding.
  * ISO2022_JP_IS_ESCAPE_FREE means similar case on ISO2022_JP encoding.
  *
- * GNU C can handle these encodings if it has been configured so.
+ * GCC can handle these encodings if it has been configured so.
  */
 #ifndef SJIS_IS_ESCAPE_FREE
 #define SJIS_IS_ESCAPE_FREE     FALSE   /* or TRUE following your compiler  */
@@ -574,37 +570,6 @@
 #include    "string.h"
 #include    "stdlib.h"
 #include    "time.h"
-
-#if     HOST_SYS_FAMILY == SYS_UNIX
-#include    "unistd.h"      /* For getcwd() */
-#elif   HOST_COMPILER == MSC
-#include    "direct.h"
-#endif
-
-/* Functions other than standard.   */
-#if     HOST_SYS_FAMILY != SYS_UNIX     /* On UNIX "unistd.h" will suffice  */
-#ifdef  __cplusplus
-extern "C" {
-    int     getopt( int argc, char * const * argv, const char * opts);
-    extern int      optind;
-    extern char *   optarg;
-#if     HOST_COMPILER == MSC
-#define getcwd( buf, size)  _getcwd( buf, size)
-#else
-    char *  getcwd( char *buf, size_t size);
-#endif
-}
-#else   /* #ifndef __cplusplus  */
-extern int      getopt( int argc, char * const * argv, const char * opts);
-extern int      optind;
-extern char *   optarg;
-#if     HOST_COMPILER == MSC
-#define getcwd( buf, size)  _getcwd( buf, size)
-#else
-extern char *   getcwd( char *buf, size_t size);
-#endif
-#endif
-#endif
 
 #if     ! (HOST_LIB_IS_GLIBC && COMPILER == GNUC && __cplusplus)
         /* Avoid conflict with glibc's declaration in C++.  */

@@ -16,10 +16,10 @@ V.1.3 prerelease 1      2002/08     Updated according to C99 Standard.
 V.1.3 prerelease 2      2002/12     Slightly modified.
                                                                 kmatsui
 V.1.3 release   2003/02     Finally released.
-                    Port to GNU C / testsuite.
+                    Port to GCC / testsuite.
                                                                 kmatsui
 V.1.3 patch 1   2003/03     Made the testsuite edition applicable to
-                        GNU C as old as 2.9x.
+                        GCC as old as 2.9x.
                                                                 kmatsui
 V.1.4 prerelease    2003/11     Added Visual C++ evaluation.
                                                                 kmatsui
@@ -32,10 +32,12 @@ V.1.5       2005/03     Moved tests of multi-byte character encoding to
                     quality matters.
                 Changed point allocation of the test items.
                 Added a few testcases for macro expansion.
-                Updated a few testsuite testcases to cope with GNU C
+                Updated a few testsuite testcases to cope with GCC
                     3.3 and 3.4.
                 Removed test results on older preprocessors (DJGPP,
                     compiler systems on MS-DOS except Borland C 4.0).
+                                                                kmatsui
+V.1.5.1     2006/07     Updated the test results of some preprocessors.
                                                                 kmatsui
 
 
@@ -70,14 +72,14 @@ V.1.5       2005/03     Moved tests of multi-byte character encoding to
         [1.7.7]     C90 Corrigendum 1 and Amendment 1
         [1.7.8]     Redundant Specifications
     [1.8]       Preprocessing Specification in C99
-    [1.9]       Toward More Clear Preprocessing Specifications
+    [1.9]       Toward Clear Preprocessing Specifications
 
 2.  Validation Suite Explanation
     [2.1]       Validation Suite for Conformance of Preprocessing
     [2.2]       Testing Method
         [2.2.1]     Manual Testing
         [2.2.2]     Automatic Testing by cpp_test
-        [2.2.3]     Automatic Testing by GNU C / testsuite
+        [2.2.3]     Automatic Testing by GCC / testsuite
             [2.2.3.1]   TestSuite
             [2.2.3.2]   Installation to TestSuite and Testing
             [2.2.3.3]   MCPP Automatic Testing
@@ -122,16 +124,16 @@ V.1.5       2005/03     Moved tests of multi-byte character encoding to
         [2.4.37]    Translation limits
     [2.5]       Documentation of Implementation-Defined Items
 
-3.  Evaluation of Various Aspects Unspecified by Standard
-    [3.1]       Multi-byte character encoding
-    [3.2]       Undefined behavior
-    [3.3]       Unspecified behavior
+3.  Evaluation of Aspects Unspecified by Standard
+    [3.1]       Multi-byte Character Encoding
+    [3.2]       Undefined Behavior
+    [3.3]       Unspecified Behavior
     [3.4]       Other Cases Where a Warning is Preferable
     [3.5]       Other Quality Matters
-        [3.5.1]     Qualities regarding behaviors
-        [3.5.2]     Options and extended functionalities
+        [3.5.1]     Qualities regarding Behaviors
+        [3.5.2]     Options and Extended Functionalities
         [3.5.3]     Efficiency and others
-        [3.5.4]     Quality of documents
+        [3.5.4]     Quality of Documents
     [3.6]       C++ Preprocessing
 
 4.  Issues Around C Preprocessing
@@ -141,7 +143,7 @@ V.1.5       2005/03     Moved tests of multi-byte character encoding to
         [4.1.3]     <limits.h>
         [4.1.4]     <iso646.h>
 
-5.  Various Preprocessor Test Results
+5.  Preprocessor Test Results
     [5.1]       Preprocessors Tested
     [5.2]       Lists of Marks
     [5.3]       Characteristics of Each Preprocessor
@@ -155,13 +157,12 @@ I completely rewrote DECUS cpp by Martin Minow to create a portable C
 preprocessor called MCPP V.2.  MCPP stands for 'Matsui cpp'.  This
 preprocessor is provided as source code and can be ported for various
 compiler systems by modifying some macros in header files on compilation.
-In addition, execution programs can be generated for various
-specifications such as Standard C (ISO/ANSI/JIS C) by modifying other
-macros.  Among those specifications, the Standard C mode literally
-implements strict Standard C preprocessing.
+In addition, execution programs has various behavioral modes such as
+Standard C (ISO/ANSI/JIS C) and others.  Among those modes, the Standard
+C mode literally implements strict Standard C preprocessing.
 
 While implementing this preprocessor, I also created a testing tool
-called "Validation Suite for Standard C Conformance of Preprocessing."
+called "Validation Suite for Standard C Conformance of Preprocessing".
 This document explains the Validation Suite.  The Validation Suite is
 open to the public as free software along with this documentation.
 
@@ -180,10 +181,10 @@ software pack in November, 1998.
 
 V.1.3 supports the official C99 release and is an update to V.1.2.  In
 addition, behavioral test samples were rewritten so that they can be
-used by the GNU C / testsuite.
+used by the GCC / testsuite.
 
 V.1.3, while it was under development, was adopted as the year 2002's
-"Exploratory Software Project" at the Information-Technology Promotion
+"Exploratory Software Project" at the Information-technology Promotion
 Agency, Japan (IPA) by Yutaka Niibe Project Manager.  From July, 2002 to
 February, 2003, the development continued under the grants-in-aid from
 IPA and Niibe PM's advice.  The English version of the document was
@@ -197,14 +198,17 @@ allowed an update to V.2.4 and V.1.4. *
 
 MCPP and Validation Suite have been kept on updating after the project.
 V.2.5 and V.1.5 are released in March, 2005.  Validation Suite V.1.5
-changed allocation of points and some other matters.
+changed allocation of points and some other matters.  In July 2006, MCPP
+V.2.6 and Validation Suite V.1.5.1 are released.  Validation Suite V.1.5.
+1 updated the test result of the preprocessors.
 
-ISO/IEC 9899:1990 (JIS X 3010-1993) had been used as a C language
-Standard in the past, however, ISO/IEC 9899:1999 was adopted in 1999.
-We will call the former C90, the latter C99 in this document.  As C90
-was transitioned from ANSI X3.159-1989, it is also in general called
-ANSI C or C89.  ISO/IEC 9899:1990 + Amendment 1995 is sometimes called
-C95.
+ISO/IEC 9899:1990 (JIS X 3010-1993) had been used as C Standard, but in
+1999, ISO/IEC 9899:1999 was adopted as a new Standard.  This document
+calls the former C90 and latter C99.  The former is generally called
+ANSI C or C89 because it migrated from ANSI X3.159-1989.  ISO/IEC 9899:
+1990 plus its Amendment 1995 is sometimes called C95.  C++ Standards are
+ISO/IEC 14882:1998 and its corrigendum version ISO/IEC 14882:2003.  This
+document calls both of them C++98.
 
 The Standards referred in this explanation are below.
 
@@ -230,70 +234,47 @@ referred to from time to time.
 PDF versions of C99 and C++ Standards can be obtained online on the
 following sites.
 
-    C99, C++98
+    C99, C++98, C++03
         http://webstore.ansi.org/ansidocstore/default.asp
     C99 Corrigendum 1
         http://ftp2.ansi.org/download/
             free_download.asp?document=ISO%2FIEC+9899%2FCor1%3A2001
     C99 Rationale final draft in October, 1999
-        http://anubis.dkuug.dk/JTC1/SC22/WG14/www/docs/n897.pdf
+        http://www.open-std.org/jtc1/sc22/wg14/www/docs/n897.pdf
 
   * The overview of the Exploratory Software Project can be found below
     (in Japanese only).
 
         http://www.ipa.go.jp/jinzai/esp/
 
-    The source and document files since MCPP V.2.3 and the Validation
-    Suite V.1.3 are located in the following CVS repository including
-    the current version.  A tar-ball is downloadable from this location.
-
-        http://cvs.m17n.org/cgi-bin/viewcvs/?cvsroot=matsui-cpp
-
-    The anonymous ftp is at:
-
-        ftp://ftp.m17n.org/pub/mcpp/
-
-    In addition, the information web page is at:
+    MCPP from V.2.3 through V.2.5 had been located at:
 
         http://www.m17n.org/mcpp/
 
-    cpp V.2.2 and Validation Suite V.1.2 are located on the following
-    sites by Vector, Inc.  They are also bundled on the
-    "PACK for WIN GOLD" CD-ROM.
+    In April 2006, MCPP project moved to:
 
-    They are under the dos/prog/c directory, though not for MS-DOS.  The
-    source code supports UNIX, WIN32/MS-DOS, OS-9 and more.
+        http://mcpp.sourceforge.net/
+
+    MCPP V.2.2 and Validation Suite V.1.2 are located in the following
+    Vector's web site.  They are in the directory called dos/prog/c, but
+    they are not for MS-DOS exclusively.  Sources are for UNIX, WIN32,
+    MS-DOS.
 
         http://download.vector.co.jp/pack/dos/prog/c/cpp22src.lzh
         http://download.vector.co.jp/pack/dos/prog/c/cpp22bin.lzh
         http://download.vector.co.jp/pack/dos/prog/c/cpp12tst.lzh
 
         http://download.vector.co.jp/
-    seems to be an equivalent of
-        ftp://ftp.vector.co.jp/.
+    and
+        ftp://ftp.vector.co.jp/
+    seem to be the same.
 
-    Text files in these archive files on Vector use [CR]+[LF] as
-    <newline> and encode Kanji characters as shift-JIS for DOS/Windows
-    systems.  Ones in the CVS repository use [LF] as <newline> and
-    encode Kanji characters as EUC-JP for the UNIX system.  They require
-    a conversion when used on another OS.  It is easy to process all
-    files at once using my little tool called convf.  (Binary files are
-    automatically determined and copied without conversion.  Time-stamps
-    and modes are reserved.  However, the MCPP package contains files to
-    test a specific multi-byte character encoding and they must not be
-    converted.  It is better to convert <newline> only in all files
-    first, then to convert again both <newline> and Kanji encoding in
-    the doc directory only.
-    Convf itself supports the same compiler systems as MCPP is ported
-    for.  However, you must copy files as an archive first, extract and
-    convert them on the target OS, since file names lose case-
-    sensitivity if extracted on MS-DOS or Windows95.  Convf is located
-    at:
-
-        http://download.vector.co.jp/pack/dos/util/text/conv/code/
-                                                        convf-1.8.lzh
-
-    Unfortunately, the document is in Japanese only.
+    The text files in these archive files available at Vector use [CR]+
+    [LF] as a <newline> and encode Kanji in shift-JIS for DOS/Windows.
+    On the other hand, those from V.2.3 through V.2.5 available at
+    SourceForge use [LF] as a <newline> and encode Kanji in EUC-JP for
+    UNIX.  From V.2.6 on two types of archive, .tar.gz file with [LF]/
+    EUC-JP and .zip file with [CR]+[LF]/shift-JIS, are provided.
 
 
 1.  Standard C Preprocessing Features
@@ -436,19 +417,14 @@ separators.)  This Validation Suite also tests up to phase 4. *3
     in the draft in January, 1999 and remained as is in C99 official
     version.
 
-  *3  However, my MCPP processes phase 6 as well by itself if it is
-    compiled with the CONCAT_STRINGS macro defined as TRUE.  Skipping
-    phase 5 may cause a wrong result when string literals including
-    escape sequences are concatenated.  Therefore, I have added a bit of
-    twist to string literals instead of phase 5.  Refer to misc.t/PART 6
-    for actual operation.
-    In addition, when the SJIS_IS_ESCAPE_FREE macro is defined as FALSE,
-    MCPP inserts an extra 0x5c if the second byte of a shift-JIS Kanji
+  *3  When the SJIS_IS_ESCAPE_FREE macro is defined as FALSE, MCPP
+    inserts an extra 0x5c if the second byte of a shift-JIS Kanji
     character in a string literal or string constant is 0x5c (\) after
-    completing phase 4 (or 6)  for the compiler proper which does not
-    recognize Shift-JIS Kanji Characters.  Refer to [3.1].
-    All of these are features for the compiler proper whose phase 5 and
-    6 processes are not sufficient.  Performing such processes in early
+    completing phase 4 (or 6) for the compiler proper which does not
+    recognize shift-JIS Kanji characters.  As with the encodings in Big5
+    or iso2022-jp, the things are the same.  Refer to [3.1].
+    This is a feature for the compiler proper whose phase 5 and 6
+    processes are not sufficient.  Performing such processes in early
     phases causes wrong results, but not after completing phase 4.
 
 
@@ -548,8 +524,8 @@ preprocessing-number instead of a numeric token.  We will discuss these
 A keyword is recognized for the first time in phase 7.  A keyword is
 handled as an identifier in preprocessing phases.  For preprocessing, an
 identifier is a macro name or an identifier which has not been defined
-as a macro (*1.)  That means that even a macro with a same name as a
-keyword can be used.
+as a macro.  That means that even a macro with a same name as a keyword
+can be used. *1
 
 This specification is indispensable in order to separate preprocessing
 from implementation-dependencies.  This, for example, prohibits using a
@@ -602,7 +578,7 @@ operator and it is stringized by a macro defined by a # operator.  Any
 pp-token becomes a valid token if it is put in a string literal.
 However, without accepting the existence of non-numeric pp-number, the
 one generated by concatenation will not become a valid pp-token (the
-result becomes undefined.) *4
+result becomes undefined.)
 
 Although this type of usage is extremely special and need not to be
 examined in detail, pp-numbers provide an interesting subject matter in
@@ -624,7 +600,6 @@ terms of token-oriented preprocessing.
 
   *3  C89 Rationale 3.1.8 Preprocessing numbers
       C99 Rationale 6.4.8 Preprocessing numbers
-  *4  Refer to a sample in misc.t PART 5.
 
 
         [1.3.3]     Token-based Operations and Token Concatenation
@@ -668,12 +643,12 @@ preprocessing. *
     [1.4]       Evaluation Type of #if Expression
 
 In C90, the #if expression was evaluated with one type of size, either
-long or unsigned long (*1.)  This also simplified preprocessing and
-helped reducing implementation-dependent parts at the same time.
-Compared with the int size, which varies greatly depending on
-implementations, long/unsigned long are 32 bits for the most part and
-sometimes 64 or 36 bit.  This assures considerable portability in
-general #if expressions. *2, *3
+long or unsigned long.  This also simplified preprocessing and helped
+reducing implementation-dependent parts at the same time.  Compared with
+the int size, which varies greatly depending on implementations, long/
+unsigned long are 32 bits for the most part and sometimes 64 or 36 bit.
+This assures considerable portability in general #if expressions. *1, *2,
+*3
 
   *1  ANSI C 3.8.1 (C90 6.8.1) Conditional inclusion -- Semantics
 
@@ -690,9 +665,9 @@ general #if expressions. *2, *3
     1. short as 2 bytes and long as 4 bytes.
     2. longlong (not long long) or quadra as 8 bytes.
     3. int should be CPU dependent.  In other words, either short, long,
-    or longlong.
+      or longlong.
     4. Stop using the usage of short int and long int by modifying int
-    with short or long.
+      with short or long.
 
     In other words, there has been a constraint of sizeof (short) <=
     sizeof (int) <=  sizeof (long) since the arrival of 64 bit compiler
@@ -733,9 +708,7 @@ smaller than that of target one in reality.
 Needless to say, MCPP was also created with a motive that these Standard
 C preprocessing specifications are independent of compiler proper
 (though there are many #if sections in order to assure the portability
-since this MCPP is intended to be compiled even by pre-Standard compiler
-systems, be ported to pre-Standard compiler systems, or generate various
-pre-Standard or post-Standard preprocessors.)
+since this MCPP is intended to be ported to many compiler systems.)
 
 
     [1.6]       Function-like Macro Expansion
@@ -790,11 +763,10 @@ parallel to function calls is to expand macros in an argument first
 before substituting a parameter with the argument.  And, the macro call
 within an argument must have been completed within that argument (it
 causes an error if not completed.)  A macro within an argument must not
-absorb the text right after it.  Nested function-like macro calls can
-maintain logical clarity. *
+absorb the text right after it.  Thus, nested function-like macro calls
+can maintain logical clarity. *
 
   *  Refer to [2.4.25].
-
 
             [1.6.2.1]   No Expansion for the Operand of the # or ##
                                 Operator
@@ -901,7 +873,7 @@ processed in phase 4 since escape sequences are processed in phase 6 (\
 within a header-name is undefined by the Standard.  This must be a
 consideration to ease implementation.  In reality, no problem occurs
 unless \ comes right before " inside of " and ".  It is a little more
-complicated inside of < and >.)*
+complicated inside of < and >.) *
 
 Also, the difference between #include <stdio.h> and #include "stdio.h"
 is only that the former searches a specific implementation-defined
@@ -1031,9 +1003,9 @@ example and should be deleted.
 
         [1.7.3]     White Space Handling at Macro Re-definition
 
-There is a similar specification to white space handlings in operand of
-# operators with regards macro re-definition.  It is defined; "A macro
-re-definition must be equivalent to the original macro.  In order to be
+There is a similar specification to white space handling in operand of #
+operators with regards macro re-definition.  It is defined; "A macro re-
+definition must be equivalent to the original macro.  In order to be
 equivalent, the number and name of parameters must be the same and the
 replacement list must have the same spellings.  However, in the case of
 white spaces in the replacement list, their existence must be the same
@@ -1149,16 +1121,16 @@ factors as shown below and has little portability.
     its implementation.  In other words, the evaluation type may vary
     depending on the implementation.
 
-  10.  In addition, multi-byte characters have an encoding problem
-    though it exists in compilation as well as preprocessing.  For
-    example, UTF-8 encodes a two byte Unicode character in between one
-    byte and three bytes, however, what is the "value" of its character
-    constant?  Is a Kanji value the "value" which results from
-    evaluating the three byte UTF-8 code or the "value" of the original
-    Unicode?  It will be implementation-defined, however, it is not even
-    clear what sort of specification is reasonable.
+  10. In addition, multi-byte characters have an encoding problem though
+    it exists in compilation as well as preprocessing.  For example, UTF-
+    8 encodes a two byte Unicode character in between one byte and three
+    bytes, however, what is the "value" of its character constant?  Is a
+    Kanji value the "value" which results from evaluating the three byte
+    UTF-8 code or the "value" of the original Unicode?  It will be
+    implementation-defined, however, it is not even clear what sort of
+    specification is reasonable.
 
-  11.  Though this is also a common problem with compilation, UCN was
+  11. Though this is also a common problem with compilation, UCN was
     also introduced in C99 and C++98.  Is a character expressed in UCN
     and one written in multi-byte characters the same "character"?  They
     should be the same in nature, however, their "value" will be
@@ -1167,7 +1139,7 @@ factors as shown below and has little portability.
 As above, little can be predicted how evaluation is done since the
 character constant values for the #if expressions have no portability
 among implementations and may differ even within the same implementation
-depending on the compilation phases. *
+depending on the compilation phases.
 
 In general, the specification of the C language integer type has few
 ambiguous parts.  Although negative value handling is implementation-
@@ -1289,7 +1261,7 @@ replacement list since the replacement list sent back to the input is
 read-in consecutively with source.  In nested macros, the nesting level
 may get shifted; unnoticed while rescanning.  A macro without arguments
 expanded into the name of the macro with arguments and a abnormal macro
-where the replacement list comprises the first half of the new macro
+where the replacement list comprises the first half of another macro
 call with arguments causes this situation.
 
 #define add( x, y)      ((x) + (y))
@@ -1862,7 +1834,7 @@ be defined in the header files for each implementation.
     I wonder how practical that is.
 
 
-    [1.9]       Toward More Clear Preprocessing Specifications
+    [1.9]       Toward Clear Preprocessing Specifications
 
 Problems in Standard C preprocessing specifications and what I think
 mentioned above are also requests for Standard C in the future.  In
@@ -1958,7 +1930,7 @@ in C99.
     for now (SC stands for a steering committee and WG means a working
     group.  SC22 deliberates programming language Standards and WG14
     handles C Standards.)
-            http://osiris.dkuug.dk/JTC1/SC22/WG14/
+        http://www.open-std.org/jtc1/sc22/wg14/
 
 
 2.  Validation Suite Explanation
@@ -2021,7 +1993,7 @@ long4095.h and nest9.h to nest15.h are samples to test C99 preprocessing
 specifications and others are for common specifications in C90 and C99.
 
 Files with alphabetics other than std or post after n_, i_, e_, or u_,
-are samples for C99 and C++.  n_dslcom.t, n_ucn1.t,e_ucn.t and u_concat.
+are samples for C99 and C++.  n_dslcom.t, n_ucn1.t, e_ucn.t and u_concat.
 t are samples to test preprocessing specifications common in C99 and C++
 98, n_bool.t, n_cnvucn.t, n_cplus.t, e_operat.t and u_cplus.t for C++,
 and the rest for C99.
@@ -2047,8 +2019,8 @@ and others.  recurs.t is a special case of recursive macro, and trad.t
 is a sample for the old "Reiser model cpp".
 
 There are 132 files in the directory called test-c.  26 of those are
-header files (24 files are same as the ones in test-t), 102 of them are
-pieces of sample source files, 4 of them are files which combine pieces
+header files (24 files are same as the ones in test-t), 101 of them are
+pieces of sample source files, 3 of them are files which combine pieces
 of sample source, and the other 2 are files used for automatic testing.
 Among these, 31 files are bonus sample source files.  Source files other
 than header files are named *.c.  This is in the C program format.
@@ -2087,8 +2059,8 @@ The files called ?_std.c combines pieces of files.
 Files named u_*.c are bonus and pieces of files which test undefined
 behaviors.  undefs.c collects them in one file.  unspcs.c tests
 unspecified behaviors while warns.c does not belong to any of the above,
-but is the file of texts for which warnings are desirable.  unspcs.t and
-warns.t are a bonus.  Those starting with m_ are samples of several
+but is the file of texts for which warnings are desirable.  unspcs.c and
+warns.c are a bonus.  Those starting with m_ are samples of several
 multi-byte character encodings.
 
 C99 tests are not included in the test-c directory since there is no
@@ -2169,12 +2141,6 @@ of a mistake even with the # operator implementation.
 In old implementations without the <limits.h> standard header file, it
 is necessary to write this (refer to [4.1.3].)
 
-For old implementations without the void keyword, please perform testing
-after writing the following temporarily at the end of <stdio.h>.
-
-    #undef  void
-    #define void
-
 In multi-byte character processing, behavioral specifications of
 implementations may differ depending on the runtime environment, thus
 testing m_* requires attention (refer to [3.1].)
@@ -2202,7 +2168,7 @@ sample process without looking at another test.
 Each test item is set by each allocation of points.  Marking criteria
 are also written.  Standard C does not have subsets, therefore unless
 all items match specifications, an implementation cannot be said to be
-Standard C conformant, strictly speaking.  In reality, there are not
+Standard C conforming, strictly speaking.  In reality, there are not
 many such implementations and we cannot help using the measure of
 Standard C conformance level to evaluate implementations.  In addition,
 as there are large differences in the importance of items, counting the
@@ -2234,19 +2200,11 @@ automatically.  However, this only scores pass or fail and it does not
 provide any detail.  It does not include tests such as e_*.?.  It just
 takes aim at the conformance level of preprocessors for C90 briefly.  No
 tests regarding C99 are included.  That is because most compilers do not
-support C99 yet. *1
+support C99 sufficiently yet. *1, *2, *3
 
-Please use the option, -D__MSDOS__, to compile for the compiler system
-on MS-DOS which does not predefine __MSDOS__ when you compile cpp_test.c.
-*2
+How to use cpp_test is, in an example of Visual C++ 2005, as follows.
 
-Before execution, copy an appropriate encoding of m_33_*.c and m_34_*.c
-to i_33.c and i_34.c respectively. *3
-
-How to use cpp_test is, in an example of Visual C++ .net 2003, as
-follows.
-
-    cpp_test VC2003 "cl -Za -Tc -Fe%s %s.c" "del %s.exe" < n_i_.lst
+    cpp_test VC2005 "cl -Za -TC -Fe%s %s.c" "del %s.exe" < n_i_.lst
 
 The second argument and on need to be enclosed by " and " respectively
 (in case the shell removes ", ", it is necessary to take the measure to
@@ -2273,17 +2231,17 @@ name which does not exist, none, for example, then run the test again.
 By running cpp_test this way, n_*.c and i_*.c are compiled and executed
 sequentially.  The outputs to stderr for sample programs are recorded in
 the n_*.err and i_*.err files.  In addition, the score results are
-written on a column in VC2003.sum.  However, there are only 3 kinds of
+written on a column in VC2005.sum.  However, there are only 3 kinds of
 marking below.
 
     *:  Pass
     o:  Compiles, but the execution result failed.
     -:  Could not be compiled.
 
-In VC2003.out, the command line that called cpp_test is recorded and so
+In VC2005.out, the command line that called cpp_test is recorded and so
 is the message which was output to stdout by the compiler system if any.
 Messages output to stderr by a compiler system are recorded in
-VC2003.err if any.
+VC2005.err if any.
 
 Look at these for more information.
 
@@ -2317,55 +2275,48 @@ They cannot be tested automatically by cpp_test.
     these encodings.
 
 
-        [2.2.3]     Automatic Testing by GNU C / testsuite
-
+        [2.2.3]     Automatic Testing by GCC / testsuite
 
             [2.2.3.1]   TestSuite
 
-GNU C contains something called testsuite.  Do 'make -k check' after
-compiling the GNU C source files, samples of this testsuite are checked
+GCC contains something called testsuite.  Do 'make check' after
+compiling the GCC source files, samples of this testsuite are checked
 one after another and the results are reported.
 
 My Validation Suite, since V.1.3, was appended the edition which is
-rewritten so that it could be used as testsuite of GNU C.  Putting this
-in testsuite allows automatic checking by 'make check'.  While the
-cpp_test tool in [2.2.2] can test only samples with n_* or i_* as a name,
+rewritten so that it could be used as testsuite of GCC.  Putting this in
+testsuite allows automatic checking by 'make check'.  While the cpp_test
+tool in [2.2.2] can test only samples with n_* or i_* as a name,
 testsuite allows samples which require diagnostic messages such as e_*,
 w_*, and u_* to be tested automatically.  This set of testcases is
-applicable to GNU C 2.9x / cpp, GNU C 3.x / cpp (cc1, cc1plus) and MCPP.
+applicable to cpp0 (cc1, cc1plus) of GCC 2.9x and later and MCPP.
 
-Here, I will explain how to use the Validation Suite in GNU C /
-testsuite.
+Here, I will explain how to use the Validation Suite in GCC / testsuite.
 
-The cpp-test directory of the Validation Suite is the edition for GNU C
-/ testsuite created by rewriting the test-t and test-l directories and
-cpp-test contains each directory of test-t and test-l.
+The cpp-test directory of the Validation Suite is the edition for GCC /
+testsuite created by rewriting the test-t and test-l directories and cpp-
+test contains each directory of test-t and test-l.
 
-GNU C / testsuite, however, cannot change the execution environment.
-The files named m_* or u_1_7_* are the testcases for several multi-byte
+GCC / testsuite, however, cannot change the execution environment.  The
+files named m_* or u_1_7_* are the testcases for several multi-byte
 character encodings.  Since those testcases need different environments
-each other for at least GNU C 3.3 or former, those are excluded from
-this testsuite edition. *
+each other for at least GCC 3.3 or former, those are excluded from this
+testsuite edition. *
 
-GNU C / cpp and testsuite specifications have been changed many times
-thus far and are expected to be changed in the future as well.  It may
-require a partial fix to the Validation Suite accordingly, especially in
-case of addition or change of diagnostics.  However, no extensive fix
-seems to be necessary so far unless the version of GNU C is extremely
-old.  The testcases in cpp-test have been verified in each cpp (cpp0) of
-GNU C 2.95.3, 2.95.4, 3.2, 3.3.2 and 3.4.3, and MCPP.
+GCC and testsuite specifications have been changed many times thus far
+and are expected to be changed in the future as well.  It may require a
+partial fix to the Validation Suite accordingly, especially in case of
+addition or change of diagnostics.  However, no extensive fix seems to
+be necessary so far unless the version of GCC is extremely old.  The
+testcases in cpp-test have been verified in each cpp0 (cc1, cc1plus) of
+GCC 2.95.3, 3.2, 3.3.2, 3.4.3 and 4.0.2, and MCPP.
 
 Runtime options cannot be changed in the testsuite depending on the
 implementation.  As a matter of fact, multiple standards coexist and it
 is necessary to specify a version of the standard using the 'std='
-option.  However, this option does not exist in older versions of GNU C.
-Therefore, my testsuite applies to GNU C 2.9x and later and MCPP V.2.3
-and later.
-
-Also, testsuite was included up to egcs-1.1.2 (GNU C 2.91.66), but not
-in GNU C 2.95.3.  As there was a copyright problem in a part of
-testsuite during this period, the release was on hold.  However, it
-revived in GNU C 3.0.
+option.  However, this option does not exist in older versions of GCC.
+Therefore, my testsuite applies to GCC 2.9x and later and MCPP V.2.3 and
+later.
 
 Testsuite is executed by interpreting the comments in the following
 format written in the sample program.  This is a comment which does not
@@ -2388,15 +2339,15 @@ Therefore, using testsuite requires these many tools of appropriate
 versions according to the testsuite.  This is same when my Validation
 Suite is used.
 
-  * In fact, GNU C does not work properly even if the environment
-    variable is set.
+  * In fact, GCC does not work properly even if the environment variable
+    is set.
 
             [2.2.3.2]   Installation to TestSuite and Testing
 
-My Validation Suite is used in GNU C / testsuite in the following manner.
+My Validation Suite is used in GCC / testsuite in the following manner.
 
 First, copy the cpp-test directory to an appropriate directory in
-testsuite of GNU C.
+testsuite of GCC.
 
 The cpp-test directory is the one created by copying necessary files in
 each directory of test-t and test-l and adding the configuration file
@@ -2410,17 +2361,17 @@ line:
 
     { dg-options "-ansi -no-integrated-cpp" }
 
-where -no-integrated-cpp is an option for GNU C 3.  GNU C 2 does not
-support the option, which need to be removed in order to test in GNU C 2.
-To accommodate both GNU C 2 and GNU C 3, there are two types of files,
+where -no-integrated-cpp is an option for GCC 3 and 4.  GCC 2 does not
+support the option, which need to be removed in order to test in GCC 2.
+To accommodate both GCC 2 and GCC 3 or 4, there are two types of files,
 *_run.c.gcc2 and *_run.c.gcc3, for these two testcases.  Link the
 appropriate one to *_run.c.
 
-Below, I will take an example of GNU C 3.2 on my machine.  Suppose the
-source files of GNU C 3.2 are located in /usr/local/gcc-3.2-src.  Also,
-the GNU C compilation is done by /usr/local/gcc-3.2-objs.
+Below, I will take an example of GCC 3.4.3 on my machine.  Suppose the
+source files of GCC 3.4.3 are located in /usr/local/gcc-3.4.3-src.  Also,
+the GCC compilation is done by /usr/local/gcc-3.4.3-objs.
 
-    cp -r cpp-test /usr/local/gcc-3.2-src/gcc/testsuite/gcc.dg
+    cp -r cpp-test /usr/local/gcc-3.4.3-src/gcc/testsuite/gcc.dg
 
 This copies files under cpp-test to the gcc.dg directory.
 
@@ -2428,45 +2379,40 @@ By doing this, if you
 
     make bootstrap
 
-in /usr/local/gcc-3.2-objs to compile the GNU C source files and you
+in /usr/local/gcc-3.4.3-objs to compile the GCC source files and you
 
     make -k check
 
 then the entire testsuite including testcases in cpp-test will be tested.
 
 Also, testing by using cpp-test only is done as below in the /usr/local/
-gcc-3.2-objs/gcc directory.
+gcc-3.4.3-objs/gcc directory.
 
     make check-gcc RUNTESTFLAGS=cpp-test.exp
 
 The testsuite logs are recorded in gcc.log and gcc.sum under the
 ./testsuite directory.
 
-When you do 'make check', you need to set up the environment variable
-called DEJAGNULIBS, TCL_LIBRARY as explained in INSTALL/test.html of the
-GNU C source files.  For example, /etc/profile is set as below on my
-VineLinux.
-
-    TCL_LIBRARY=/usr/lib/tcl8.0jp
-    DEJAGNULIBS=/usr/share/dejagnu
-    export TCL_LIBRARY DEJAGNULIBS
+When you do 'make check', depending on the environment, you need to set
+up the environment variable called DEJAGNULIBS, TCL_LIBRARY as explained
+in INSTALL/test.html of the GCC source files.
 
 In addition, the environment variable, LANG and LC_ALL, must be C to set
 the environment to English.
 
 Please note that it is xgcc, cc1, cc1plus, cpp0 etc. generated in the
-gcc directory that are used in make check at compiling GNU C, not gcc,
-cc1 and such that have already been installed.
+gcc directory that are used in make check at compiling GCC, not gcc, cc1
+and such that have already been installed.
 
 Tests can be executed in any directory as follows.
 
-    runtest --tool gcc --srcdir /usr/local/gcc-3.2-src/gcc/testsuite  \
+    runtest --tool gcc --srcdir /usr/local/gcc-3.4.3-src/gcc/testsuite  \
                                                         cpp-test.exp
 
 Logs are output to the current directory.  In this case, what is to be
 tested is gcc, cc1, and cpp0 which have already been installed.  cpp-
 test requires testsuite as it contains various configuration files for
-GNU C (config.*, *.exp).
+GCC (config.*, *.exp).
 
 The argument 'gcc' of "runtest --tool gcc" should be exactly 'gcc'.  If
 the name of the compiler to be tested is not 'gcc', for example 'cc' or
@@ -2475,15 +2421,14 @@ invoked by the name of 'gcc'.
 
 Also, cpp-test contains the testcases for warnings in the cases where it
 is thought to be desirable for a preprocessor to issue a warning.  The
-GNU C preprocessor passes less than a half of those cases, however, not
+GCC preprocessor passes less than a half of those cases, however, not
 passing does not mean that the behavior is wrong or that the
 preprocessor was not compiled properly.  This is not the issue of being
 right or wrong, but rather of the "quality" of the preprocessor.
 
-
             [2.2.3.3]   MCPP Automatic Testing
 
-This cpp-test can test MCPP also.  Therefore, substituting the GNU C
+This cpp-test can test MCPP also.  Therefore, substituting the GCC
 preprocessing with MCPP and calling
 
     make check-gcc RUNTESTFLAGS=cpp-test.exp
@@ -2491,12 +2436,12 @@ preprocessing with MCPP and calling
 in the gcc directory checks MCPP of Standard mode automatically.  Tests
 can be done also using runtest command in any directory.
 
-    runtest --tool gcc --srcdir /usr/local/gcc-3.2-src/gcc/testsuite  \
+    runtest --tool gcc --srcdir /usr/local/gcc-3.4.3-src/gcc/testsuite  \
                                                         cpp-test.exp
 
-If MCPP is executed in GNU C 3, all testcases for cpp-test except one
+If MCPP is executed in GCC 3 or 4, all testcases for cpp-test except one
 should pass.  There is another testcase which does not pass when
-executed in GNU C 2.  However, it is because gcc calls MCPP with the
+executed in GCC 2.  However, it is because gcc calls MCPP with the
 -D__cplusplus=1 option and not MCPP's fault.
 
 Please refer to manual.txt [3.9.5] and [3.9.7] for how to substitute the
@@ -2506,16 +2451,15 @@ to enable trigraphs.  -j is an option for not adding information such as
 source lines to diagnostic message output.  Do not use other options.
 Additionally, testsuite can test MCPP in standard mode only, no other.
 
-The method above is done after the make with GNU C, however, automatic
+The method above is done after the make with GCC, however, automatic
 testing can be done by 'configure' and 'make' of MCPP itself as long as
-GNU C / testsuite is installed and is ready to execute.  This case is
-the easiest as 'make check' automatically performs necessary settings.
-See the INSTALL in MCPP for this method.
-
+GCC / testsuite is installed and is ready to execute.  This case is the
+easiest as 'make check' automatically performs necessary settings.  See
+the INSTALL in MCPP for this method.
 
             [2.2.3.4]   TestSuite and Validation Suite
 
-GNU C has had testsuite for a long time, but very few samples about
+GCC has had testsuite for a long time, but very few samples about
 preprocessing up to V.2.9x.  You can see how little attention
 preprocessing was paid to.  The number of testcases for preprocessing
 increased quite a lot in V.3.x.  You can tell preprocessing was given
@@ -2532,15 +2476,14 @@ come from the following nature of testsuite.
     functionalities there.
 
 This is the way of debugging special to the open source project and
-became possible as GNU C has been used by many excellent programmers in
+became possible as GCC has been used by many excellent programmers in
 the world.  However, this method might have brought the randomness and
 imbalance of testcases at the same time.
 
-In addition, most of these testcases are valid only in GNU C and cannot
-be used in other compiler systems.  Also, testcases for GNU C 3 contain
-many testcases which cannot be applied to even GNU C 2 / cpp.  The
-reason is the differences in preprocessing output spacing and diagnostic
-messages.
+In addition, most of these testcases are valid only in GCC and cannot be
+used in other compiler systems.  Also, testcases for GCC 3 contain many
+testcases which cannot be applied to even GCC 2 / cpp.  The reason is
+the differences in preprocessing output spacing and diagnostic messages.
 
 On the other hand, my Validation Suite was originally written by myself
 only in order to debug my preprocessor and rewritten so that the entire
@@ -2548,74 +2491,74 @@ preprocessing specifications are tested.  Many samples are organized
 systematically on the whole.
 
 It will have considerable meaning to add these systematic testcases to
-GNU C / testsuite.
+GCC / testsuite.
 
 Also, my testsuite edition of Validation Suite is written so that it can
-test three preprocessors, GNU C 2.9x / cpp, GNU C 3.x / cpp, and MCPP.
-In other words, the use of the regular expression facility in DejaGnu
-and Tcl can absorb the implementation differences in preprocessing
-output spacing and diagnostic messages. *
+test three preprocessors, GCC 2.9x / cpp, GCC 3.x, 4.x / cc1 (cc1plus),
+and MCPP.  In other words, the use of the regular expression facility in
+DejaGnu and Tcl can absorb the implementation differences in
+preprocessing output spacing and diagnostic messages. *
 
 Below are the results of applying the testsuite edition of the
-Validation Suite to these three preprocessors (tested in March 2005).
+Validation Suite to these three preprocessors (tested in June 2006).
 
-Below is the case where the preprocessor is replaced by MCPP V.2.5 of
-standard mode in GNU C 3.4.3.
+Below is the case where the preprocessor is replaced by MCPP V.2.6 in
+GCC 3.3.2.
 
                 === gcc Summary ===
 
-# of expected passes            266
+# of expected passes            264
 # of unexpected failures        1
-# of expected failures          2
-gcc version 3.4.3
+# of expected failures          4
+/usr/bin/gcc version 3.3.2
 
 There is one failure due to a lack of the universal-character-name <=>
 multi-byte character conversion implementation in C++98.
 
-Here is the GNU C 3.2 / cpp0 case.
-
-                === gcc Summary ===
-
-# of expected passes            217
-# of unexpected failures        52
-# of unexpected successes       1
-# of expected failures          1
-/usr/local/gcc-3.2/bin/gcc version 3.2
-
-Most of failures are due to a missing warning.
-
-GNU C 3.4.3 / cc1 is almost the same.
+Here is the GCC 3.3.2 / cc1 case.
 
                 === gcc Summary ===
 
 # of expected passes            215
-# of unexpected failures        54
-# of unexpected successes       1
-# of expected failures          1
-/usr/local/bin/gcc version 3.4.3
+# of unexpected failures        52
+# of unexpected successes       2
+# of expected failures          2
+/usr/bin/gcc version 3.3.2 20031218 (Vine Linux 3.3.2-0vl8)
 
-Here is the GNU C 2.95.3 / cpp0 case.
+Most of failures are due to a missing warning.
+
+GCC 4.0.2 / cc1 is almost the same.
+
+                === gcc Summary ===
+
+# of expected passes            214
+# of unexpected failures        53
+# of unexpected successes       2
+# of expected failures          2
+/usr/bin/gcc version 4.0.2 20050901 (prerelease) (SUSE Linux)
+
+Here is the GCC 2.95.3 / cpp0 case.
 
                 === gcc Summary ===
 
 # of expected passes            181
 # of unexpected failures        87
-# of unexpected successes       1
+# of unexpected successes       3
 # of expected failures          1
 gcc version 2.95.3 20010315 (release)
 
-There are less warnings than GNU C 3 / cpp.  There are also some
+There are less warnings than GCC 3, 4 / cc1.  There are also some
 diagnostic messages that are off the point.  Half of new C99 and C++98
 specifications have not been implemented yet, either.
 
-The number of items differ among different versions of GNU C, since
+The number of items differ among different versions of GCC, since
 multiple failures can occur in one testcase.
 
   *  This makes dg script in my testcases difficult to read with
     frequent use of \ and symbols.  The regular expression processing in
     DejaGnu and Tcl has a considerable number of peculiarities and flaws
     requiring ingenuity to perform all the automatic testing achieved on
-    multiple compiler systems.  Currently however, runtime options used
+    multiple compiler systems.  Currently, however, runtime options used
     in testcases for those compiler systems must be common.
 
 
@@ -2790,8 +2733,8 @@ Scoring: 2.
 
             [n.2.4]     Inside an identifier
 
-In Standard C, <backslash><newline> must be removed unconditionally if
-it is inside an identifier.
+In Standard C, <backslash><newline> must be removed unconditionally even
+if it is inside an identifier or anywhere.
 
 Scoring: 2.
 
@@ -2840,16 +2783,10 @@ However, C99 started supporting C++ style of comment, //. *2
 
 Scoring: 4.
 
-In C90, this should be processed as just a pp-token, not a comment.  Up
-to V.1.2 of this Validation Suite, it was tested that way.  However, as
-implementations which handle // as comments even prior to C99 are more
-common and there is a lot of source code expecting the support for // as
-a comment, which was officially accepted in C99, I removed this test
-from V.1.3.
-
-In MCPP up to V.2.2, // was not handled as a comment in C90 mode.
-Starting with V.2.3, I made a change so that // was handled as a comment
-and a warning is issued in C90 mode.
+In C90, this should be processed as just a sequence of pp-token '/' and
+'/', not a comment.  However, as implementations which handle // as
+comments even prior to C99 were common, MCPP treats this as a comment
+and issues a warning in C90 mode.
 
   *1  ANSI C 3.1.9 (C90 6.1.9) Comments
   *2  C99 6.4.9 Comments
@@ -3228,7 +3165,7 @@ are called a #if expression.
 
 Scoring: 10.
 
-            [n.10.2]    pp-token process in the #if group which is
+            [n.10.2]    pp-token processing in the #if group which is
                                 skipped
 
 In the #if group skipped, preprocessing directives are not processed
@@ -3397,7 +3334,7 @@ Scoring: 10.  2 points each for processing each of 5 samples correctly.
   *  C99 6.4.4.1 Integer constants
      C99 6.6 Constant expressions -- Constraints
 
-            [e.intmax]  Operation result out of int_max_t range
+            [e.intmax]  Operation result out of intmax_t range
 
 The constant or constant expression which exceeds the intmax_t or
 uintmax_t range is a violation of constraint in the #if expression for
@@ -3517,7 +3454,7 @@ a negative value to be converted into a positive number.
 In standard integer constant expressions, the integer promotion is
 applied to the operand before the usual arithmetic conversion if each
 operand is in the integer type shorter than int.  However, in the #if
-expressions, no integral promotion occurs since all operands are handled
+expressions, no integer promotion occurs since all operands are handled
 as the same size type.
 
 Scoring: 6.  2 points each for processing one of 3 tests correctly.
@@ -3593,7 +3530,6 @@ operators, -, +, ~, and !, binary operators, -, *, %, >>, &, | ^, ==,
 and !=, and tertiary operator, ? :.
 
 Scoring: 2.
-
 
             [n.13.13]   Macros expanded into operators
 
@@ -4096,7 +4032,7 @@ as a keyword can be defined as a macro and expanded. *
      C99 6.4 Lexical elements -- Syntax
      C89 Rationale 3.8.3 (C99 Rationale 6.10.3) Macro replacement
 
-            [n.20.1]    Names are applicable for all expansions
+            [n.20.1]    Names are all subject to macro expansion
 
 Scoring: 6.
 
@@ -4134,6 +4070,7 @@ result of the macro should not be merged with its surrounding pp-tokens
 in outer macro's replacement list.
 
 Scoring: 2.
+
 
         [2.4.22]    Macro-like Sequence in a Pp-number
 
@@ -4277,8 +4214,7 @@ they do not exist at macro expansion.
 Scoring: 2.
 
             [n.24.5]    Token separator inserted by macro expansion
-should
-                                not remain
+                                should not remain
 
 Macro expansion routine generally guards the expansion result with token
 separators in order to avoid token-merging with surrounding tokens. (See
@@ -4395,9 +4331,9 @@ included is replaced, if and only this A is in the source file (not in
 replacement list of any macro).
 
 4. 1 to 3 are recursively applied to macro B replacement.  In other
-words, unless B appears again in the middle of macro B replacement and
-it is on the token sequence after the replacement list of the original B,
-and this B is in the source file, this B will not be replaced.
+words, if B appears again in the middle of macro B replacement and it is
+on the token sequence after the replacement list of the original B, and
+this B is not in the source file, this B will not be replaced.
 
 5. In case there is macro C call in the argument for the original macro
 A call and C which appeared in the middle of replacement of C applies 1
@@ -4645,7 +4581,7 @@ Scoring: 4.  2 points if the line number starts with 0.
 #undef has been supported since K&R 1st and there are no major changes.
 It cancels the macro definition previously defined.  The valid range for
 the macro is from when it is defined by #define until when it is
-cancelled by #undef. *
+canceled by #undef. *
 
   *  ANSI C 3.8.3.5 (C90 6.8.3.5) Scope of macro definitions
      C99 6.10.3.5 Scope of macro definitions
@@ -4887,7 +4823,7 @@ The evaluation method is also implementation-defined overall, however, a
 wide character multi-character constant needs to match the multi-
 character constant for corresponding multi-byte character.
 
-Scoring: 2.
+Scoring: 0.
 
 
         [2.4.37]    Translation limits
@@ -5005,7 +4941,7 @@ Scoring: 2 for each of below.
 
             [n.37.1L]   127 parameters in a macro definition
             [n.37.2L]   127 arguments in a macro call
-            [n.37.3L]   63 characters in an identification
+            [n.37.3L]   63 characters in an identifier
             [n.37.4L]   63 levels of nested conditional inclusion
             [n.37.5L]   15 levels of nested #include
             [n.37.6L]   #if expression with 63 levels of parentheses
@@ -5035,14 +4971,13 @@ proper.
 
 Other than items below, there are some implementation-defined aspects in
 the #if expression evaluation.  The first one is character sets (basic
-character set is ASCII or EBCDIC, multi-byte character and wide
-character encodings are EUC or Shift-JIS and such.)  The integer
-representation (2's complement, 1's complement, or sign+absolute value)
-is another one.  Same as a result converted from a signed integer into
-an unsigned by usual arithmetic conversion.  However, since these are
-all machine and OS dependent, just those documents should be enough and
-they do not need to be described in the preprocessor documents.
-Therefore, these are not subject to scoring.
+character set is ASCII or EBCDIC and such.)  The integer representation
+(2's complement, 1's complement, or sign+absolute value) is another one.
+Same as a result converted from a signed integer into an unsigned by
+usual arithmetic conversion.  However, since these are all machine and
+OS dependent, just those documents should be enough and they do not need
+to be described in the preprocessor documents.  Therefore, these are not
+subject to scoring.
 
   *  ANSI C 1.6 (C90 3) Definitions of Terms
      C99 3 Terms, definitions, and symbols
@@ -5234,8 +5169,8 @@ implementation-defined.  This has several levels.
   3. How is sign handled
   4. What is the byte order for multi-byte character constant evaluation
 
-Among these, 1 and 2 are not subject to scoring since they are OS
-dependent.  The problems are 3 and 4.
+Among these, 1 is not subject to scoring since they are OS dependent.
+The problems are 2, 3 and 4.
 
 Even single byte single-character character constants are implementation-
 defined in terms of sign handling.  Moreover, different evaluation
@@ -5322,14 +5257,14 @@ Scoring: 2.
   *  C99 6.1.2 Identifiers -- General
 
 
-3.  Evaluation of Various Aspects Unspecified by Standard
+3.  Evaluation of Aspects Unspecified by Standard
 
 Even if something is not required to implementations by Standards, they
 may be important in order to evaluate the "quality" of implementations.
 In this chapter, quality evaluation testing is explained.
 
 
-    [3.1]       Multi-byte character encoding
+    [3.1]       Multi-byte Character Encoding
 
 There are various encodings for multi-byte character and wide character.
 The specification of encoding is implementation-defined.  In this
@@ -5345,27 +5280,27 @@ order to process source files supporting multiple languages. *
 However, the method of testing differs depending on the system and
 compiler systems and is not easy.
 
-In GNU C, use environment variables, LC_ALL, LC_CTYPE, and LANG, change
+In GCC, use environment variables, LC_ALL, LC_CTYPE, and LANG, change
 behavior, but their implementations are half-finished and not reliable.
 Moreover, whether this feature is available depends on the configuration
-when GNU C itself was compiled.
+when GCC itself was compiled.
 
-GNU C 3.4 changed its way of multi-byte character processing entirely.
-It converts every encoding of source file to UTF-8 at the start of
-preprocessing (so to say the translation phase 1). Hence, a multi-byte
+GCC 3.4 changed its way of multi-byte character processing entirely.  It
+converts every encoding of source file to UTF-8 at the start of
+preprocessing (so to say the translation phase 1).  Hence, a multi-byte
 character constant in #if expression cannot be evaluated in other than
 UTF-8 which is irrelevant to the original encoding.
 
-The C++98 Standard has a similar problem. Since it stipulates to convert
-multi-byte character into UCN at translation phase 1, multi-byte
+The C++98 Standard has a similar problem.  Since it stipulates to
+convert multi-byte character into UCN at translation phase 1, multi-byte
 character constant in #if expression cannot be evaluated in other than
 UCN.
 
 Considering the rather confused status of the Standards and the
 implementations, and considering the lack of portability and lack of
 meaning of character constant in #if expression, I excluded the tests of
-multi-byte/wide character constants in #if expression (m.33.1, m.34, m.
-36.1) from the subject of scoring since Validation Suite V.1.5.
+multi-byte/wide character constants in #if expression (m.33, m.34, m.36.
+1) from the subject of scoring since Validation Suite V.1.5.
 
 In Visual C++, use #pragma setlocale, which is a convenient directive.
 On Windows, "Regional and Language Options" is supposed to change the
@@ -5385,13 +5320,11 @@ encoding of source files.
     which made it difficult to understand the relationship with multi-
     byte/wide character.  The C++ Standard is even more complicated.
 
-
             [m.33.1]    Wide character constant evaluation
 
 For wide character constant, see [2.4.33].
 
 Scoring: none.
-
 
             [m.34]      Multi-byte character constant evaluation
 
@@ -5410,14 +5343,13 @@ accepted for the encoding.  The encoding of a character is properly
 recognized only after its value is correctly evaluated in m.34 and after
 an appropriate diagnostic message is displayed in u.1.7.
 
-
             [m.36.1]    0x5c in Multi-byte Characters is not an escape
                                 character
 
 If the encoding of (multi-byte | wide) characters is shift-JIS, Big-5,
 or ISO-2022-*, cumbersome issues arise as there may be a byte with the
 0x5c value in a character which is same as '\\'.  Compiler systems must
-not interpret this as a \ (backslash) escape character.  A (multi-byte /
+not interpret this as a \ (backslash) escape character.  A (multi-byte |
 wide) character is one character and not two single-byte characters.
 
 0x5c in the value for multi-byte character constants must not be
@@ -5452,7 +5384,7 @@ identifying the complex string literal including a Kanji character with
 tokenization of string literals.
 
 
-    [3.2]       Undefined behavior
+    [3.2]       Undefined Behavior
 
 In Standard C, there are many specifications of an undefined behavior.
 What causes an undefined behavior is incorrect programs or data or at
@@ -5461,7 +5393,7 @@ issue a diagnostic message, different from violation of syntax rules or
 constraints.  Implementations can process this in any way.  Some sort of
 reasonable processing as a valid program or handling it as an error by
 issuing a diagnostic message are acceptable, and it is not against
-Standards even if the process is cancelled or run out of control without
+Standards even if the process is canceled or run out of control without
 issuing a diagnostic message.
 
 However, in order to evaluate the "quality" of an implementation,
@@ -5479,9 +5411,9 @@ some sort of reasonable processing is necessary.
 u.1.* are preprocessing specific problems and u.2.* are common in
 constant expressions in general.
 
-Scoring: 2 points each for an item unless otherwise noted if an
-appropriate diagnostic message is issued.  1 point each for other items.
-0 points for an off-center or no diagnostic message.
+Scoring: 1 point each for an item unless otherwise noted if an
+appropriate diagnostic message is issued.  0 points for an off-center or
+no diagnostic message.
 
         [u.1.1]     Source files not ending with <newline>
 
@@ -5527,9 +5459,9 @@ argument and it is important to have a diagnostic message.
   *  ANSI C 3.8.3.4 (C90 6.8.3.4)  Rescanning and further replacement
      C99 6.10.3.4 Rescanning and further replacement
 
-        [u.1.5]     Invalid character in areas other than quotes
+        [u.1.5]     Invalid character in places other than quotes
 
-Extremely limited characters can be written in areas other than string
+Extremely limited characters can be written in places other than string
 literals, character constants, header-names, and comments.  They are
 uppercase and lowercase alphabets, numbers, 29 symbols, and 6 kinds of
 white space characters.  It is no wonder since these are for source. *
@@ -5539,7 +5471,7 @@ Although control codes are invalid even in string literals and elsewhere,
 compiler proper can check this.  As there are many locale-specific or
 implementation-defined aspects in character sets in general and the
 range is not necessarily clear, we do not test those.  Kanji characters
-are undefined in areas other than above, but not tested for similar
+are undefined in places other than above, but not tested for similar
 reasons.
 
   *  ANSI C 2.2.1 (C90 5.2.1) Character sets
@@ -5881,7 +5813,7 @@ acceptable as well.  Only processing what is macro-expanded as a
                             expression
 
 Character escape sequences in a string literal or character constant
-support only \', \", \?, \, \a, \b, \f, \n, \r, \t, and \v as a
+support only \', \", \?, \\, \a, \b, \f, \n, \r, \t, and \v as a
 specification.  Other character sequences starting with \ are undefined.
 Especially, sequences with \ followed by a lowercase are reserved for
 future use. *
@@ -5912,7 +5844,7 @@ preprocessing.
      C99 6.5.7 Bitwise shift operators -- Semantics
 
 
-    [3.3]       Unspecified behavior
+    [3.3]       Unspecified Behavior
 
 In Standard C, there is a specification called unspecified.  This is for
 valid programs without a processing method unspecified and whose
@@ -6018,14 +5950,14 @@ official Standard C.  However, this situation is brought about only by
 an unusual macro.  Especially, the one where the replacement list
 comprises the first half part of another function-like macro call is an
 extremely unusual macro.  In reality, the possibility of an error in a
-macro definition is large,it is preferable for the implementations to
+macro definition is large, it is preferable for the implementations to
 issue a warning.  I sometimes see an object-like macro expanded into a
 function-like macro name though such writing style causes bad
 readability.
 
-This is a problem for Standards.  Incomplete rescan in a replacement
-list should be specified as an error (violation of constraints) (refer
-to [1.7.6].)
+This is a problem for Standards.  I think that incomplete rescan in a
+replacement list should be specified as an error (violation of
+constraints) (refer to [1.7.6].)
 
 Scoring: 4.  1 point if only 1 out of 2 samples can be diagnosed.
 
@@ -6089,7 +6021,8 @@ counted in 1024 macros and whether the macros defined in standard
 headers should be counted vary the number.  The macro tested in this
 sample is the 1024th in header files, but there are some macros defined
 prior in warns.t and warns.c.  In any case, this macro exceeds the
-1024th.  Implementations should issue warnings at appropriate places.
+1024th.  Implementations are expected to issue warnings at appropriate
+places.
 
 Scoring: 1.
 
@@ -6130,7 +6063,8 @@ Among these, some cannot help relying on rather subjective evaluation.
 Others can be evaluated objectively, but the measure may not be
 specified clearly.  Refer to [5.2] to score them appropriately.
 
-        [3.5.1]     Qualities regarding behaviors
+
+        [3.5.1]     Qualities regarding Behaviors
 
             [q.1.1]     Translation limits above the specification
 
@@ -6162,7 +6096,7 @@ limit values in the C++ Standard guideline are higher than these.)
 l_37_8.c does not become an execution program even if it is compiled.
 Only preprocessing is necessary, however, make an object file by doing
 cc -c l_37_8.c to compile.  If preprocessing is successful, you can find
-out how long the compiler proper can accept.
+out how long line the compiler proper can accept.
 
 Scoring: 9.  1 point for each of 9 kinds of samples.  Compiler proper
 testing is not included.
@@ -6174,7 +6108,7 @@ too vague, or not obvious about the point of the problem.  Some
 diagnostic messages are detailed while others may lack focus.  A
 diagnostic message should not be simply "syntax error", but should show
 the reason for the error.  The implementation should indicate the line
-and point out the token of the problem
+and point out the token of the problem.
 
 The error of a miss-matched #if section must indicate the corresponding
 line.  Otherwise, it is not possible to detect where the error resides.
@@ -6209,6 +6143,7 @@ done though the program ends prematurely.
 runaway, classify it as a "runway") if a processed is aborted in n_std.c.
 
 3. 10 points for a runaway in any of other samples.
+
 
         [3.5.2]     Options and extended functionalities
 
@@ -6327,8 +6262,8 @@ example, by
 
 some implementations automatically do not access this for a second time.
 
-There is a #pragma directive which makes many header files combined as
-one file as a "pre-preprocess."  In other words, this is the
+In MCPP, there is a #pragma directive which makes many header files
+combined as one file as a "pre-preprocess."  In other words, this is the
 functionality to preprocess the header included by #include to output
 and add the #define directives which appeared there to the combined
 output.  Including this is enough in compiling the original source.
@@ -6353,12 +6288,11 @@ Some implementations have #pragma which specifies the encoding of multi-
 byte characters.  It is complete as a method of passing along the
 encoding of source files to a preprocessor or compiler.
 
-Some implementations also have #pragma which traces preprocessing and
-outputs debug information.  As no debugging can be performed for
-preprocessing using a regular debugger, this is an important feature
-that can be done only in a preprocessor.  This feature is easier to use
-since debug points can be restricted by using #pragma rather than
-specifying an option.
+MCPP also has #pragma which traces preprocessing and outputs debug
+information.  As no debugging can be performed for preprocessing using a
+regular debugger, this is an important feature that can be done only in
+a preprocessor.  This feature is easier to use since debug points can be
+restricted by using #pragma rather than specifying an option.
 
 Some implementations implement what is normally specified as an option
 at compilation by #pragma such as error and warning control
@@ -6374,7 +6308,7 @@ preprocessing.
 
 By the way, #pragma sub-directives are implementation-defined and have a
 possibility of name collision between implementations.  Some device to
-avoid name collision is desirable.  GNU C 3 uses the name GCC as
+avoid name collision is desirable.  GCC 3 uses the name GCC as
 '#pragma GCC poison'.  This is a good idea.  MCPP has adopted this idea
 as '#pragma MCPP debug' since V.2.5.
 
@@ -6386,24 +6320,24 @@ Although extended functionalities should be implemented as #pragma sub-
 directives, some preprocessors implement directives other than #pragma
 as proposals of new preprocessing specifications.
 
-In Linux system headers, GNU C / #include_next directive is used.  Using
+In Linux system headers, GCC / #include_next directive is used.  Using
 of this directive means, however, organization of the system headers are
-unnecessarily complicated, and is not praiseworthy.  GNU C / cpp
-implements also non-Standard directives such as #warning, #assert, etc.
-whose needs are not high.  GNU C 3.2 / cpp treats some of those
-directives as "obsolete" features.  It seems a good turn.
+unnecessarily complicated, and is not praiseworthy.  GCC implements also
+non-Standard directives such as #warning, #assert, etc. whose needs are
+not high.  GCC 3.2 / cpp treats some of those directives as "obsolete"
+features.  It seems a good turn.
 
 The preprocessor named "wave" has a directive to specify the scope of
 macro definition, and, in correspondence with the directive, adopts a
 macro call syntax similar to C++ scope specifier.  It seems an
 interesting experiment.
 
-GNU C has a "traditional" mode preprocessor other than the standard mode
-one.  MCPP can generate preprocessors of various specifications
-according to its compile time configurations.  Those experiments also
-have some meanings.
+GCC / cc1 has a "traditional" mode option other than the standard
+behavioral mode.  MCPP has options for various behavioral specifications.
+Those experiments also have some meanings.
 
 Scoring: 6.
+
 
         [3.5.3]     Efficiency and others
 
@@ -6419,21 +6353,19 @@ Scoring: 20.  The speed of the program that does nothing but copying
 input to output is set as 20 points.  Comparative scoring is done speed
 relative to this benchmark.  Refer to [5.2] for concrete measurements.
 Since the absolute speed varies depending on hardware, comparison should
-be done with same level of hardware.  In addition, the processing speed
-of processing same program depends on the amount of standard headers to
-be read.  Comparison should be done with MCPP as a point of reference.
+be done with same level of hardware.  In addition, the speed of
+processing same program depends on the amount of standard headers to be
+read.  Comparison should be done with MCPP as a point of reference.
 
 In order to measure time, the time command (built-in command in bash or
-tcsh) is used for UNIX systems.  On the DOS/Windows systems, there is a
-time command in bash if CygWIN is installed.  Also, WindowsNT has a
-similar command called TimeThis in the "resource kit."  On systems where
-these are not available, compile tool/clock_of.c for use (though it is
-rather inaccurate.) *
+tcsh) is used for UNIX systems.  On the Windows systems, there is a time
+command in bash if CygWIN is installed.  Also, WindowsNT has a similar
+command called TimeThis in the "resource kit."  On systems where these
+are not available, compile tool/clock_of.c for use (though it is rather
+inaccurate.) *
 
   * Some WindowsNT resource kit programs can be used on WindowsXP while
-    others do not.  TimeThis seems to be usable.  TimeThis is usable
-    also for DOS execution programs on WindowsNT and WindowsXP (though
-    it loses accuracy from the large overhead in launching DOS.)
+    others do not.  TimeThis seems to be usable.
 
             [q.3.2]     Memory usage
 
@@ -6441,11 +6373,11 @@ The smaller the memory usage is, the better it is.  This is a serious
 problem especially where there is a strict limitation in memory usage.
 
 As preprocessing is a part of compilation, the memory usage for overall
-implementation actually becomes an issue.  Since the compiler proper
+compiler system actually becomes an issue.  Since the compiler proper
 itself eats up more memory usually in case preprocessing is performed by
 an independent preprocessor, memory usage by a preprocessor shall not be
 a problem.  However, in case there are many macro definitions and such,
-a preprocessor may run out of memory.  Memory usage includes not only
+a preprocessor may consume more memory.  Memory usage includes not only
 the size of a program, but also data area usage.
 
 Scoring: 20.  Out of memory problems in regular usage subtract points.
@@ -6456,7 +6388,7 @@ The 'time' command in tcsh also serves as a reference.
             [q.3.3]     Portability
 
 The portability of preprocessor source itself becomes an issue when it
-replaces a preprocessor provided by the compiler system or when it is
+replaces a resident preprocessor of the compiler system or when it is
 being updated or customized.  The following shall be subject to
 evaluation.
   1. Whether source is open (0 points if not open.)
@@ -6469,12 +6401,13 @@ what conditions?
 Scoring: 20.  I only read one and a half source.  I just took a glance
 at the rest.  So, this scoring is just a guess.
 
-        [3.5.4]     Quality of documents
+
+        [3.5.4]     Quality of Documents
 
             [q.4.1]     Quality of documents
 
-In d.*, we saw only whether there are documents regarding
-"implementation-defined items" by Standard C.  Here, we will also
+In d.*, we saw only whether there are documents regarding "
+implementation-defined items" by Standard C.  Here, we will also
 evaluate the quality of documents.
 
 In addition to implementation-defined items, the following are necessary
@@ -6495,8 +6428,8 @@ Scoring: 10.
 
     [3.6]       C++ Preprocessing
 
-More C and C++ compiler systems are starting to be provided together.
-In that case, the same preprocessor seems to be used in both C and C++.
+Nowadays, in most compiler systems C and C++ are provided together.  In
+that case, the same preprocessor seems to be used in both C and C++.
 Since preprocessing is almost the same in both, it is not necessary to
 prepare separate preprocessors for each.  However, it is not exactly the
 same in both.
@@ -6694,7 +6627,8 @@ below.
 
 1. The identifier not specified by the Standard nor reserved must not be
 declared nor defined.  The range declarable is determined for each
-standard header (range may be duplicate or shared.) *1
+standard header (range may be duplicate or shared between more than one
+standard header.) *1
 
 2. Therefore, it is usually not acceptable for one standard header to
 include another one.
@@ -6766,11 +6700,11 @@ What becomes an issue in 5 is there are implementations where macros
 using sizeof or cast are written in standard headers.  In Standard C,
 sizeof and cast are not allowed in the #if expression.  Since sizeof and
 cast are available in the #if expression as well in the implementations
-actually using sizeof or cast in standard headers (Borland C), they must
-consider this as an extended specification.
+actually using sizeof or cast in standard headers (Borland C 5.5), they
+must consider this as an extended specification.
 
 As long as a user does not use sizeof and cast in the #if expression in
-his/her program, no portability problem no other problems will arise.
+his/her program, no portability problem or no other problems will arise.
 However, this preprocessing implementation is not an "extension" of
 Standard C, but rather a "deviation."  That is because #if is processed
 in translation phase 4 in Standard C and no keyword exists in this phase.
@@ -6869,11 +6803,11 @@ implemented.
 In reality, some of the old implementations do not implement the #
 operator correctly or do not implement <assert.h> correctly.  There are
 many samples in this Validation Suite which includes <assert.h>, testing
-the preprocessor itself cannot be accurately performed if <assert.h> is
+the preprocessor itself cannot be correctly performed if <assert.h> is
 not written correctly.  Since it is easy to write <assert.h> correctly,
 it is better to rewrite the ones that are not right among the files in
 an implementation.  The following is an example from C89 Rationale 4.2.1.
-1.  In this as well, the accurate result cannot be obtained if the #
+1.  In this as well, the correct result cannot be obtained if the #
 operator is not correctly implemented.  However, it is a preprocessor
 problem and cannot be helped.
 
@@ -6930,7 +6864,7 @@ must be met. *1
 directive.
 
 2. Must be the expression of the same type as the object of the
-corresponding type after integral promotion.
+corresponding type after integer promotion.
 
 There are implementations that use cast.  We discussed that sizeof and
 cast in the #if expression are not in the range of Standard C in [4.1].
@@ -6957,7 +6891,7 @@ In #if, cast and sizeof are not necessary if <limits.h> macros are used.
 Examples where the <limits.h> macros are wrong in the type can be seen
 from time to time.  Those do not come from the preprocessor
 specification, but it seems that the person writing <limits.h> forgets 2
-above and integral promotion, the usual arithmetic conversion rule, or
+above and integer promotion, the usual arithmetic conversion rule, or
 the evaluation rule for integer constant tokens.
 
 For example, there is a definition as below.
@@ -6965,7 +6899,7 @@ For example, there is a definition as below.
     #define UCHAR_MAX   255U
 
 The unsigned char values are all in the int range (if CHAR_BIT is 8) and
-the data object values in the unsigned char type becomes int by integral
+the data object values in the unsigned char type becomes int by integer
 promotion.  Therefore, UCHAR_MAX also must be evaluated as int.  However,
 it becomes unsigned int in 255U.  This must be:
 
@@ -6973,20 +6907,21 @@ it becomes unsigned int in 255U.  This must be:
 
 Although either way does not seem to have any issues in practice, it is
 not necessarily so.  Operations including unsigned type cause "usual
-arithmetic conversion" and force the conversion from signed type of the
-same size to unsigned.  Therefore, the result of size comparison varies.
+arithmetic conversion" and force the conversion from signed type to
+unsigned of the same size.  Therefore, the result of value comparison
+varies.
 
 This is easy to see in the following:
     assert( -255 < UCHAR_MAX);
 
-This mistake is related to the circumstance that the integral promotion
+This mistake is related to the circumstance that the integer promotion
 and usual arithmetic conversion rules were changed in Standard C from
 the ones adopted in many conventional implementations.  The unsigned
 char, unsigned short, and unsigned long types were not in K&R 1st, but
 were implemented in many implementations later.  In addition, in most of
 those implementations, unsigned was always converted into unsigned.
 
-In the integral promotion in Standard C, however, unsigned char and
+In the integer promotion in Standard C, however, unsigned char and
 unsigned short are promoted into int as long as all values stay in the
 int range and they are promoted into unsigned int otherwise.  Also, in
 the usual arithmetic conversion between unsigned int and long, all
@@ -7151,8 +7086,8 @@ complement and sign+absolute value.  This is consistent from K&R 1st to
 Standard C.  C has no way to write a bit pattern itself and "Not-a-
 Number" can be written only as (-32767-1) etc.  This is an int value
 itself as you can see.  C89 Rationale mentions some grounds and made
-clear there is no room for bit patterns representing an "invalid integer
-" or "illegal integer" in the integer type. *3, *4
+clear there is no room for bit patterns representing an "invalid
+integer" or "illegal integer" in the integer type. *3, *4
 
 In the internal representation of 2's complement, ~INT_MAX is the value
 of INT_MIN and I must say that the definition bigger than that is wrong.
@@ -7172,7 +7107,7 @@ of INT_MIN and I must say that the definition bigger than that is wrong.
   *2  In recent compiler systems, *_MIN is typically defined in the form
     of (-*_MAX - 1) and there are few mistakes though they are still
     found occasionally.  Vc7/include/limits.h and Vc7/crt/src/include/
-    limits.h in Visual C++ .net 2003 contains:
+    limits.h in Visual C++ 2003 contains:
         #define LLONG_MIN   0x8000000000000000
     0x8000000000000000 evaluates to unsigned long long.  Since this type
     has the highest rank, the result of integer promotion has the same
@@ -7180,7 +7115,7 @@ of INT_MIN and I must say that the definition bigger than that is wrong.
         #if LLONG_MAX > LLONG_MIN
     does not turn out as expected.
 
-    LLONG_MIN in include/limits.h of LCC-Win32 V.3.2 is as below.
+    LLONG_MIN in include/limits.h of LCC-Win32 V.3.2, V.3.8 is as below.
         #define LLONG_MIN   -9223372036854775808LL
     9223372036854775808LL is a violation of constraints as this token
     value overflows the range of signed long long.  If LLONG_MIN is
@@ -7191,10 +7126,12 @@ of INT_MIN and I must say that the definition bigger than that is wrong.
     however, the result becomes a value which cannot be expressed in
     unsigned long long and ends up undefined.
 
-    In Visual C++ and LCC-Win32, all other *_MIN definitions are (-*_MAX
-    - 1), but why is only LLONG_MIN wrong?  If it is defined as below,
-    there will be no problem.
+    In Visual C++ 2003 and LCC-Win32, all other *_MIN definitions are (-
+    *_MAX - 1), but why is only LLONG_MIN wrong?  If it is defined as
+    below, there will be no problem.
         #define LLONG_MIN   (-LLONG_MAX - 1LL)
+
+    In Visual C++ 2005, this definition was revised correctly.
 
   *3  C89 Rationale 3.1.2.5 Types
       C99 Rationale 6.2.6.2 Integer types
@@ -7243,7 +7180,7 @@ for implementations. *
     meaningless specification for implementations.
 
 
-5.  Various Preprocessor Test Results
+5.  Preprocessor Test Results
 
     [5.1]   Preprocessors Tested
 
@@ -7255,7 +7192,7 @@ Runtime options slightly vary in each of C95 (C90), C99, and C++98.
 If there are problems in <assert.h> and <limits.h>, testing was done
 after correctly rewriting them.
 
-Number  OS          Compiler System         Execution program (version)
+Number: OS          / Compiler System       / Execution program (version)
         Runtime option
     Comment
 
@@ -7264,23 +7201,10 @@ Number  OS          Compiler System         Execution program (version)
     DECUS cpp original version by Martin Minow (June 1985.)  It was
     ported to some systems such as various DEC systems, UNIX, and MS-DOS
     at that time, but what I used in this test was modified by kmatsui
-    and compiled on Linux / GNU C.  Macros were rewritten so that
+    and compiled on Linux / GCC.  Macros were rewritten so that
     translation limits clear as many specifications as possible.
 
-2   :   MS-DOS      / Borland C++ V.4.02J   / cpp
-        C95:    cpp -A -w -i250
-                bcc -A -w -i250
-    In 1993.  The Japanese version was released in December, 1994.
-    Trigraphs are not processed by cpp nor bcc.  Instead, a conversion
-    program called trigraph.exe is provided.
-    It just set up an alibi called "Standard conformance."  In Borland C,
-    I used this program to convert trigraphs in advance to test (lenient
-    testing.)  This trigraph.exe, however, processes even line splicing
-    by <backslash><newline>.
-    Therefore, the line number is out of alignment (deduct scores in q.1.
-    2.)
-
-3   :   FreeBSD 2.2.7   / GNU C V.2.7.2.1   / cpp (V.2.0)
+2   :   FreeBSD 2.2.7   / GCC V.2.7.2.1     / cpp (V.2.0)
         GO32        / DJGPP V.1.12          / cpp (V.2.0)
         WIN32       / BC 4.0                / cpp (V.2.0)
         MS-DOS      / BC 4.0, TC 2.0        / cpp (V.2.0)
@@ -7292,51 +7216,50 @@ Number  OS          Compiler System         Execution program (version)
         C++:    cpp -23+ -S199711L -W15
     Free software by kmatsui (August, 1998.)  Called MCPP.  Rewrite of
     DECUS cpp.
-    A part of translation limits cannot be cleared in the MS-DOS or OS-9
-    /09 version.  In case the compiler system which compiles MCPP does
-    not implement long long, the #if expression can be evaluated only in
-    long.
-    The following scores are in the case of using the version compiled
-    in the 32 bit system with long long. I have recompiled with GNU C V.
-    3.3 on Linux and used the executable for this test.
+    I have compiled with GCC V.3.3 on Linux and used the executable for
+    this test.
 
-4   :   WIN32       / Borland C++ V.5.5J    / cpp32 (August, 2000)
+3   :   WIN32       / Borland C++ V.5.5J    / cpp32 (August, 2000)
         C95:    cpp32 -A -w
                 bcc32 -A -w
         C99:    cpp32 -A -w
         C++:    cpp32 -A -w
-    Trigraphs are similar to V.4.0.  This became a free compiler system,
-    but help is the only documentation.
+    Trigraphs are not processed by cpp32 nor bcc32.  Instead, a
+    conversion program called trigraph.exe is provided.
+    It just set up an alibi called "Standard conformance."  In Borland C,
+    I used this program to convert trigraphs in advance to test (lenient
+    testing.)  This trigraph.exe, however, processes even line splicing
+    by <backslash><newline>.
+    Therefore, the line number is out of alignment (deduct scores in q.1.
+    2.)
 
-5   :   Vine Linux 3.1, CygWIN 1.3.10
-                                 / GNU C V.2.95.3 (March, 2001) / cpp0
+4   :   Vine Linux 3.2, CygWIN 1.3.10
+                                 / GCC V.2.95.3 (March, 2001)   / cpp0
         C95:    cpp0 -D__STRICT_ANSI__ -std=c89 -$ -pedantic -Wall
                 gcc -ansi -pedantic -Wall
         C99:    cpp0 -std=c9x -$ -Wall
         C++:    g++ -E -trigraphs -$ -Wall
-    The source files seem to support multi-byte character encodings such
-    as shift-JIS and ISO-2022-JP, however they are not compiled to make
-    them effective.  Since GNU C is portable source, the person who
-    ported it should prepare the specification for what has been ported
-    to a specific system.  However, no such document is provided.  Only
-    GNU cpp.info exists as a cpp document.
+    Since GCC is portable source, the person who ported it should
+    prepare the specification for what has been ported to a specific
+    system.  However, no such document is provided.  Only GNU cpp.info
+    exists as a cpp document.
 
-6   :  Vine Linux 3.1   / GNU C V.3.2 (August, 2002)    / cpp0
+5   :  Vine Linux 3.2   / GCC V.3.2 (August, 2002)      / cpp0
         C95:    cpp0 -D__STRICT_ANSI__  -std=iso9899:199409 -$ -pedantic
-                        -Wall
-                gcc -std=iso9898:199409 -pedantic -Wall
+                                                                -Wall
+                gcc -std=iso9899:199409 -pedantic -Wall
         C99:    cpp0 -std=c99 -$ -Wall
         C++:    g++ -E -trigraphs -$ -Wall
     Compiled from the source by kmatsui.  Configured with --enable-c-
     mbchar option.
 
-7   :   Vine Linux 3.1  /                   / ucpp (V.1.3)
-        C95:    ucpp -wa
+6   :   Vine Linux 3.2  /                   / ucpp (V.1.3)
+        C95:    ucpp -wa -c90
         C99:    ucpp -wa
     Free software by Thomas Pornin (January, 2003.)  A portable stand-
     alone preprocessor.
 
-8   :   WIN32        / Visual C++ .net 2003 / cl
+7   :   WIN32       / Visual C++ 2003       / cl
         C95:    cl -Za -E -Wall -Tc
         C99:    cl -E -Wall -Tc
         C++:    cl -E -Wall -Tp
@@ -7344,7 +7267,7 @@ Number  OS          Compiler System         Execution program (version)
     <newline> properly, a compilation testing is used together (April,
     2003.)
 
-9   :   WIN32       / LCC-Win32 V.3.2       / lcc
+8   :   WIN32       / LCC-Win32 V.3.2       / lcc
         C95:    lcc -A -E
                 lcc -A
         C99:    lcc -A -E
@@ -7354,7 +7277,7 @@ Number  OS          Compiler System         Execution program (version)
     source is shareware.  The preprocessing part is based on source
     originally written for Plan9 by Dennis Ritchie.
 
-10  :   WIN32           /                   / wave (V.1.0.0)
+9   :   WIN32       /                       / wave (V.1.0.0)
         C95:    wave
         C99:    wave --c99
         C++:    wave
@@ -7362,378 +7285,409 @@ Number  OS          Compiler System         Execution program (version)
     preprocessor.  Implemented using the C++ library called "Boost
     preprocessor library" by Paul Mensonides et al.
 
-11  :    VineLinux 3.1  / GNU C V.3.4.3 (November, 2004)
-                                                / cc1, cc1plus
-        C95:    gcc -E -std=iso9898:199409 -pedantic -Wall
-        C99:    gcc -E -std=c99 -$ -Wall
-        C++:    g++ -E -std=c++98 -$ -Wall
-    Compiled by kmatsui with GNU C V.3.3.2.
-
-12  :   FreeBSD, Linux, CygWIN      / GNU C     / mcpp_std (V.2.5)
-  :     WIN32, MS-DOS  / BCC, LCC-Win32, ...    / mcpp32_std (V.2.5)
+10 :    FreeBSD, Linux, CygWIN   / GCC 2.95, 3.
+   :    WIN32, MS-DOS   / Visual C 2003, BCC, etc.  / mcpp_std (V.2.4)
         C95:    mcpp_std -23 (-S1 -V199409L) -W31
                 gcc -ansi -Wp,-2,-W31
         C99:    mcpp_std -23 (-S1) -V199901L -W31
         C++:    mcpp_std -23+ -V199711L -W31
-    Standard mode of MCPP V.2.5 (March, 2005.)
+    MCPP V.2.4 (February, 2004), in Standard mode.  Compiled with Linux
+    / GCC 2.95.3.
+
+11  :    VineLinux 3.2  / GCC V.3.4.3 (November, 2004)
+                                                    / cc1, cc1plus
+        C95:    gcc -E -std=iso9899:199409 -pedantic -Wall
+        C99:    gcc -E -std=c99 -$ -Wall
+        C++:    g++ -E -std=c++98 -$ -Wall
+    Compiled by kmatsui with GCC V.3.3.2.
+
+12 :    openSUSE Linux 10.0 / GCC V.4.0.2 (September, 2005)
+                                                    / cc1, cc1plus
+        C95:    gcc -E -std=iso9899:199409 -pedantic -Wall
+        C99:    gcc -E -std=c99 -$ -Wall
+        C++:    g++ -E -std=c++98 -$ -Wall
+    Bundled in openSUSE 10.0.
+
+13 :   WIN32        / Visual C++ 2005       / cl
+        C95:    cl -Za -E -Wall -Tc
+        C99:    cl -E -Wall -Tc
+        C++:    cl -E -Wall -Tp
+    Since the -E option does not process comments and <backslash>
+    <newline> properly, a compilation testing is used together.
+    (September, 2005.)
+
+14 :    WIN32       / LCC-Win32 V.3.8       / lcc
+        C95:    lcc -A -E
+                lcc -A
+        C99:    lcc -A -E
+        C++:    lcc -A -E
+    LCC-Win32 V.3.8 (March, 2006.)
+
+15 :    FreeBSD, Linux, CygWIN   / GCC 2.95-4.
+   :    WIN32  / Visual C 2003-2005, BCC, LCC-Win32 / mcpp (V.2.6)
+        C95:    mcpp -23 (-S1 -V199409L) -W31
+                gcc -ansi -Wp,-2,-W31
+        C99:    mcpp -23 (-S1) -V199901L -W31
+        C++:    mcpp -23+ -V199711L -W31
+    MCPP V.2.6 (July, 2006.)
 
 
     [5.2]       Lists of Marks
 
-                D   B   M   B   G   G   u   V   L   W   G   M
-                E   C   C   C   C   C   c   C   C   a   C   C
-                C   4   P   C   C   C   p   2   C   v   C   P
-                U   C   P   5   2   3   p   0   W   e   3   P
-                S   P   2   5   9   2   1   0   i   1   4   2
-                C   P   0   C   5   R   3   3   n   0   2   5
-                P   1       P   3               3   0    
-                P   6       P                   2
+                D   M   B   G   G   u   V   L   W   M   G   G   V   L   M
+                E   C   C   C   C   c   C   C   a   C   C   C   C   C   C
+                C   P   C   C   C   p   2   C   v   P   C   C   2   C   P
+                U   P   5   2   3   p   0   W   e   P   3   4   0   W   P
+                S   2   5   9   2   1   0   i   1   2   4   0   0   i   2
+                C   0   C   5       3   3   n   0   4   3   2   5   n   6
+                P       P   3               3   0                   3    
+                P       P                   2                       8    
 
-        max     1   2   3   4   5   6   7   8   9  10  11  12
+        max     1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
 
 [K&R: Processing of sources conforming to K&R and C90] (31 items)
-n.2.1     4     4   4   4   4   4   4   4   4   4   4   4   4
-n.2.2     2     2   2   2   2   2   2   2   2   2   2   2   2
-n.2.3     2     0   2   2   2   2   2   2   2   2   2   2   2
-n.6.1    10    10  10  10  10  10  10  10  10  10   4  10  10
-n.7.2     4     4   4   4   4   4   4   4   4   4   4   4   4
-n.10.2    6     0   6   6   6   6   6   6   6   6   6   6   6
-n.12.3    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.12.4    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.12.5    2     0   2   2   2   2   2   2   2   2   2   2   2
-n.12.7    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.13.1    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.13.2    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.13.3    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.13.4    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.13.7    6     6   4   6   4   6   6   6   4   6   0   6   6
-n.13.8    2     0   2   2   2   2   2   2   2   2   0   2   2
-n.13.9    2     2   2   2   2   2   2   2   0   2   0   2   2
-n.13.10   2     2   2   2   2   2   2   2   0   0   2   2   2
-n.13.11   2     0   2   2   2   2   2   2   0   0   0   2   2
-n.13.12   2     0   2   2   2   2   2   2   2   0   0   2   2
-n.15.1    6     6   6   6   6   6   6   6   6   6   6   6   6
-n.15.2    6     6   6   6   6   6   6   6   6   6   6   6   6
-n.18.1   30    30  30  30  30  30  30  30  30  30  30  30  30
-n.18.2   20    20  20  20  20  20  20  20  20  20  20  20  20
-n.18.3   10    10  10  10  10  10  10  10  10  10  10  10  10
-n.27.1    6     6   6   6   6   6   6   6   6   6   6   6   6
-n.27.2    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.29.1   10    10  10  10  10  10  10  10  10  10  10  10  10
-n.32.1    2     2   2   2   2   2   2   2   2   2   0   2   2
-i.32.3    2     2   2   2   2   2   2   2   2   2   0   2   2
-i.35.1    2     2   2   2   2   2   2   2   0   2   0   2   2
-stotal  166   150 164 166 164 166 166 166 156 160 140 166 166
+n.2.1     4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.2.2     2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.2.3     2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.6.1    10    10  10  10  10  10  10  10  10   4  10  10  10  10  10  10
+n.7.2     4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.10.2    6     0   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.12.3    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.12.4    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.12.5    2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.12.7    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.13.1    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.13.2    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.13.3    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.13.4    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.13.7    6     6   6   4   6   6   6   4   6   0   6   6   6   4   4   6
+n.13.8    2     0   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+n.13.9    2     2   2   2   2   2   2   0   2   0   2   2   2   0   2   2
+n.13.10   2     2   2   2   2   2   2   0   0   2   2   2   2   2   0   2
+n.13.11   2     0   2   2   2   2   2   0   0   0   2   2   2   2   0   2
+n.13.12   2     0   2   2   2   2   2   2   0   0   2   2   2   2   0   2
+n.15.1    6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.15.2    6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.18.1   30    30  30  30  30  30  30  30  30  30  30  30  30  30  30  30
+n.18.2   20    20  20  20  20  20  20  20  20  20  20  20  20  20  20  20
+n.18.3   10    10  10  10  10  10  10  10  10  10  10  10  10  10  10  10
+n.27.1    6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.27.2    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.29.1   10    10  10  10  10  10  10  10  10  10  10  10  10  10  10  10
+n.32.1    2     2   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+i.32.3    2     2   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+i.35.1    2     2   2   2   2   2   2   0   0   0   2   2   2   0   0   2
+stotal  166   150 166 164 166 166 166 156 158 140 166 166 166 160 156 166
 
 [C90: Processing of strictly conforming sources] (76 items)
-n.1.1     6     0   6   6   6   6   6   6   6   6   0   6   6
-n.1.2     2     0   2   2   2   2   2   2   2   2   0   2   2
-n.1.3     2     0   2   2   2   2   2   2   2   2   0   2   2
-n.2.4     2     2   2   2   2   2   2   2   2   2   2   2   2
-n.2.5     2     0   2   2   2   2   2   2   2   2   0   2   2
-n.3.1     6     6   6   6   6   6   6   6   6   6   6   6   6
-n.3.3     4     4   4   4   4   4   4   4   4   4   4   4   4
-n.3.4     2     0   0   2   0   2   2   0   2   2   2   2   2
-n.4.1     6     0   0   6   0   6   6   6   6   0   0   6   6
-n.4.2     2     0   0   2   0   2   2   2   2   0   0   2   2
-n.5.1     6     6   6   6   6   6   6   6   6   6   6   6   6
-n.6.2     6     6   6   6   6   6   6   6   6   6   6   6   6
-n.6.3     2     0   0   2   0   2   2   2   2   2   2   2   2
-n.7.1     6     6   6   6   6   6   6   6   6   6   6   6   6
-n.7.3     4     0   4   4   4   4   4   4   4   4   4   4   4
-n.8.1     8     0   8   8   8   8   8   8   8   8   8   8   8
-n.8.2     2     0   2   2   2   2   2   2   2   2   2   2   2
-n.9.1    10    10  10  10  10  10  10  10  10  10  10  10  10
-n.10.1   10    10  10  10  10  10  10  10  10  10  10  10  10
-n.11.1    8     8   8   8   8   8   8   8   8   8   8   8   8
-n.11.2    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.12.1    6     0   6   6   6   6   6   6   6   6   6   6   6
-n.12.2    4     0   4   4   4   4   4   4   4   4   0   4   4
-n.12.6    6     6   6   6   6   6   6   6   6   6   6   6   6
-n.13.5    2     2   2   2   2   2   2   2   2   2   0   2   2
-n.13.6    6     0   6   6   6   6   6   4   6   4   0   6   6
-n.13.13   4     4   4   4   4   4   4   4   4   4   4   4   4
-n.13.14   2     0   2   2   2   2   2   2   2   2   2   2   2
-n.19.1    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.19.2    4     2   4   4   4   4   4   4   4   4   2   4   4
-n.20.1    6     6   6   6   6   6   6   6   6   6   6   6   6
-n.21.1    4     0   0   4   0   4   4   4   0   4   4   4   4
-n.21.2    2     0   0   2   0   2   2   2   0   2   2   2   2
-n.22.1    4     0   0   4   0   4   4   4   4   4   0   4   4
-n.22.2    2     0   0   2   0   2   2   2   2   2   0   2   2
-n.22.3    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.23.1    6     2   6   6   6   6   6   6   6   6   6   6   6
-n.23.2    2     2   2   2   2   2   2   2   2   2   0   2   2
-n.24.1    6     6   6   6   6   6   6   6   6   6   6   6   6
-n.24.2    4     0   4   4   4   4   4   4   4   4   4   4   4
-n.24.3    6     0   0   6   0   6   6   6   6   6   6   6   6
-n.24.4    2     0   2   2   2   2   2   2   2   2   2   2   2
-n.24.5    2     0   2   2   2   2   2   2   2   2   2   2   2
-n.25.1    4     2   4   4   4   4   4   4   4   4   4   4   4
-n.25.2    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.25.3    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.25.4    6     0   6   6   6   6   6   6   6   6   6   6   6
-n.25.5    4     0   4   4   4   4   4   4   4   4   4   4   4
-n.26.1    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.26.2    2     0   2   2   2   2   2   2   2   2   2   2   2
-n.26.3    2     0   2   2   2   2   2   2   2   2   2   2   2
-n.26.4    2     0   2   2   2   2   2   2   2   2   2   2   2
-n.26.5    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.27.3    2     0   2   2   2   2   2   2   2   2   2   2   2
-n.27.4    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.27.5    2     2   2   2   2   2   2   2   0   2   0   2   2
-n.27.6    2     0   2   0   2   2   2   2   2   2   2   2   2
-n.28.1    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.28.2    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.28.3    4     0   4   4   4   4   4   2   4   4   4   4   4
-n.28.4    4     0   4   4   4   4   4   4   4   4   4   4   4
-n.28.5    4     0   4   4   4   4   4   4   4   4   4   4   4
-n.28.6    4     0   0   4   0   4   4   2   0   0   4   4   4
-n.28.7    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.29.2    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.30.1    6     6   6   6   6   6   6   6   6   6   6   6   6
-n.32.2    2     2   2   2   2   2   2   2   2   2   0   2   2
-n.37.1    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.37.2    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.37.3    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.37.4    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.37.5    4     4   4   4   4   4   4   4   4   4   4   4   4
-n.37.6    2     2   0   2   2   2   2   2   2   2   2   2   2
-n.37.7    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.37.8    2     2   2   2   2   2   2   2   2   2   2   2   2
-n.37.9    4     4   4   4   4   4   4   4   4   4   4   4   4
-stotal  286   160 250 284 252 286 286 278 274 272 240 286 286
+n.1.1     6     0   6   6   6   6   6   6   6   0   6   6   6   6   6   6
+n.1.2     2     0   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+n.1.3     2     0   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+n.2.4     2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.2.5     2     0   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+n.3.1     6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.3.3     4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.3.4     2     0   2   0   2   2   0   2   2   2   2   2   2   2   2   2
+n.4.1     6     0   6   0   6   6   6   6   0   0   6   6   6   6   0   6
+n.4.2     2     0   2   0   2   2   2   2   0   0   2   2   2   2   0   2
+n.5.1     6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.6.2     6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.6.3     2     0   2   0   2   2   2   2   2   2   2   2   2   2   2   2
+n.7.1     6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.7.3     4     0   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.8.1     8     0   8   8   8   8   8   8   8   8   8   8   8   8   8   8
+n.8.2     2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.9.1    10    10  10  10  10  10  10  10  10  10  10  10  10  10  10  10
+n.10.1   10    10  10  10  10  10  10  10  10  10  10  10  10  10  10  10
+n.11.1    8     8   8   8   8   8   8   8   8   8   8   8   8   8   8   8
+n.11.2    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.12.1    6     0   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.12.2    4     0   4   4   4   4   4   4   4   0   4   4   4   4   4   4
+n.12.6    6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.13.5    2     2   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+n.13.6    6     0   6   6   6   6   4   6   4   0   6   6   6   4   4   6
+n.13.13   4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.13.14   2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.19.1    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.19.2    4     2   4   4   4   4   4   4   4   2   4   4   4   4   4   4
+n.20.1    6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.21.1    4     0   4   0   4   4   4   0   4   4   4   4   4   0   4   4
+n.21.2    2     0   2   0   2   2   2   0   2   2   2   2   2   0   2   2
+n.22.1    4     0   4   0   4   4   4   4   4   0   4   4   4   4   4   4
+n.22.2    2     0   2   0   2   2   2   2   2   0   2   2   2   2   2   2
+n.22.3    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.23.1    6     2   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.23.2    2     2   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+n.24.1    6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.24.2    4     0   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.24.3    6     0   6   0   6   6   6   6   6   6   6   6   6   6   6   6
+n.24.4    2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.24.5    2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.25.1    4     2   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.25.2    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.25.3    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.25.4    6     0   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.25.5    4     0   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.26.1    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.26.2    2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.26.3    2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.26.4    2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.26.5    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.27.3    2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.27.4    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.27.5    2     2   2   2   2   2   2   0   2   0   2   2   2   0   2   2
+n.27.6    2     0   0   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.28.1    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.28.2    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.28.3    4     0   4   4   4   4   2   4   4   4   4   4   4   4   4   4
+n.28.4    4     0   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.28.5    4     0   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.28.6    4     0   4   0   4   4   2   0   0   4   4   4   4   0   0   4
+n.28.7    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.29.2    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.30.1    6     6   6   6   6   6   6   6   6   6   6   6   6   6   6   6
+n.32.2    2     2   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+n.37.1    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.37.2    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.37.3    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.37.4    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.37.5    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.37.6    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.37.7    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.37.8    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+n.37.9    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+stotal  286   160 284 252 286 286 278 274 272 240 286 286 286 272 272 286
 
 [C90: Processing of implementation defined portions] (1 item)
-i.32.4    2     2   2   2   2   2   2   2   2   2   2   2   2
-stotal    2     2   2   2   2   2   2   2   2   2   2   2   2
+i.32.4    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+stotal    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
 
 [C90: Diagnosing of violation of syntax rule or constraint] (50 items)
-e.4.3     2     2   1   2   1   2   2   2   2   2   2   2   2
-e.7.4     2     0   2   2   2   2   2   2   2   2   2   2   2
-e.12.8    2     0   0   2   2   2   2   2   2   0   2   2   2
-e.14.1    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.14.2    4     2   2   4   2   4   4   2   2   4   4   4   4
-e.14.3    2     2   2   2   2   2   2   1   2   2   2   2   2
-e.14.4    2     2   2   2   2   2   2   1   2   2   2   2   2
-e.14.5    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.14.6    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.14.7    2     0   2   2   2   2   2   2   2   2   2   2   2
-e.14.8    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.14.9    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.14.10   4     0   2   4   2   0   0   0   0   0   0   0   4
-e.15.3    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.15.4    2     2   1   2   1   2   2   2   1   2   2   2   2
-e.15.5    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.16.1    2     2   1   2   1   2   2   2   1   2   2   2   2
-e.16.2    2     2   1   2   1   2   2   2   1   2   2   2   2
-e.17.1    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.17.2    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.17.3    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.17.4    2     2   2   2   2   2   2   2   2   2   0   2   2
-e.17.5    2     0   2   2   2   2   2   2   2   2   0   2   2
-e.17.6    2     0   2   2   2   2   2   2   2   2   0   2   2
-e.17.7    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.18.4    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.18.5    2     2   2   2   2   0   2   2   2   2   2   2   2
-e.18.6    2     0   2   2   2   2   2   2   2   2   0   2   2
-e.18.7    2     0   2   2   2   2   2   2   2   2   2   2   2
-e.18.8    2     2   2   2   2   2   2   2   2   2   0   2   2
-e.18.9    2     0   0   2   0   2   2   2   2   0   0   0   2
-e.19.3    4     4   4   4   4   4   4   4   4   4   4   4   4
-e.19.4    4     4   4   4   4   4   4   4   4   4   4   4   4
-e.19.5    4     4   4   4   4   4   4   4   4   4   4   4   4
-e.19.6    2     0   2   2   2   2   2   2   2   2   2   2   2
-e.19.7    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.23.3    2     0   2   2   2   2   2   2   2   0   0   2   2
-e.23.4    2     2   2   2   2   2   2   2   2   0   0   2   2
-e.24.6    2     2   2   2   2   2   2   2   2   0   0   2   2
-e.25.6    4     0   0   4   0   4   4   4   4   4   4   4   4
-e.27.7    2     0   2   2   2   2   2   2   0   2   2   2   2
-e.29.3    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.29.4    2     2   1   2   1   2   2   2   1   2   2   2   2
-e.29.5    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.31.1    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.31.2    2     2   2   2   2   2   2   2   2   2   2   2   2
-e.31.3    2     2   0   2   0   2   2   2   2   2   2   2   2
-e.32.5    2     0   2   2   2   2   2   0   2   0   0   2   2
-e.33.2    2     0   0   2   0   0   2   0   2   0   0   2   2
-e.35.2    2     0   1   2   1   2   2   0   2   0   2   2   2
-stotal  112    74  90 112  92 104 108  98 100  92  86 106 112
+e.4.3     2     2   2   1   2   2   2   2   2   2   2   2   2   2   2   2
+e.7.4     2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.12.8    2     0   2   2   2   2   2   2   0   2   2   2   2   2   0   2
+e.14.1    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.14.2    4     2   4   2   4   4   2   2   4   4   4   4   4   4   4   4
+e.14.3    2     2   2   2   2   2   1   2   2   2   2   2   2   2   2   2
+e.14.4    2     2   2   2   2   2   1   2   2   2   2   2   2   2   2   2
+e.14.5    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.14.6    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.14.7    2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.14.8    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.14.9    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.14.10   4     0   4   2   0   0   0   0   0   0   4   0   0   0   0   4
+e.15.3    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.15.4    2     2   2   1   2   2   2   1   2   2   2   2   2   2   2   2
+e.15.5    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.16.1    2     2   2   1   2   2   2   1   2   2   2   2   2   2   2   2
+e.16.2    2     2   2   1   2   2   2   1   2   2   2   2   2   2   2   2
+e.17.1    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.17.2    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.17.3    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.17.4    2     2   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+e.17.5    2     0   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+e.17.6    2     0   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+e.17.7    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.18.4    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.18.5    2     2   2   2   0   2   2   2   2   2   2   2   2   2   2   2
+e.18.6    2     0   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+e.18.7    2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.18.8    2     2   2   2   2   2   2   2   2   0   2   2   2   2   2   2
+e.18.9    2     0   2   0   2   2   2   2   0   0   2   0   2   2   0   2
+e.19.3    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+e.19.4    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+e.19.5    4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+e.19.6    2     0   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.19.7    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.23.3    2     0   2   2   2   2   2   2   0   0   2   2   2   2   0   2
+e.23.4    2     2   2   2   2   2   2   2   0   0   2   2   2   2   0   2
+e.24.6    2     2   2   2   2   2   2   2   0   0   2   2   2   2   0   2
+e.25.6    4     0   4   0   4   4   4   4   4   4   4   4   4   4   4   4
+e.27.7    2     0   2   2   2   2   2   0   2   2   2   2   2   0   2   2
+e.29.3    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.29.4    2     2   2   1   2   2   2   2   2   2   2   2   2   2   2   2
+e.29.5    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.31.1    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.31.2    2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+e.31.3    2     2   2   0   2   2   2   1   2   2   2   2   2   1   2   2
+e.32.5    2     0   2   2   2   2   0   2   0   0   2   2   2   2   0   2
+e.33.2    2     0   2   0   0   2   0   2   0   0   2   2   2   2   0   2
+e.35.2    2     0   2   1   2   2   0   2   0   2   2   2   2   2   0   2
+stotal  112    74 112  92 104 108  98 100  92  86 112 106 108 105  92 112
 
 [C90: Documents on implementation defined behaviors] (13 items)
-d.1.1     2     0   0   2   0   0   2   0   0   0   0   2   2
-d.1.2     4     2   4   4   4   4   4   0   4   0   0   4   4
-d.1.3     2     0   0   2   0   0   2   0   0   2   2   2   2
-d.1.4     4     0   4   4   4   4   4   0   4   4   4   4   4
-d.1.5     4     2   4   4   4   2   4   4   4   4   4   2   4
-d.1.6     2     0   0   2   0   0   1   0   0   0   0   1   2
-d.2.1     2     0   2   2   2   2   2   2   0   0   0   2   2
-d.2.2     2     0   2   2   2   0   2   0   0   0   0   2   2
-d.2.3     2     0   2   2   0   0   0   0   0   0   0   0   2
-d.2.4     2     0   0   2   0   0   0   0   0   0   0   0   2
-d.2.5     2     0   2   2   0   0   0   0   2   0   0   0   2
-d.2.6     2     0   2   2   2   0   0   0   2   0   0   0   2
-d.2.7     2     0   2   2   2   0   2   0   2   0   0   2   2
-stotal   32     4  24  32  20  12  23   6  18  10  10  21  32
+d.1.1     2     0   2   0   0   2   0   0   0   0   2   2   2   0   0   2
+d.1.2     4     2   4   4   4   4   0   4   0   0   4   4   4   4   0   4
+d.1.3     2     0   2   0   0   2   0   0   2   2   2   2   2   2   0   2
+d.1.4     4     0   4   4   4   4   0   4   4   4   4   4   4   4   4   4
+d.1.5     4     2   4   4   2   4   4   4   4   4   4   2   2   4   4   4
+d.1.6     2     0   2   0   0   1   0   0   0   0   2   1   1   0   0   2
+d.2.1     2     0   2   2   2   2   2   0   0   0   2   2   2   0   0   2
+d.2.2     2     0   2   2   0   2   0   0   0   0   2   2   2   0   0   2
+d.2.3     2     0   2   0   0   0   0   0   0   0   2   0   0   0   0   2
+d.2.4     2     0   2   0   0   0   0   0   0   0   2   0   0   0   0   2
+d.2.5     2     0   2   0   0   0   0   2   0   0   2   0   0   2   0   2
+d.2.6     2     0   2   2   0   0   0   2   0   0   2   0   0   2   0   2
+d.2.7     2     0   2   2   0   2   0   2   0   0   2   2   2   2   0   2
+stotal   32     4  32  20  12  23   6  18  10  10  32  21  21  20   8  32
 
 [C90: Degree of Standard C conformance] (171 items)
-mttl90  598   390 530 596 530 570 585 550 550 536 478 581 598
+mttl90  598   390 596 530 570 585 550 550 534 478 598 581 583 559 530 598
 
 [C99: Conformance to new features] (20 items)
-n.dslcom  4     0   4   4   4   4   4   4   4   4   4   4   4
-n.ucn1    8     0   0   0   0   0   6   8   6   0   2   6   8
-n.ucn2    2     0   0   0   0   0   0   2   0   0   0   2   2
-n.ppnum   4     0   0   4   0   4   4   4   0   0   0   4   4
-n.line    2     0   0   2   2   2   2   2   2   0   2   2   2
-n.pragma  6     0   0   6   0   0   6   6   0   0   2   6   6
-n.llong  10     0   0   0   0  10  10   8  10   0   0  10  10
-n.vargs  10     0   0  10   0  10  10  10   0   0  10  10  10
-n.stdmac  4     0   0   2   0   0   4   4   0   0   4   4   4
-n.nularg  6     0   0   6   0   6   6   6   2   0   6   6   6
-n.tlimit 18     0  10  18  14  18  18  17  18  14  18  18  18
-e.ucn     4     0   0   0   0   0   0   2   0   0   2   0   4
-e.intmax  2     0   0   0   0   2   2   2   0   0   0   1   2
-e.pragma  2     0   0   2   0   0   2   2   0   0   2   2   2
-e.vargs1  2     0   0   0   0   0   2   1   0   0   1   2   2
-e.vargs2  2     0   0   2   0   0   0   0   0   0   0   0   2
-d.pragma  2     0   0   2   0   0   2   2   0   0   0   2   2
-d.predef  6     0   0   0   0   0   6   6   0   0   0   6   6
-d.ucn     2     0   0   0   0   0   0   0   0   0   0   0   2
-d.mbiden  2     0   0   0   0   0   2   2   1   0   0   2   2
-mttl99   98     0  14  58  20  56  86  88  43  18  53  87  98
+n.dslcom  4     0   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.ucn1    8     0   0   0   0   6   8   6   0   2   8   6   6   8   0   8
+n.ucn2    2     0   0   0   0   0   2   0   0   0   2   2   2   2   0   2
+n.ppnum   4     0   4   0   4   4   4   0   0   0   4   4   4   0   4   4
+n.line    2     0   2   2   2   2   2   2   0   2   2   2   2   2   0   2
+n.pragma  6     0   6   0   0   6   6   0   0   2   6   6   6   0   0   6
+n.llong  10     0   0   0  10  10   8  10   0   0  10  10  10  10   0  10
+n.vargs  10     0  10   0  10  10  10   0   0  10  10  10  10  10   2  10
+n.stdmac  4     0   2   0   0   4   4   0   0   4   4   4   4   0   0   4
+n.nularg  6     0   6   0   6   6   6   2   0   6   6   6   6   6   0   6
+n.tlimit 18     0  18  14  18  18  17  18  14  18  18  18  18  18  12  18
+e.ucn     4     0   0   0   0   0   2   0   0   2   4   0   0   2   0   4
+e.intmax  2     0   0   0   2   2   2   0   0   0   2   1   1   0   0   2
+e.pragma  2     0   2   0   0   2   2   0   0   2   2   2   2   0   0   2
+e.vargs1  2     0   0   0   0   2   1   0   0   1   2   2   2   2   0   2
+e.vargs2  2     0   2   0   0   0   0   0   0   0   2   0   0   0   0   2
+d.pragma  2     0   2   0   0   2   2   0   0   0   2   2   2   0   0   2
+d.predef  6     0   0   0   0   6   6   0   0   0   6   6   6   0   0   6
+d.ucn     2     0   0   0   0   0   0   0   0   0   2   0   0   0   0   2
+d.mbiden  2     0   0   0   0   2   2   1   0   0   2   2   2   1   0   2
+mttl99   98     0  58  20  56  86  88  43  18  53  98  87  87  65  22  98
 
 [C++: Conformance to new features not in C90] (9 items)
-n.dslcom  4     0   4   4   4   4   4   4   4   4   4   4   4
-n.ucn1    4     0   0   0   0   0   4   4   2   0   2   4   4
-n.cnvucn  4     0   0   0   0   0   0   1   0   0   0   0   0
-n.bool    2     0   0   0   0   0   2   0   0   0   2   2   2
-n.token1  2     0   0   2   0   0   2   0   2   2   2   2   2
-n.token2  2     0   0   0   0   0   2   0   2   0   2   2   2
-n.cplus   4     0   2   2   2   2   2   0   4   0   4   2   4
-e.operat  2     0   0   0   0   0   2   0   0   0   2   2   2
-d.tlimit  2     0   0   2   0   0   2   0   1   0   0   2   2
-mttl++   26     0   6  10   6   6  20   9  15   6  18  20  22
+n.dslcom  4     0   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+n.ucn1    4     0   0   0   0   4   4   2   0   2   4   4   4   4   0   4
+n.cnvucn  4     0   0   0   0   0   1   0   0   0   0   0   0   0   0   0
+n.bool    2     0   0   0   0   2   0   0   0   2   2   2   2   0   0   2
+n.token1  2     0   2   0   0   2   0   2   2   2   2   2   2   2   2   2
+n.token2  2     0   0   0   0   2   0   2   0   2   2   2   2   2   0   2
+n.cplus   4     0   2   2   2   2   0   4   0   4   4   2   2   4   0   4
+e.operat  2     0   0   0   0   2   0   0   0   2   2   2   2   0   0   2
+d.tlimit  2     0   2   0   0   2   0   1   0   0   2   2   2   1   0   2
+mttl++   26     0  10   6   6  20   9  15   6  18  22  20  20  17   6  22
 
 [C90: Qualities / 1 : handling of multibyte character] (1 item)
-m.36.2    7     0   2   2   2   0   0   0   4   0   0   5   7
-stotal    7     0   2   2   2   0   0   0   4   0   0   5   7
+m.36.2    7     0   2   2   0   0   0   4   0   0   7   5   7   2   0   7
+stotal    7     0   2   2   0   0   0   4   0   0   7   5   7   2   0   7
 
 [C90: Qualities / 2 : diagnosis of undefined behaviors] (29 items)
-u.1.1     1     0   0   1   0   1   1   0   0   0   1   1   1
-u.1.2     1     0   0   1   0   1   1   0   1   0   1   1   1
-u.1.3     1     0   1   1   1   1   1   1   1   1   1   1   1
-u.1.4     1     0   0   1   1   1   1   1   1   1   1   1   1
-u.1.5     1     1   1   1   1   1   1   1   1   1   0   1   1
-u.1.6     1     0   0   1   0   1   1   0   0   1   0   1   1
-u.1.7     7     0   0   1   0   0   0   0   0   0   0   6   7
-u.1.8     1     1   0   1   0   1   1   0   0   0   0   0   1
-u.1.9     1     1   0   1   0   1   1   1   0   1   0   0   1
-u.1.10    1     1   1   1   1   1   1   1   1   1   1   1   1
-u.1.11    1     1   1   1   1   0   1   1   1   1   1   1   1
-u.1.12    1     1   1   1   1   1   1   1   1   1   1   1   1
-u.1.13    1     0   1   1   1   1   1   1   1   1   1   1   1
-u.1.14    1     0   1   1   1   1   1   1   1   1   1   1   1
-u.1.15    1     0   1   1   1   1   1   1   1   1   1   1   1
-u.1.16    1     0   1   1   1   1   1   1   1   1   0   1   1
-u.1.17    2     0   0   2   0   1   1   0   0   1   0   1   2
-u.1.18    1     0   0   1   0   1   1   1   0   0   0   1   1
-u.1.19    2     0   0   2   0   0   1   1   0   0   1   1   2
-u.1.20    1     0   1   1   1   1   1   1   1   0   1   1   1
-u.1.21    2     0   1   2   1   0   1   2   2   2   2   1   2
-u.1.22    1     0   0   1   0   0   1   1   0   1   0   1   1
-u.1.23    1     1   0   1   0   0   1   0   0   0   0   1   1
-u.1.24    2     0   0   2   0   0   0   0   0   0   0   0   2
-u.1.25    1     0   0   1   0   0   1   0   0   0   0   1   1
-u.1.27    1     1   1   1   1   0   1   1   1   1   0   1   1
-u.1.28    1     1   1   1   1   0   1   1   1   1   0   1   1
-u.2.1     1     1   0   1   1   1   1   0   1   0   1   1   1
-u.2.2     1     0   0   1   1   0   1   1   0   0   0   1   1
-stotal   39    10  13  33  16  18  27  20  17  18  15  31  39
+u.1.1     1     0   1   0   1   1   0   0   0   1   1   1   1   0   0   1
+u.1.2     1     0   1   0   1   1   0   1   0   1   1   1   1   0   0   1
+u.1.3     1     0   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+u.1.4     1     0   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+u.1.5     1     1   1   1   1   1   1   1   1   0   1   1   1   1   1   1
+u.1.6     1     0   1   0   1   1   0   0   1   0   1   1   1   0   1   1
+u.1.7     7     0   1   0   0   0   0   0   0   0   7   6   0   0   0   7
+u.1.8     1     1   1   0   1   1   0   0   0   0   1   0   0   0   1   1
+u.1.9     1     1   1   0   1   1   1   0   1   0   1   0   0   0   1   1
+u.1.10    1     1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+u.1.11    1     1   1   1   0   1   1   1   1   1   1   1   1   1   1   1
+u.1.12    1     1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+u.1.13    1     0   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+u.1.14    1     0   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+u.1.15    1     0   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+u.1.16    1     0   1   1   1   1   1   1   1   0   1   1   1   1   1   1
+u.1.17    2     0   2   0   1   1   0   0   1   0   2   1   1   0   1   2
+u.1.18    1     0   1   0   1   1   1   0   0   0   1   1   1   0   0   1
+u.1.19    2     0   2   0   0   1   1   0   0   1   2   1   1   0   0   2
+u.1.20    1     0   1   1   1   1   1   1   0   1   1   1   1   1   1   1
+u.1.21    2     0   2   1   0   1   2   2   2   2   2   1   1   2   2   2
+u.1.22    1     0   1   0   0   1   1   0   1   0   1   1   1   0   0   1
+u.1.23    1     1   1   0   0   1   0   0   0   0   1   1   0   0   0   1
+u.1.24    2     0   2   0   0   0   0   0   0   0   2   0   0   0   0   2
+u.1.25    1     0   1   0   0   1   0   0   0   0   1   1   1   0   0   1
+u.1.27    1     1   1   1   0   1   1   1   1   0   1   1   1   1   1   1
+u.1.28    1     1   1   1   0   1   1   1   1   0   1   1   1   1   1   1
+u.2.1     1     1   1   1   1   1   0   1   0   1   1   1   1   1   0   1
+u.2.2     1     0   1   1   0   1   1   0   0   0   1   1   1   0   0   1
+stotal   39    10  33  16  18  27  20  17  18  15  39  31  24  16  19  39
 
 [C90: Qualities / 3 : Diagnosis of unspecified behaviors] (2 items)
-s.1.1     2     0   0   2   0   0   0   2   0   0   0   0   2
-s.1.2     2     0   0   2   0   0   0   0   0   0   2   0   2
-stotal    4     0   0   4   0   0   0   2   0   0   2   0   4
+s.1.1     2     0   2   0   0   0   2   0   0   0   2   0   0   0   0   2
+s.1.2     2     0   2   0   0   0   0   0   0   2   2   0   0   0   0   2
+stotal    4     0   4   0   0   0   2   0   0   2   4   0   0   0   0   4
 
 [C90: Qualities / 4 : Diagnosis of suspicious cases] (12 items)
-w.1.1     4     4   0   4   0   4   4   0   0   0   0   4   4
-w.1.2     4     0   0   4   0   0   0   0   0   0   2   0   4
-w.2.1     2     0   0   2   1   0   0   0   0   0   0   2   2
-w.2.2     1     0   0   1   0   0   0   0   0   0   0   0   1
-w.3.1     1     1   0   1   0   0   0   0   0   0   0   0   1
-w.3.3     1     0   0   1   0   0   0   0   0   0   0   0   1
-w.3.4     1     0   0   1   0   0   0   0   0   0   0   0   1
-w.3.5     1     0   0   1   0   0   0   0   0   0   0   0   1
-w.3.6     1     0   0   1   0   0   0   0   0   0   0   0   1
-w.3.7     1     0   0   1   0   0   0   0   0   0   0   0   1
-w.3.8     1     0   0   1   0   0   0   0   0   0   0   0   1
-w.3.9     1     0   0   1   0   0   0   0   0   0   0   0   1
-stotal   19     5   0  19   1   4   4   0   0   0   2   6  19
+w.1.1     4     4   4   0   4   4   0   0   0   0   4   4   4   0   0   4
+w.1.2     4     0   4   0   0   0   0   0   0   2   4   0   0   0   0   4
+w.2.1     2     0   2   1   0   0   0   0   0   0   2   2   2   0   0   2
+w.2.2     1     0   1   0   0   0   0   0   0   0   1   0   0   0   0   1
+w.3.1     1     1   1   0   0   0   0   0   0   0   1   0   0   0   1   1
+w.3.3     1     0   1   0   0   0   0   0   0   0   1   0   0   0   0   1
+w.3.4     1     0   1   0   0   0   0   0   0   0   1   0   0   0   0   1
+w.3.5     1     0   1   0   0   0   0   0   0   0   1   0   0   0   0   1
+w.3.6     1     0   1   0   0   0   0   0   0   0   1   0   0   0   0   1
+w.3.7     1     0   1   0   0   0   0   0   0   0   1   0   0   0   0   1
+w.3.8     1     0   1   0   0   0   0   0   0   0   1   0   0   0   0   1
+w.3.9     1     0   1   0   0   0   0   0   0   0   1   0   0   0   0   1
+stotal   19     5  19   1   4   4   0   0   0   2  19   6   6   0   1  19
 
 [C90: Qualities / 5 : Other features] (17 items)
-q.1.1     9     0   5   9   6   9   9   8   7   4   9   9   9
-q.1.2    10     6   4  10   4   8  10   4   4   4   4  10  10
-q.1.3     4     4   2   4   2   4   4   4   4   4   4   4   4
-q.1.4    20    10  10  20  10  20  20  20  10  20  10  20  20
-q.2.1     4     2   2   4   2   4   4   4   4   2   4   4   4
-q.2.2     4     4   4   4   4   4   4   4   4   4   4   4   4
-q.2.3     2     2   2   2   2   2   2   2   2   2   2   2   2
-q.2.4     2     2   0   2   0   2   2   0   0   0   0   2   2
-q.2.5     2     0   0   2   0   0   0   0   0   0   0   0   2
-q.2.6     4     0   2   4   2   4   4   2   4   2   0   4   4
-q.2.7    10     4   2   6   4   8   8   4   4   4   2   8   8
-q.2.8    10     0   2   6   2   2   2   0   6   4   4   2   8
-q.2.9     6     2   0   2   0   2   2   0   0   0   4   2   2
-q.3.1    20    10   8   8   8  14  12   8  10  10   6  12   8
-q.3.2    20    20  18  20  18  16  16  18  16  20  14  14  18
-q.3.3    20    10   0  14   0  10  12   8   0  10   8  12  16
-q.4.1    10     2   6   6   6   4   6   2   4   6   4   6   6
-stotal  157    78  67 123  70 113 117  88  79  96  79 115 127
+q.1.1     9     0   9   6   9   9   8   7   4   9   9   9   9   7   5   9
+q.1.2    10     6  10   4   8  10   4   4   4   4  10  10  10   4   4  10
+q.1.3     4     4   4   2   4   4   4   4   4   4   4   4   4   4   4   4
+q.1.4    20    10  20  10  20  20  20  10  20  10  20  20  20  10  20  20
+q.2.1     4     2   4   2   4   4   4   4   2   4   4   4   4   4   2   4
+q.2.2     4     4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
+q.2.3     2     2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+q.2.4     2     2   2   0   2   2   0   0   0   0   2   2   2   0   0   2
+q.2.5     2     0   2   0   0   0   0   0   0   0   2   0   0   0   0   2
+q.2.6     4     0   4   2   4   4   2   4   2   0   4   4   4   4   2   4
+q.2.7    10     4   6   4   8   8   4   4   4   2   8   8   8   4   4   8
+q.2.8    10     0   6   2   2   2   0   6   4   4   8   2   2   6   4   8
+q.2.9     6     2   2   0   2   2   0   0   0   4   2   2   2   0   0   2
+q.3.1    20    10   8   8  14  12   8  10  10   6   8  12  12   8  10   8
+q.3.2    20    20  20  18  16  16  18  16  18  14  18  14  14  14  18  18
+q.3.3    20    10  14   0  10  12   8   0  10   8  16  12  12   0  10  16
+q.4.1    10     2   6   6   4   6   2   4   6   4   6   6   6   4   6   6
+stotal  157    78 123  70 113 117  88  79  94  79 127 115 115  75  95 127
 
 [C90: Qualities] (61 items)
-mttl90  226    93  82 181  89 135 148 110 100 114  98 157 196
+mttl90  226    93 181  89 135 148 110 100 112  98 196 157 152  93 115 196
 
 [C99: Qualities of new features] (3 items)
-u.line    2     0   0   2   0   1   1   0   0   0   0   1   2
-u.concat  1     0   0   1   0   0   1   0   0   0   0   1   1
-w.tlimit  8     0   0   8   0   0   0   3   2   0   0   0   8
-mttl99   11     0   0  11   0   1   2   3   2   0   0   2  11
+u.line    2     0   2   0   1   1   0   0   0   0   2   1   1   0   0   2
+u.concat  1     0   1   0   0   1   0   0   0   0   1   1   1   0   0   1
+w.tlimit  8     0   8   0   0   0   3   2   0   0   8   0   0   2   0   8
+mttl99   11     0  11   0   1   2   3   2   0   0  11   2   2   2   0  11
 
 [C++: Qualities of features not in C90] (1 item)
-u.cplus   1     0   1   1   1   0   0   0   1   0   1   0   1
-mttl++    1     0   1   1   1   0   0   0   1   0   1   0   1
+u.cplus   1     0   1   1   0   0   0   1   0   1   1   0   0   1   0   1
+mttl++    1     0   1   1   0   0   0   1   0   1   1   0   0   1   0   1
 
 [Overall] (265 items)
-gtotal  960   483 633 857 646 768 841 760 711 674 648 847 926
+gtotal  960   483 857 646 768 841 760 711 670 648 926 847 844 737 673 926
 
-                D   B   M   B   G   G   u   V   L   W   G   M
-                E   C   C   C   C   C   c   C   C   a   C   C
-                C   4   P   C   C   C   p   2   C   v   C   P
-                U   C   P   5   2   3   p   0   W   e   3   P
-                S   P   2   5   9   2   1   0   i   1   4   2
-                C   P   0   C   5   R   3   3   n   0   2   5
-                P   1       P   3               3   0
-                P   6       P                   2
+                D   M   B   G   G   u   V   L   W   M   G   G   V   L   M
+                E   C   C   C   C   c   C   C   a   C   C   C   C   C   C
+                C   P   C   C   C   p   2   C   v   P   C   C   2   C   P
+                U   P   5   2   3   p   0   W   e   P   3   4   0   W   P
+                S   2   5   9   2   1   0   i   1   2   4   0   0   i   2
+                C   0   C   5       3   3   n   0   4   3   2   5   n   6
+                P       P   3               3   0                   3    
+                P       P                   2                       8    
 
-        max     1   2   3   4   5   6   7   8   9  10  11  12
+        max     1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
+
 
     [5.3]       Characteristics of Each Preprocessor
 
 1   :   Linux       /                           / DECUS cpp
 
-This has been around since the early stage of ANSI draft and the
-Standard conformance level is low by now.  Diagnostic messages are
-adequate, however, there is almost no documentation.  It is a well-
-structured stable program.
+This was written around the early stage of ANSI draft and the Standard
+conformance level is low by now.  Diagnostic messages are adequate,
+however, there is almost no documentation.  It is a well-structured
+stable program.
 
 The portability of source is high and it has been ported to some
 compiler systems.  The source code is easy to read as if reading a
 textbook and you can learn a lot from by just reading it.  I modeled
 MCPP after this source.
 
-2   :   MS-DOS      / Borland C++ V.4.02J       / cpp
-4   :   WIN32       / Borland C++ V.5.5J        / cpp32
+3   :   WIN32       / Borland C++ V.5.5J        / cpp32
 
 The C90 conformance level is relatively high and troublesome shift-JIS
 is respectably supported.  Documents are well provided.  Although e_*
@@ -7749,10 +7703,7 @@ Different from Turbo C, the speed is no longer fast.  Merits in one path
 compiler seem to have disappeared and only demerits seem to have
 remained.  I wonder how long Borland continue this style.
 
-The preprocessor in BC 5.5 was slightly improved compared with BC 4.0.
-On the other hand as it became free, documentation became lacking.
-
-5   :   Linux, CygWIN   / GNU C V.2.95.3        / cpp0
+4   :   Linux, CygWIN   / GCC V.2.95.3          / cpp0
 
 The C90 and C95 Standard conformance level is quite high and diagnostic
 messages are accurate.  The behavior is near stable and the speed is
@@ -7769,19 +7720,19 @@ Standards which do not use #pragma, that many obsolete pre-Standard
 specifications are hidden, and that multi-byte character encoding
 support is half-finished and does not reach practical level.
 
-The cpp.info document is excellent as the explanation of overall GNU C/
-cpp and Standard C preprocessing.  However, it is really too bad that
+The cpp.info document is excellent as the explanation of overall GCC/cpp
+and Standard C preprocessing.  However, it is really too bad that
 documentation for implementation-defined areas do not exist in CygWIN,
 FreeBSD, or Linux.  "Portability" is not only for programs.
 
 The source is a full of patches and difficult to read, and the program
 structure is still dragging old macro processor structure.  However,
-since overall GNU C compiler systems are good, this is ported to many
+since overall GCC compiler systems are good, this is ported to many
 systems.
 
-6   :   Linux       / GNU C V.3.2               / cpp0
+5   :   Linux       / GCC V.3.2                 / cpp0
 
-GNU C V.3 changed the source for preprocessing completely from V.2.  At
+GCC V.3 changed the source for preprocessing completely from V.2.  At
 the same time, it changed documentations completely.  Token-based
 principles are fully enforced, warnings are issued while allowing pre-
 Standard specifications, and the number of undocumented specifications
@@ -7789,10 +7740,9 @@ decreased.  On the whole, it has improved to the direction I had hoped
 for to a large extent.  I suspect that future improvements will be
 easier since the program structure has changed completely.
 
-Though diagnostic messages, documentations, C99 support, multi-byte
-character support are not enough yet, they shall be improved in the
-future.  The speed is slightly slower than V.2, but it is still one of
-the faster ones.
+Diagnostic messages, documentations, C99 support, multi-byte character
+support are not enough yet.  The speed is slightly slower than V.2, but
+it is still one of the faster ones.
 
 However, it is troublesome that header files became complex and setting
 the search order of include directories is getting complicated.  Also,
@@ -7802,83 +7752,90 @@ unfortunate that the internal interface between preprocessing and
 compilation parts is complicated for some reasons although preprocessing
 become combined with the compiler proper in V.3.
 
-7   :   Linux       /                           / ucpp (V.1.3)
+6   :   Linux       /                           / ucpp (V.1.3)
 
 The characteristics are the support for C99, open source, and portable.
 The Standard conformance level is rather high.  This version is supposed
-to support UCN and UTF-8, but the support is highly insufficient.  The
+to support UCN and UTF-8, but the support is insufficient.  The
 diagnostic messages are somewhat poor.  Documentation is not sufficient,
 either.
 
-8   :   WIN32       / Visual C++ .net 2003      / cl
+7   :   WIN32       / Visual C++ 2003           / cl
+13  :   WIN32       / Visual C++ 2005           / cl
 
-Few C99 specifications are implemented.  There remain some bugs
+Though in 2003 few C99 specifications are implemented, more than half of
+them are implemented in 2005.  There remain, however, some bugs
 regarding the specifications for C90 and prior.  The most fundamental
 problem is confusion in the translation phases.  The upgrades must have
 been rework of some very old source code.
 
 The diagnostic messages are often somewhat off the point.  An error
 terminates the process which makes this software difficult to use.  The
-manual update is quite behind the implementation.
+manual update is behind the implementation.
 
 The merits are large translation limits and a relatively large number of
 #pragma.  #pragma setlocale in particular is useful.  However, it is
-problematic that the #pragma line is macro-expanded in C90 but that #
-pragma sub-directive uses user's names pace.
+problematic that the #pragma line is macro-expanded even in C90 but that
+#pragma sub-directive uses user's names pace.
 
 The system headers included seem to have few problems on the whole with
 a few exceptions.
 
-9   :   WIN32       / LCC-Win32 V.3.2           / lcc
+8   :   WIN32       / LCC-Win32 V.3.2           / lcc
+14  :   WIN32       / LCC-Win32 V.3.8           / lcc
 
 Jacob Navia modified the preprocessing part of the source code for Plan9
 by Dennis Ritchie, but this lacks in debugging and there are quite a
 number of bugs in the #if expression evaluation and others.  The
 specifications since C95 are not supported.  Lack of documentation.
 
-10  :   WIN32       /                           / wave (V.1.0.0)
+There are few differences of preprocessing between V.3.2 and V.3.8.
+
+9   :   WIN32       /                           / wave (V.1.0.0)
 
 This preprocessor has been developed for "meta-programming" of C++ STL
 as a primary purpose, and has some extended facilities for it.  Wave has
 an unique construction: i.e. it is consisted of mainly C++ libraries,
 and its source is consisted of mainly header files.  The examples of
 meta-programming use recursive macros heavily, and Wave expands those
-macros as GNU C / cpp or -@compat option of MCPP, i.e. limiting the
-scope of "inhibition of once-replaced macro's re-replacement" narrower
-than the Standard's wording. (see [2.4.26].)
+macros as GCC / cpp or -@compat option of MCPP, i.e. limiting the scope
+of "inhibition of once-replaced macro's re-replacement" narrower than
+the Standard's wording. (see [2.4.26].)
 
 Although Wave intends also to be used as a usual preprocessor, and
-intends conformant to C++98 and C99, its conformance is not yet high.
+intends conforming to C++98 and C99, its conformance is not yet high.
 It was reported, however, that a lot of bugs were fixed after V.1.0
-using the validation suite of MCPP V.2.4.  It will become a good
-preprocessor, if it keeps on to be tested by this validation suite.
+using the validation suite of MCPP V.2.4.
 
-Meanwhile, MCPP's recursive macro expansion was revised using GNU C /
-cpp testsuite and the testcases accompanied to Wave, although many
-testcases of the latter are Wave specific ones and a few testcases
-contain wrong interpretation of the Standards.
+Meanwhile, MCPP's recursive macro expansion was revised using GCC / cpp
+testsuite and the testcases accompanied to Wave, although many testcases
+of the latter are Wave specific ones and a few testcases contain wrong
+interpretation of the Standards.
 
-11  :   Linux       / GNU C V.3.4.3             / cc1, cc1plus
+11  :   Linux       / GCC V.3.4.3               / cc1, cc1plus
+12  :   Linux       / GCC V.4.0.2               / cc1, cc1plus
 
-The scoring is almost the same with V.3.2. However, the construction of
-preprocessing has changed largely. Although V.3.2 seemed to proceed in
-the direction to portability, GNU C has changed the direction on V.3.3
-and 3.4. It has become one huge and complex compiler, removing
-independent preprocessor, predefining many macros and restoring some old
-specifications which was once obsoleted by V.3.2. It is a question
-whether these changes can be said improvements. It has also given a
+The scoring is almost the same with V.3.2.  However, the construction of
+preprocessing has changed largely.  Although V.3.2 seemed to proceed in
+the direction to portability, GCC has changed the direction on V.3.3 and
+3.4.  It has become one huge and complex compiler, removing independent
+preprocessor, predefining many macros and restoring some old
+specifications which was once obsoleted by V.3.2.  It is a question
+whether these changes can be said improvements.  It has also given a
 privileged place to UTF-8 among many encodings of multi-byte character.
 I am afraid that it might narrow the wide variety of multi-
 lingualization.
 
-3   :   FreeBSD, DJGPP, WIN32, MS-DOS, OS-9/09  /   / MCPP (V.2.0)
-11  :   FreeBSD, Linux, CygWIN, WIN32, MS-DOS   /   / MCPP (V.2.5)
+2   :   FreeBSD, DJGPP, WIN32, MS-DOS, OS-9/09  /   / MCPP (V.2.0)
+10  :   FreeBSD, Linux, CygWIN, WIN32, MS-DOS   /   / MCPP (V.2.4)
+15  :   FreeBSD, Linux, CygWIN, WIN32           /   / MCPP (V.2.6)
 
 Since I created and tested this myself, the conformance level is the
 best, of course.  It should be the world's most accurate preprocessor.
 The plentifulness and accuracy of diagnostic messages and the detailed
 documentation is also the best.  Useful options and #pragma directives
-are provided.  The C99 specification is fully supported.
+are provided.  The C99 specification is fully supported in V.2.3 and
+later.
 
 The portability of source is also the best.  Only problem is there are
 not many ports, so I would appreciate your contribution.
@@ -7886,50 +7843,45 @@ not many ports, so I would appreciate your contribution.
 
     [5.4]       Overall Review
 
-As we test many preprocessors, we can find that many are starting to
-have high level of C90 Standard conformance.  However, each compiler
-system still has many issues.  I am not going to speak for MCPP since
-most of items score full.
+As we test many preprocessors, we can find that nowadays many have high
+level of C90 Standard conformance.  However, each compiler system still
+has many issues.  I am not going to speak for MCPP since most of items
+score full.
 
-More compiler systems can process the n_* samples correctly.  GNU C 2.95,
-3.2,3.4, BC (Borland C) 4.0,5.5, LCC-Win32 3.2, Visual C++ .net 2003 and
-Ucpp 1.3 have reached the level with not so many problems in practice.
-However, each compiler system has unexpected bugs.
+More compiler systems can process the n_* samples correctly now.  GCC 2.
+95 and later, BC (Borland C) 5.5, LCC-Win32 3.2,3.8, Visual C++ (VC)
+2003,2005 and Ucpp 1.3 have reached the level with not so many problems
+in practice.  However, each compiler system has unexpected bugs.
 
 The most surprising is that compiler systems including Visual C often
 have the division by 0 errors in n_13_7.t (n_13_7.c.)  The basic
 specification of C which is the "short-circuit evaluation" by &&, || and
-a ternary operator is not handled.  BC 4.0,5.5 issues a warning in
-n_13_7.c and it issues the same warning only for the real division by 0
-in e_14_9.c as well.  In Turbo C, the real division by 0 and partial
+a ternary operator is not handled.  Borland C issues a warning in n_13_7.
+c and it issues the same warning only for the real division by 0 in
+e_14_9.c as well.  In Turbo C, the real division by 0 and partial
 expression with skipped evaluation caused the same error while the same
 diagnostic message is downgraded only to warning in Borland C.   This is
 an example of a "hasty diagnostic message" in this compiler system.
 
-In the new Standard C specification, there are some with errors in the
-stringizing implementation using the # operator.  When there is a string
-literal or character constant in an argument and if an escape sequence
-exists there, the portability is not yet guaranteed.  This may seem to
-be a special example, however, it is not so special since "double
-stringizing" often occurs if the assert() macro is used.
-
-In addition, each compiler system always has one or two bugs.
+In the C90 specification, there are some with errors in the stringizing
+implementation using the # operator.
 
 The specifications added by Amendment 1, Corrigendum 1 are implemented
-to some extent by GNU C/2.95,3.2,3.4, Visual C .net and Ucpp.
+to some extent by GCC 2.95 and later, VC 2003,2005 and Ucpp.
 
-In the C99 specification, only Ucpp implements largely but not
-completely.  The // comments has been implemented by many compiler
-systems for a quite some time.  In addition, GNU C/cpp has long long,
-has considerable room in translation limits, and properly processes
-empty arguments of macros.  GNU C has variable argument macro of its own
-specification, but the one in the C99 specification is also implemented
-since 2.95.  _Pragma() is implemented since 3.2.  UCN is implemented by
-Ucpp only.  GNU C 3.2,3.4 implements UCN in string literals and
-character constants only.  Wave implements half of C99 specifications.
+In the C99 specification, only GCC 3.2 and later and Ucpp implements
+largely but not completely.  The // comments has been implemented by
+many compiler systems for a quite some time.  In addition, GCC has long
+long, has considerable room in translation limits, and properly
+processes empty arguments of macros.  GCC has variable argument macro of
+its own specification, but the one in the C99 specification is also
+implemented since 2.95.  _Pragma() is implemented since 3.2.  UCN is
+implemented by Ucpp and VC 2005 only.  GCC 3.2 and later implements UCN
+in string literals and character constants only.  Wave implements half
+of C99 specifications.
 
-In C++98, GNU C 3.2,3.4 and Wave implements specifications except for
-UCN while Visual C .net implements only half.
+In C++98, GCC 3.2 and later, Wave and VC 2005 implements most of the
+specifications.
 
 The queer specification of C++98 to convert extended-characters to UCN
 is not yet implemented by any preprocessor.
@@ -7942,36 +7894,36 @@ these cannot be used.  This type of meaningless specification should be
 removed from Standard.
 
 Visual C supports relatively many encodings for multi-byte characters,
-though not enough.  Other implementations are poor.  The implementation
-of GNU C 2.95,3.2 are half-finished and does not reach a practical level.
-GNU C 3.4 has begun to support many encodings, by converting all
+though not enough.  Other preprocessors are poor.  The implementation of
+GCC 2.95,3.2 are half-finished and does not reach a practical level.
+GCC 3.4,4.0 has begun to support many encodings, by converting all
 encodings to UTF-8.  The actual implementation is, however, not yet
 practical level.
 
 In the systems using shift-JIS or BIG-5, tokenization of literals and
 stringizing using the # operator requires attention.  Visual C supports
-these well.  Also BC 4.0J,5.5J support shift-JIS.
+these well.  Also BC 5.5J support shift-JIS.
 
-In the diagnostic messages for e_*, GNU C 2.95,3.2,3.4 are superior.
+In the diagnostic messages for e_*, GCC 2.95 and later are superior.
 Though Visual C and Ucpp issue diagnostics to comparatively many items,
 they are often vague or off-target.  Very few preprocessors issue
-diagnostic messages to the overflow in the #if expression and only BC
-and Ucpp do to some extent.
+diagnostic messages to the overflow in the #if expression and only BC,
+Ucpp and GCC do to some extent.
 
-In documents for implementation-defined areas, BC 4.0 and GNU C 3.2,3.4
-are at adequate level and the rest are all very poor.
+In documents for implementation-defined areas, GCC 3.2 and later are at
+adequate level and the rest are all very poor.
 
-In the diagnostics for u_*, GNU C 3.2,3.4 is only adequate.  The rest
-are very poor.  I don't think it is acceptable for compiler systems not
-to do anything just because the result is undefined.
+In the diagnostics for u_*, GCC 3.2 and later is only adequate.  The
+rest are very poor.  I don't think it is acceptable for compiler systems
+not to do anything just because the result is undefined.
 
 Almost no compiler systems handle s_* and w_*.  It is unexpected that
 very few compiler systems issue even a warning for nested comments.
 
-In "other various quality", GNU C stand out with plentiful options,
+In "other various quality", GCC stand out with plentiful options,
 accurate diagnostic messages, high speed, and portability.
 
-Overall, GNU C / cpp, especially V.3, excels the most in the Standard
+Overall, GCC, especially V.3.2, excels the most in the Standard
 conformance level, ease of use, and stability without many big problems.
 
 Certainly, it is understood that MCPP exceeds in most aspects though
@@ -7992,26 +7944,30 @@ time.  Test samples are the illustration of Standards.
 
 I look forward to opinions about this Validation Suite and preprocessing
 test reports for various compiler systems using this tool.  Please use
-the newsgroup comp.std.c or email.
+the "Open Discussion Forum" at:
+
+    http://mcpp.sourceforge.net/
+
+or email.
 
 If you perform the detail testing of a preprocessor, cut out the [5.2]
 score table and send it.  To calculate the total score, please compile
 and use tool/total.c.  The score table is cpp_test.old and if
 
-    total 13 cpp_test.old cpp_test.new
+    total 16 cpp_test.old cpp_test.new
 
 each field of stotal (sub-total), mtotal (mid-total), and gtotal (grand-
 total) is written and output to cpp_test.new.  Specify the compiler
-system number at "13".
+system number at "16".
 
-You can test automatically GNU C / cpp by the testsuite edition of
-Validation Suite.  I am waiting for the test reports on various versions
-of GNU C / cpp.  Please send me the log files (gcc.sum and gcc.log), and
-I will supplement my testsuite edition with the diagnostics of various
-versions if any differences exist.
+You can test automatically GCC by the testsuite edition of Validation
+Suite.  I am waiting for the test reports on various versions of GCC.
+Please send me the log files (gcc.sum and gcc.log), and I will
+supplement my testsuite edition with the diagnostics of various versions
+if any differences exist.
 
 Also, the development of Validation Suite and MCPP are in progress in
-the CVS repository.  Please send me email if you would like to join the
-development.
+the mcpp project above in SourceForge.  Please send me email if you
+would like to join the development.
 
                                                                   [eof]

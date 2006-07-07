@@ -1,4 +1,4 @@
-dnl configure.ac for MCPP   2003/11, 2006/06  kmatsui
+dnl configure.ac for MCPP   2003/11, 2006/07  kmatsui
 dnl Process this file with autoconf to produce a configure script.
 
 dnl WARNING: This script does not assume cross-compiling.
@@ -202,18 +202,7 @@ if test x${ac_cv_c_compiler_gnu} = xyes; then
 
     AC_DEFINE( [HOST_COMPILER], [GNUC], [Define the host compiler.])
 
-    AC_DEFINE( [HOST_CMP_NAME], "GNU C", [Define the host compiler name.])
-
-    AC_MSG_CHECKING( for value of __GNUC__)
-    gcc_maj_ver=`echo '__GNUC__' | ${CPP} - | sed 's/^ *//' | $EGREP -v '^#|^$' | sed 's/ *//'`
-    AC_MSG_RESULT( ${gcc_maj_ver})
-    AC_DEFINE_UNQUOTED( [GCC_MAJOR_VERSION], "${gcc_maj_ver}",
-        [Define gcc major version.])
-    AC_MSG_CHECKING( for value of __GNUC_MINOR__)
-    gcc_min_ver=`echo __GNUC_MINOR__ | ${CPP} - | sed 's/^ *//' | $EGREP -v '^#|^$' | sed 's/ *//'`
-    AC_MSG_RESULT( ${gcc_min_ver})
-    AC_DEFINE_UNQUOTED( [GCC_MINOR_VERSION], "${gcc_min_ver}",
-        [Define gcc minor version.])
+    AC_DEFINE( [HOST_CMP_NAME], "GCC", [Define the host compiler name.])
 
     AC_CACHE_CHECK( if the library is glibc,
         gcc_cv_glibc,
@@ -377,7 +366,7 @@ fi
 AC_CACHE_CHECK( preprocessor output format of line directive,
     ac_cv_c_line_format,
     [ac_cv_c_line_format=\"`echo '#line 4321' | ${CPP} - | grep 432 | sed 's/432.*$//'`\"]
-## Note: the output line number may be 4320 on GNU C 2.* or other preprocessors.
+## Note: the output line number may be 4320 on GCC 2.* or other preprocessors.
 )
 AC_DEFINE_UNQUOTED( [LINE_PREFIX], ${ac_cv_c_line_format},
     [Define output format of line directive.])
@@ -447,6 +436,17 @@ AC_MSG_NOTICE( checking for some compiler specific elements)
 if test x${ac_cv_c_compiler_gnu} = xyes; then
 
     AC_DEFINE( [COMPILER], [GNUC], [Define the target compiler.])
+
+    AC_MSG_CHECKING( for value of __GNUC__)
+    gcc_maj_ver=`echo '__GNUC__' | ${CPP} - | sed 's/^ *//' | $EGREP -v '^#|^$' | sed 's/ *//'`
+    AC_MSG_RESULT( ${gcc_maj_ver})
+    AC_DEFINE_UNQUOTED( [GCC_MAJOR_VERSION], "${gcc_maj_ver}",
+        [Define gcc major version.])
+    AC_MSG_CHECKING( for value of __GNUC_MINOR__)
+    gcc_min_ver=`echo __GNUC_MINOR__ | ${CPP} - | sed 's/^ *//' | $EGREP -v '^#|^$' | sed 's/ *//'`
+    AC_MSG_RESULT( ${gcc_min_ver})
+    AC_DEFINE_UNQUOTED( [GCC_MINOR_VERSION], "${gcc_min_ver}",
+        [Define gcc minor version.])
 
     cpp_call=`echo '' | ${CPP} -v - 2>&1 | $EGREP '/cpp|/cc1' | sed 's/^ *//; s/ .*//'` 
     AC_MSG_CHECKING( for the directory to install mcpp)
@@ -561,17 +561,7 @@ if test x${ac_cv_c_compiler_gnu} = xyes; then
     fi
 fi
 
-if test x${ac_cv_c_compiler_gnu} = xyes     \
-    && (test x${gcc_maj_ver} = x4           \
-    || (test x${gcc_maj_ver} = x3 && test x${gcc_min_ver} = x4)); then
-    ## for GNU C V.3.4 and 4.x.  Skip these tests, since GCC 3.4 is buggy on
-    ## multibyte character processing.
-
-    AC_DEFINE( [SJIS_IS_ESCAPE_FREE], 1)
-    AC_DEFINE( [ISO2022_JP_IS_ESCAPE_FREE], 1)
-    AC_DEFINE( [BIGFIVE_IS_ESCAPE_FREE], 1)
-
-else    # for the compilers except GNU C V.3.4 or 4.x
+if test x${ac_cv_c_compiler_gnu} = xyes; then
 
     AC_DEFUN( [AC_CHECK_MBCHAR_IS_ESCAPE_FREE], [
         AC_CACHE_CHECK(
@@ -602,7 +592,7 @@ else    # for the compilers except GNU C V.3.4 or 4.x
         lang_save=${LANG}
     fi
     
-    ## Set the environment variable, though this is not fully enabled in GNU C.
+    ## Set the environment variable, though this is seldom enabled in GCC.
     if test x${ac_cv_c_compiler_gnu} = xyes; then
         export LANG=C-SJIS
     fi
@@ -631,7 +621,7 @@ else    # for the compilers except GNU C V.3.4 or 4.x
             [Define if '0x5c' in BIG5 multi-byte character is safe.])
     fi
     
-fi # for the compilers except GNU C V.3.4 or 4.x
+fi ## gcc
 
 fi ## replace-cpp mode
 

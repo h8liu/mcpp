@@ -1,4 +1,4 @@
-.TH MCPP "1" "June 2006" "alternative CPP" "Commands for GCC"
+.TH MCPP "1" "July 2006" "alternative CPP" "Commands for GCC"
 .SH NAME
 mcpp \- Matsui CPP, an alternative C preprocessor
 .SH SYNOPSIS
@@ -8,15 +8,12 @@ mcpp [\fIoptions\fP] [\fI<infile>\fP [\fI<outfile>\fP]]
 \fBmcpp\fR has plentiful diagnostics and many #pragmas. 
 It is useful to check portability of your program, and also useful to debug complicated macro.
 This is a man-page for \fBmcpp\fR of GCC-specific-build.
-
 .SH OPTIONS
-
 \fBmcpp\fR expects two file names as arguments, \fI<infile>\fR and
 \&\fI<outfile>\fR.  If not specified, \fI<infile>\fR defaults to standard input
 and \fI<outfile>\fR defaults to standard output.
 .PP
 It takes the following options.
-
 .PP
 Commonly used options:
 .IP \fB-@MODE
@@ -74,7 +71,6 @@ Set warning level to <level> (OR of {0,1,2,4,8,16}, default:1).
 Same as -W0.
 .IP \fB-z
 Don't output the included file, only defining macros.
-
 .PP
 Options available with -@std (default) or -@poststd options:
 .IP \fB-+
@@ -106,7 +102,6 @@ C with -V199901L specifies C99 mode.
 C++ with -V199901L specifies C99 compatible mode.
 .IP "\fB-x c++"
 Same as -+.
-
 .PP
 Options available with only -@std (default) option:
 .IP \fB-@compat
@@ -115,43 +110,39 @@ Expand recursive macro more than Standard.
 Enable trigraphs.
 .IP \fB-trigraphs
 Enable trigraphs.
-
 .PP
 Options available with -@std (default), -@kr or -@oldprep options:
 .IP \fB-lang-asm\fR
 Same as -x assembler-with-cpp.
 .IP "\fB-x assembler-with-cpp"
 Process "assembler" source.
-
 .SH PRAGMA
 \fBmcpp\fR has the following #pragma directives.
-.PP
-#pragma once
-.PP
-#pragma __setlocale
-.PP
-#pragma MCPP put_defines
-.PP
-#pragma MCPP debug <args>
+.IP "#pragma once"
+Read the header file only once even if multiply #included.
+.IP "#pragma __setlocale( ""encoding"")"
+Specify the multibyte character encoding to "encoding".
+See -e option for the encodings.
+.IP "#pragma MCPP put_defines"
+Putout all the macro definitions currently valid.
+.IP "#pragma MCPP debug <args>"
+Start to putout debugging informations.
     <args> should be one or more of:
     token expand path if expression memory getc
-.PP
-#pragma MCPP end_debug <args>
+.IP "#pragma MCPP end_debug <args>"
+Stop to putout debugging informations.
     <args> are the same with 'debug'.
     No argument specifies all arguments.
-.PP
-#pragma MCPP push_macro
-.PP
-#pragma MCPP pop_macro
-.PP
-#pragma MCPP preprocess
-.PP
-#pragma MCPP preprocessed
-.PP
-#pragma MCPP warning
-
+.IP "#pragma MCPP push_macro( ""MACRO"")"
+Save the macro definition to the stack.
+.IP "#pragma MCPP pop_macro( ""MACRO"")"
+Retrieve the macro definition from the stack.
+.IP "#pragma MCPP preprocess"
+"Pre-preprocess" the following header files for \fBmcpp\fR.
+.IP "#pragma MCPP warning    any message"
+Putout warning "any message".
 .SH "VERSION"
-MCPP V.2.6 (2006/06) for GNU C
+MCPP V.2.6 (2006/07) for GCC
 .SH "SEE ALSO"
 The full documentation for \fBmcpp\fR are maintained as text files.
 Please see /usr/share/doc/mcpp/*. (or /usr/local/share/doc/mcpp/* depending the installation).

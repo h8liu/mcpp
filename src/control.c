@@ -91,7 +91,7 @@
 
 /*
  * MCPP Version 2.6
- * 2006/06      kmatsui
+ * 2006/07      kmatsui
  *      Integrated STANDARD and PRE_STANDARD modes into one executable.
  */
 
@@ -816,7 +816,7 @@ static int  get_parm( void)
                         && token_type == OPE && openum == OP_ELL) {
                     /*
                      * Enable variable argument macro which is a feature of
-                     * C99.  We enable this even on C90 or C++ for GNU C
+                     * C99.  We enable this even on C90 or C++ for GCC
                      * compatibility.
                      */
                     if (skip_ws() != ')') {
@@ -1428,7 +1428,7 @@ void    dump_a_def(
     const char *    why,
     const DEFBUF *  dp,
     int     newdef,         /* TRUE if parmnames are currently in parlist[] */
-    int     dDflag,         /* TRUE if -dD option is used (for GNU C)       */
+    int     dDflag,         /* TRUE if -dD option is used (for GCC)         */
     int     comment,        /* Show location of the definition in comment   */
     FILE *  fp
 )
@@ -1498,7 +1498,7 @@ void    dump_a_def(
 }
 
 void    dump_def(
-    int     dDflag,                 /* -dD option (for GNU C)       */
+    int     dDflag,                 /* -dD option (for GCC)         */
     int     comment         /* Location of definition in comment    */
 )
 /*

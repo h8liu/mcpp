@@ -42,7 +42,7 @@ echo "  cd ${cpp_path}"
 cd ${cpp_path}
 echo '#!/bin/sh'        >  mcpp.sh
 
-# for GNU C V.3.3 and later
+# for GCC V.3.3 and later
 if test x${cpp_base} = xcc1; then
     echo 'for i in $@'  >> mcpp.sh
     echo '    do'       >> mcpp.sh
@@ -63,7 +63,7 @@ if test x${cpp_base} = xcc1; then
     echo 'done'         >> mcpp_plus.sh
 fi
 
-# for GNU C V.2, V.3 and V.4
+# for GCC V.2, V.3 and V.4
 echo ${cpp_path}/mcpp '"$@"'   >>  mcpp.sh
 chmod a+x mcpp.sh
 if test x${cpp_base} = xcc1; then
@@ -71,7 +71,7 @@ if test x${cpp_base} = xcc1; then
     chmod a+x mcpp_plus.sh
 fi
 
-# backup GNU C / cpp or cc1, cc1plus
+# backup GCC / cpp or cc1, cc1plus
 if test `echo '' | ${cpp_call} -v - 2>&1 | grep 'MCPP' > /dev/null; echo $?`;
         then
     sym_link=`ls -l ${cpp_name} | sed 's/^l.*/l/; s/^[^l].*//'`
@@ -103,7 +103,7 @@ if test x${gcc_maj_ver} = x2; then
     exit 0
 fi
 
-# for GNU C V.3 or V.4 make ${CC}.sh and ${CXX}.sh to add -no-integrated-cpp
+# for GCC V.3 or V.4 make ${CC}.sh and ${CXX}.sh to add -no-integrated-cpp
 # option
 echo "  cd ${gcc_path}"
 cd ${gcc_path}

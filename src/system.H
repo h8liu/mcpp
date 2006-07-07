@@ -67,7 +67,7 @@
  *                  available through -@post option.
  *              Made OLD_PREPROCESSOR configuration available through -@old
  *                  option in PRE_STANDARD mode.                by kmatsui
- * 2006/06      MCPP Version 2.6 / system.H
+ * 2006/07      MCPP Version 2.6 / system.H
  *              Integrated STANDARD and PRE_STANDARD modes into one executable,
  *                  differentiating by execution time options.
  *              Removed settings for 16 bits system.

@@ -1,4 +1,4 @@
-# makefile to compile MCPP version 2.6 for FreeBSD / GNU C / UCB make
+# makefile to compile MCPP version 2.6 for FreeBSD / GCC / UCB make
 #       2006/05     kmatsui
 #
 # First, you must edit GCCDIR, BINDIR, INCDIR, gcc_maj_ver and gcc_min_ver.

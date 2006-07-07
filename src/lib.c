@@ -14,7 +14,7 @@
  * 1998/08      First released.                             kmatsui
  * 2003/11      Added strstr() and strcspn().
  *              Uses macros defined by configure.           kmatsui
- * 2006/06      Removed Standard functions (memmove(), memcpy(), memcmp(),
+ * 2006/07      Removed Standard functions (memmove(), memcpy(), memcmp(),
  *                  strstr(), strcspn()).
  *              Removed non-prototype declarations.         kmatsui
  */

@@ -6,7 +6,7 @@
  *              "Plum-Hall Validation Sampler".
  *      2005/03 by kmatsui
  *              Changed 'PGNUM'.
- *      2006/06 by kmatsui
+ *      2006/07 by kmatsui
  *              Changed 'PGNUM'.
  *              Changed non-prototype declarations to prototype ones.
  *              Removed DOS-extender option.

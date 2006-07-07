@@ -1,5 +1,5 @@
-*** noconfig.H	2006-05-29 00:21:45.000000000 +0900
---- noconfig.H.cyg1518	2006-06-01 18:56:16.000000000 +0900
+*** noconfig.H	2006-07-03 00:29:27.000000000 +0900
+--- noconfig.H.cyg1518	2006-07-03 00:32:45.000000000 +0900
 ***************
 *** 27,33 ****
    */
@@ -18,7 +18,7 @@
   /* Define target compiler.          */
   #ifndef COMPILER
 ***************
-*** 307,317 ****
+*** 306,316 ****
   #define TARGET_HAVE_LONG_LONG       TRUE
   #endif
   #define STDC_VERSION        0L      /* 199409L for V.2.9, 0L for V.3.*      */
@@ -30,7 +30,7 @@
   #ifndef ENV_C_INCLUDE_DIR
   #define ENV_C_INCLUDE_DIR   "C_INCLUDE_PATH"
   #define ENV_CPLUS_INCLUDE_DIR   "CPLUS_INCLUDE_PATH"
---- 307,317 ----
+--- 306,316 ----
   #define TARGET_HAVE_LONG_LONG       TRUE
   #endif
   #define STDC_VERSION        0L      /* 199409L for V.2.9, 0L for V.3.*      */
@@ -43,7 +43,7 @@
   #define ENV_C_INCLUDE_DIR   "C_INCLUDE_PATH"
   #define ENV_CPLUS_INCLUDE_DIR   "CPLUS_INCLUDE_PATH"
 ***************
-*** 327,333 ****
+*** 323,329 ****
   #define COMPILER_SP3        "__WCHAR_TYPE__"
   #define COMPILER_SP1_VAL    "unsigned int"
   #define COMPILER_SP2_VAL    "int"
@@ -51,7 +51,7 @@
       /* SYS_FREEBSD: "int" , SYS_CYGWIN: "short unsigned int"
           , others: "long int"    */
   #endif  /* COMPILER_FAMILY == GNUC   */
---- 327,333 ----
+--- 323,329 ----
   #define COMPILER_SP3        "__WCHAR_TYPE__"
   #define COMPILER_SP1_VAL    "unsigned int"
   #define COMPILER_SP2_VAL    "int"

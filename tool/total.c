@@ -6,7 +6,7 @@
  *  1998/08     kmatsui
  *  2002/08     Updated for "cpp-test.txt" V.1.3    kmatsui
  *  2004/11     Updated for "cpp-test.txt" V.1.5    kmatsui
- *  2006/06     Changed non-prototype declarations to prototype ones.
+ *  2006/07     Changed non-prototype declarations to prototype ones.
  *                                                  kmatsui
  */
 

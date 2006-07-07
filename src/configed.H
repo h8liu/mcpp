@@ -6,14 +6,14 @@
  *
  * 2004/02  Extended multi-byte character handling.         by kmatsui
  *
- * 2006/06  Created settings for stand-alone (compiler-independent) build.
+ * 2006/07  Created settings for stand-alone (compiler-independent) build.
  *          Removed settings for pre-C90 compiler.          by kmatsui
  *
  * WARNING: These settings assume HOST == TARGET.  In case of HOST
  *      differs from TARGET, you must edit this file here and there.
  */
 
-#define     DATE            "2006/06"               /* Date of mcpp     */
+#define     DATE            "2006/07"               /* Date of mcpp     */
 
 /*
  *  'Target' means the O.S. and the compiler to which cpp is implemented.
@@ -181,12 +181,10 @@
 #ifndef ENV_C_INCLUDE_DIR
 #define ENV_C_INCLUDE_DIR   "C_INCLUDE_PATH"
 #define ENV_CPLUS_INCLUDE_DIR   "CPLUS_INCLUDE_PATH"
-#define ENV_VERSION         "GCC_VERSION"
-            /* The name of environment variable to specify GNU C VERSION    */
 #endif
 /*
  * __SIZE_TYPE__, __PTRDIFF_TYPE__ and __WCHAR_TYPE__ are the predefines of
- * GNU C / cpp and undocumented in GNU C 2..
+ * GCC and undocumented in GCC 2.
  */
 #if     __GNUC__ == 2
 #define COMPILER_SP1        "__SIZE_TYPE__"
@@ -194,7 +192,7 @@
 #define COMPILER_SP3        "__WCHAR_TYPE__"
 #endif
 
-#define CMP_NAME            "GNU C"
+#define CMP_NAME            "GCC"
 #endif  /* COMPILER == GNUC */
 
 #if     COMPILER == STAND_ALONE
@@ -304,7 +302,7 @@
  * BIGFIVE_IS_ESCAPE_FREE means similar case on BIGFIVE encoding.
  * ISO2022_JP_IS_ESCAPE_FREE means similar case on ISO2022_JP encoding.
  *
- * GNU C can handle these encodings if it has been configured so.
+ * GCC can handle these encodings if it has been configured so.
  */
 #ifndef SJIS_IS_ESCAPE_FREE
 #define SJIS_IS_ESCAPE_FREE     FALSE   /* or TRUE following your compiler  */
@@ -351,29 +349,13 @@
 #include    "stdlib.h"
 #include    "time.h"
 
-#if     HOST_SYS_FAMILY == SYS_UNIX
-#include    "unistd.h"      /* For getcwd() */
-#endif
-
 /* Functions other than standard.   */
 #ifdef  __cplusplus
 extern "C" {
-    int     getopt( int argc, char * const * argv, const char * opts);
-    extern int      optind;
-    extern char *   optarg;
     char *  stpcpy( char * dest, const char * src);
-#if     HOST_SYS_FAMILY != SYS_UNIX
-    char *  getcwd( char *buf, size_t size);
-#endif
 }
-#else   /* #ifndef __cplusplus  */
-extern int      getopt( int argc, char * const * argv, const char * opts);
-extern int      optind;
-extern char *   optarg;
+#else
 extern char *   stpcpy( char * dest, const char * src);
-#if     HOST_SYS_FAMILY != SYS_UNIX
-extern char *   getcwd( char *buf, size_t size);
-#endif
 #endif
 
 /* For debugging malloc systems by kmatsui  */

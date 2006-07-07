@@ -4119,28 +4119,7 @@ _ACEOF
 
 
 cat >>confdefs.h <<\_ACEOF
-#define HOST_CMP_NAME "GNU C"
-_ACEOF
-
-
-    echo "$as_me:$LINENO: checking for value of __GNUC__" >&5
-echo $ECHO_N "checking for value of __GNUC__... $ECHO_C" >&6
-    gcc_maj_ver=`echo '__GNUC__' | ${CPP} - | sed 's/^ *//' | $EGREP -v '^#|^$' | sed 's/ *//'`
-    echo "$as_me:$LINENO: result: ${gcc_maj_ver}" >&5
-echo "${ECHO_T}${gcc_maj_ver}" >&6
-
-cat >>confdefs.h <<_ACEOF
-#define GCC_MAJOR_VERSION "${gcc_maj_ver}"
-_ACEOF
-
-    echo "$as_me:$LINENO: checking for value of __GNUC_MINOR__" >&5
-echo $ECHO_N "checking for value of __GNUC_MINOR__... $ECHO_C" >&6
-    gcc_min_ver=`echo __GNUC_MINOR__ | ${CPP} - | sed 's/^ *//' | $EGREP -v '^#|^$' | sed 's/ *//'`
-    echo "$as_me:$LINENO: result: ${gcc_min_ver}" >&5
-echo "${ECHO_T}${gcc_min_ver}" >&6
-
-cat >>confdefs.h <<_ACEOF
-#define GCC_MINOR_VERSION "${gcc_min_ver}"
+#define HOST_CMP_NAME "GCC"
 _ACEOF
 
 
@@ -4730,7 +4709,7 @@ if test "${ac_cv_c_line_format+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_cv_c_line_format=\"`echo '#line 4321' | ${CPP} - | grep 432 | sed 's/432.*$//'`\"
-## Note: the output line number may be 4320 on GNU C 2.* or other preprocessors.
+## Note: the output line number may be 4320 on GCC 2.* or other preprocessors.
 
 fi
 echo "$as_me:$LINENO: result: $ac_cv_c_line_format" >&5
@@ -4845,6 +4824,27 @@ if test x${ac_cv_c_compiler_gnu} = xyes; then
 
 cat >>confdefs.h <<\_ACEOF
 #define COMPILER GNUC
+_ACEOF
+
+
+    echo "$as_me:$LINENO: checking for value of __GNUC__" >&5
+echo $ECHO_N "checking for value of __GNUC__... $ECHO_C" >&6
+    gcc_maj_ver=`echo '__GNUC__' | ${CPP} - | sed 's/^ *//' | $EGREP -v '^#|^$' | sed 's/ *//'`
+    echo "$as_me:$LINENO: result: ${gcc_maj_ver}" >&5
+echo "${ECHO_T}${gcc_maj_ver}" >&6
+
+cat >>confdefs.h <<_ACEOF
+#define GCC_MAJOR_VERSION "${gcc_maj_ver}"
+_ACEOF
+
+    echo "$as_me:$LINENO: checking for value of __GNUC_MINOR__" >&5
+echo $ECHO_N "checking for value of __GNUC_MINOR__... $ECHO_C" >&6
+    gcc_min_ver=`echo __GNUC_MINOR__ | ${CPP} - | sed 's/^ *//' | $EGREP -v '^#|^$' | sed 's/ *//'`
+    echo "$as_me:$LINENO: result: ${gcc_min_ver}" >&5
+echo "${ECHO_T}${gcc_min_ver}" >&6
+
+cat >>confdefs.h <<_ACEOF
+#define GCC_MINOR_VERSION "${gcc_min_ver}"
 _ACEOF
 
 
@@ -5658,26 +5658,7 @@ _ACEOF
     fi
 fi
 
-if test x${ac_cv_c_compiler_gnu} = xyes     \
-    && (test x${gcc_maj_ver} = x4           \
-    || (test x${gcc_maj_ver} = x3 && test x${gcc_min_ver} = x4)); then
-    ## for GNU C V.3.4 and 4.x.  Skip these tests, since GCC 3.4 is buggy on
-    ## multibyte character processing.
-
-    cat >>confdefs.h <<\_ACEOF
-#define SJIS_IS_ESCAPE_FREE 1
-_ACEOF
-
-    cat >>confdefs.h <<\_ACEOF
-#define ISO2022_JP_IS_ESCAPE_FREE 1
-_ACEOF
-
-    cat >>confdefs.h <<\_ACEOF
-#define BIGFIVE_IS_ESCAPE_FREE 1
-_ACEOF
-
-
-else    # for the compilers except GNU C V.3.4 or 4.x
+if test x${ac_cv_c_compiler_gnu} = xyes; then
 
 
 
@@ -5688,7 +5669,7 @@ else    # for the compilers except GNU C V.3.4 or 4.x
         lang_save=${LANG}
     fi
 
-    ## Set the environment variable, though this is not fully enabled in GNU C.
+    ## Set the environment variable, though this is seldom enabled in GCC.
     if test x${ac_cv_c_compiler_gnu} = xyes; then
         export LANG=C-SJIS
     fi
@@ -5882,7 +5863,7 @@ _ACEOF
 
     fi
 
-fi # for the compilers except GNU C V.3.4 or 4.x
+fi ## gcc
 
 fi ## replace-cpp mode
 

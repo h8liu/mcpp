@@ -12,7 +12,7 @@
 
 #if     LONG_MAX - LONG_MIN     /* { dg-error "integer overflow in preprocessor expression| Result of \"-\" is out of range" } */
 #endif
-#if     LONG_MAX + 1    /* { dg-error "integer overflow in preprocessor expression| Result of \"\\+\" is out of range" } */
+#if     LONG_MAX + 1 > SHRT_MAX     /* { dg-error "integer overflow in preprocessor expression| Result of \"\\+\" is out of range" } */
 #endif
 #if     LONG_MIN - 1    /* { dg-error "integer overflow in preprocessor expression| Result of \"-\" is out of range" } */
 #endif

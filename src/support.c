@@ -80,7 +80,7 @@
  * CPP Version 2.3 release / support.c
  * 2003/02      kmatsui
  *      Created id_operator() for C++98 identifier-like operators.
- *      Modified the format of diagnostics (for GNU C testsuite).
+ *      Modified the format of diagnostics (for GCC testsuite).
  */
 
 /*
@@ -104,7 +104,7 @@
 
 /*
  * MCPP Version 2.6
- * 2006/06      kmatsui
+ * 2006/07      kmatsui
  *      Removed settings for pre-Standard compiler.
  *      Integrated STANDARD and PRE_STANDARD modes into one executable.
  */

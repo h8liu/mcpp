@@ -77,8 +77,8 @@
  *      Extended -D option to enable function-like macro definition.
  *      Added -a (-lang-asm, -x assembler-with-cpp) option.
  *      Added handling of #pragma __include_next and #pragma __warning_cpp.
- *      Added handling of #include_next and #warning for GNU C.
- *      Added -dM, -dD, -include and -isystem option for GNU C.
+ *      Added handling of #include_next and #warning for GCC.
+ *      Added -dM, -dD, -include and -isystem option for GCC.
  *      Fixed the bugs of parse_env() and bsl2sl().
  *      Created conv_case(), chk_env() and at_end().
  *      Split set_limit(), set_pragma_op(), def_a_macro() from dooptions().
@@ -89,13 +89,13 @@
  * CPP Version 2.3 pre-release 2 / system.c
  * 2002/12      kmatsui
  *      Added norm_path() to normalize include directories.
- *      Added -I- option and -std=xx option for GNU C.
+ *      Added -I- option and -std=xx option for GCC.
  *      Fixed the bug of #pragma __include_next (#include_next).
  *
  * CPP Version 2.3 release / system.c
  * 2003/02      kmatsui
  *      Enabled options interspersed between the filename arguments.
- *      Added -j option (for the GNU C compatible diagnostic format).
+ *      Added -j option (for the GCC compatible diagnostic format).
  *      Changed #pragma __debug and #pragma __warning to #pragma __debug_cpp
  *          and #pragma __warning_cpp.
  *
@@ -142,18 +142,20 @@
  *      Removed FOLD_CASE settings.
  *      Sorted usage() message lines alphabetically.
  *      Renamed most of #pragma __* or #pragma __*_cpp as #pragma MCPP *.
- *      Updated in order to cope with GNU C V.3.3 and 3.4 (created
+ *      Updated in order to cope with GCC V.3.3 and 3.4 (created
  *          init_gcc_macro(), undef_gcc_macro()).
  *      Removed -E option, changed -m option to -e.
  */
 
 /*
  * MCPP Version 2.6
- * 2006/06      kmatsui
+ * 2006/07      kmatsui
  *      Removed settings for pre-C90 compiler.
  *      Removed settings for MS-DOS compiler, removed mem_model().
  *      Added stand-alone preprocessor setting.
- *      Made path of include directories and include files absolute.
+ *      Revised handling of include directories list and #pragma once,
+ *          making path of include directories and once files absolute,
+ *          dereferencing the symbolic linked file.
  *      Removed #pragma MCPP include_next.
  *      Created init_msc_macro(), parse_warn_level(), chk_opts()
  *          , init_predefines(), init_std_defines(), do_prestd_directive().
@@ -170,6 +172,28 @@
 #else
 #include    "system.H"
 #include    "internal.H"
+#endif
+
+#if     HOST_SYS_FAMILY == SYS_UNIX
+#include    "unistd.h"              /* For getcwd(), readlink() */
+#elif   HOST_COMPILER == MSC
+#include    "direct.h"
+#define getcwd( buf, size)  _getcwd( buf, size)
+#endif
+
+/* Functions other than standard.   */
+#if     HOST_SYS_FAMILY != SYS_UNIX     /* On UNIX "unistd.h" will suffice  */
+#ifdef  __cplusplus
+extern "C" {
+    int     getopt( int argc, char * const * argv, const char * opts);
+    extern int      optind;
+    extern char *   optarg;
+}
+#else   /* #ifndef __cplusplus  */
+extern int      getopt( int argc, char * const * argv, const char * opts);
+extern int      optind;
+extern char *   optarg;
+#endif
 #endif
 
 /*
@@ -236,9 +260,9 @@ static char *   norm_path( const char * dirname, int from_do_once);
                 /* Normalize pathname to compare    */
 #if COMPILER == GNUC
 static void     init_gcc_macro( int gcc_maj_ver, int gcc_min_ver);
-                /* Predefine GNU C macros           */
+                /* Predefine GCC macros             */
 static void     undef_gcc_macro( int clearall);
-                /* Undefine GNU C predef-macros     */
+                /* Undefine GCC predef-macros       */
 static void     chk_env( void);
                 /* Check the environment variables  */
 #elif   COMPILER == MSC
@@ -313,12 +337,12 @@ static const char **    fname_end = fnamelist;
 
 static int      search_rule = SEARCH_INIT;  /* Rule to search include file  */
 
-static int      dDflag = FALSE;         /* Flag of -dD option (for GNU C)   */
+static int      dDflag = FALSE;         /* Flag of -dD option (for GCC)     */
 static int      nflag = FALSE;          /* Flag of -N (-undef) option       */
 
 static FILE *   mkdep_fp;                       /* For -Mx option   */
 static char *   mkdep_target;
-    /* For -MT TARGET option and for GNU C's queer environment variables.   */
+    /* For -MT TARGET option and for GCC's queer environment variables.     */
 static char *   mkdep_mf;               /* Argument of -MF option   */
 static char *   mkdep_md;               /* Argument of -MD option   */
 static char *   mkdep_mq;               /* Argument of -MQ option   */
@@ -364,7 +388,7 @@ void    do_options(
     int         vflag;                      /* -v option            */
     int         unset_sys_dirs;
     /* Unset system-specific and site-specific include directories ?    */
-    int         set_cplus_dir;  /* Set C++ include directory ? (for GNU C)  */
+    int         set_cplus_dir;  /* Set C++ include directory ? (for GCC)*/
     int         show_path;          /* Show include directory list  */
     DEFBUF *    defp;
     int         i;
@@ -918,7 +942,9 @@ plus:
             break;
 
         case 't':
-            if (str_eq( optarg, "raditional")) {    /* -traditional */
+            if (str_eq( optarg, "raditional")
+                    || str_eq( optarg, "raditional-cpp")) {
+                                /* -traditional, -traditional-cpp   */
                 trad = TRUE;
                 mode = OLD_PREP;
             } else if (str_eq( optarg, "rigraphs")) {
@@ -1135,7 +1161,7 @@ static void version( void)
     const char *    mes[] = {
 
 #ifdef  VERSION_MSG
-        "MCPP V.2.6 (2006/06) "
+        "MCPP V.2.6 (2006/07) "
 #else
         "MCPP V.", VERSION, " (", DATE, ") "
 #endif
@@ -1146,11 +1172,12 @@ static void version( void)
             , "for ", CMP_NAME, " "
 #endif
 #endif
+            , "compiled by "
 #ifdef  VERSION_MSG
             , VERSION_MSG
 #else
 #ifdef  HOST_CMP_NAME
-            , "compiled by ", HOST_CMP_NAME
+            , HOST_CMP_NAME
 #if     HOST_COMPILER == GNUC
             , " V.", GCC_MAJOR_VERSION, ".", GCC_MINOR_VERSION
 #endif
@@ -1239,7 +1266,7 @@ static void usage(
 "-RTC*       Define the macro __MSVC_RUNTIME_CHECKS as 1.\n",
 #endif
 #if COMPILER == GNUC
-"-traditional    Same as -@oldprep.\n",
+"-traditional, -traditional-cpp      Same as -@oldprep.\n",
 #endif
 "-U <macro>  Undefine <macro>.\n",
 
@@ -1479,8 +1506,8 @@ static void def_a_macro(
 static void     chk_opts( 
     int     sflag,      /* Flag of Standard or post-Standard mode   */
     long    std_val,                /* Value of __STDC_VERSION__    */
-    int     ansi,                   /* -ansi (GNU C only)           */
-    int     trad                    /* -traditional (GNU C only)    */
+    int     ansi,                   /* -ansi (GCC only)             */
+    int     trad                    /* -traditional (GCC only)      */
 )
 /*
  * Check consistency between the specified options.
@@ -1622,13 +1649,13 @@ static void init_std_defines( void)
 
     if (! look_id( "__STDC_HOSTED__")) {
         /*
-         * Some compilers, e.g. GNU C older than 3.3, define this macro by
+         * Some compilers, e.g. GCC older than 3.3, define this macro by
          * -D option.
          */
         sprintf( tmp, "%d", STDC_HOSTED);
         look_and_install( "__STDC_HOSTED__", DEF_NOARGS - 1, null, tmp);
     }
-#if COMPILER != GNUC    /* GNU C do not undefine __STDC__ on C++    */
+#if COMPILER != GNUC        /* GCC do not undefine __STDC__ on C++  */
     if (cplus)
         return;
 #endif
@@ -1877,6 +1904,7 @@ static char *   norm_path(
  * "foo/../", "./" and trailing "/.".
  * Append trailing "/" unless called from do_once().
  * Change relative path to absolute path.
+ * Dereference a symbolic linked file to a real file.
  * Returns a malloc'ed buffer.
  * This routine is called from set_a_dir() and do_once().
  */
@@ -1888,12 +1916,23 @@ static char *   norm_path(
     char *  abs_path;
     size_t  len, slen;
     size_t  start_pos = 0;
+    int     real_len = 0;
+#if SYS_FAMILY == SYS_UNIX
+    char    slbuf[ FILENAMEMAX];    
+#endif
 
     len = slen = strlen( dirname);
     if (len == 0)
         return  (char *) dirname;   /* Ignore the empty argument    */
+#if SYS_FAMILY == SYS_UNIX
+    if ((real_len = readlink( dirname, slbuf, FILENAMEMAX-1)) > 0) {
+        /* Dereference symbolic linked file */
+        *(slbuf + real_len) = EOS;
+        len = real_len;
+    }
+#endif
     start = norm_name = xmalloc( len + 2);  /* Need a new buffer    */
-    strcpy( norm_name, dirname);
+    strcpy( norm_name, real_len > 0 ? slbuf : dirname);
 #if SYS_FAMILY == SYS_WIN
     bsl2sl( norm_name);
 #endif
@@ -1924,7 +1963,7 @@ static char *   norm_path(
 
     if (strncmp( cp1, "./", 2) == 0)    /* Remove beginning "./"    */
         memmove( cp1, cp1 + 2, strlen( cp1 + 2) + 1);       /* +1 for EOS   */
-    if (*start != '/') {     /* Relative path to current directory   */
+    if (*start != '/') {    /* Relative path to current directory   */
         /* Make absolute path   */
         abs_path = xmalloc( len + strlen( cur_work_dir) + 1);
         cp1 = stpcpy( abs_path, cur_work_dir);
@@ -2018,7 +2057,7 @@ static void init_gcc_macro(
     int     gcc_min_ver         /* __GNUC_MINOR__   */
 )
 /*
- * Predefine GNU C macros.
+ * Predefine GCC macros.
  */
 {
     char        fname[ 256];
@@ -2068,7 +2107,7 @@ static void undef_gcc_macro(
     int     clearall
 )
 /*
- * Undefine GNU C predefined macros.
+ * Undefine GCC predefined macros.
  */
 {
     DEFBUF **   predef;
@@ -2087,17 +2126,11 @@ static void undef_gcc_macro(
 
 static void chk_env( void)
 /*
- * Check the environment variables to specify version of GNU C and
- * output of dependency lines.
+ * Check the environment variables to specify output of dependency lines.
  */
 {
     char *  env;
     char *  cp;
-
-    /* Version of GNU C */
-    if (look_id( "__VERSION__") == NULL     /* Predefined one precedes  */
-            && (env = getenv( ENV_VERSION)) != NULL)
-        look_and_install( "__VERSION__", DEF_NOARGS-1, "", env);
 
     /* Output of dependency lines   */
     if ((env = getenv( "DEPENDENCIES_OUTPUT")) == NULL) {
@@ -2278,7 +2311,7 @@ static char *   md_quote(
 )
 /*
  * 'Quote' $, tab and space.
- * This part of source code is taken from GNU C V.3.2.
+ * This part of source code is taken from GCC V.3.2.
  */
 {
     char *  p;
@@ -2913,7 +2946,7 @@ void    do_pragma( void)
             cwarn( unknown_arg, identifier, 0L, NULLST);
         goto  skip_nl;                  /* Do not putout the line   */
 #if COMPILER == GNUC
-    /* The #pragma lines for GNU C / cpp is skipped not to confuse cc1. */
+    /* The #pragma lines for GCC is skipped not to confuse cc1.     */
     } else if (str_eq( identifier, "GCC")) {    /* #pragma GCC *    */
         if ((scan_token( skip_ws(), (tp = work, &tp), work_end) == NAM)
                 && (str_eq( identifier, "poison")
@@ -3012,7 +3045,7 @@ static void do_once(
 /*
  * Process #pragma MCPP once or #pragma once so as not to re-include the file
  * in future.
- * This directive has been imported from GNU C V.1.* / cpp as an extension.
+ * This directive has been imported from GCC V.1.* / cpp as an extension.
  */
 {
     INC_LIST *  inc;
@@ -3146,7 +3179,7 @@ static void do_asm(
 void    do_old( void)
 /*
  * Process the out-of-standard directives.
- * GNU C permits #include_next and #warning even in STANDARD mode.
+ * GCC permits #include_next and #warning even in STANDARD mode.
  */
 {
     static const char * const   unknown
@@ -3410,9 +3443,9 @@ static int  do_debug(
         { "token",  TOKEN   },
         { "expand", EXPAND  },
         { "if",     IF      },
+        { "expression", EXPRESSION  },
         { "getc",   GETC    },
         { "memory", MEMORY  },
-        { "expression", EXPRESSION  },
         { NULL,     0       },
     };
     struct Debug_arg    *argp;

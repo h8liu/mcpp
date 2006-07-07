@@ -13,7 +13,7 @@ G_0(42)
  * (1)  This macro should be expanded to 'NIL(42)'.
  * (2)  This macro should be expanded to '42'.
  * The Standard's wording seems to justify the (1).
- * GNU C, Visual C++ and other major implementations, however, expand
+ * GCC, Visual C++ and other major implementations, however, expand
  * this macro as (2).
  * MCPP V.2.4.1 or later of Standard mode expands this as (1) by default,
  * and expands as (2) when invoked with -@compat option.

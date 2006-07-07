@@ -5,15 +5,15 @@ source.  For further details, please refer to mcpp-porting.txt.
 
 There are two types of MCPP executables:
 
-  1. stand-alone build:  The preprocessor which behaves on it's own not
+  1. stand-alone-build:  The preprocessor which behaves on its own not
     depending on any compiler system.  The invocation options, for
     example, are the same across the compilers with which MCPP is
-    compiled.  Although It can preprocess source files, it cannot behave
+    compiled.  Although it can preprocess source files, it cannot behave
     as an integrated part of the compiler system.
-  2. compiler-specific build:  The preprocessor to replace the resident
-    preprocessor of a certain compiler system.  It has some
-    specifications for the compiler system only and is installed in the
-    compiler system-specific directory.
+  2. compiler-specific-build:  The preprocessor to replace the resident
+    preprocessor of certain compiler system.  It has some specifications
+    for the compiler system only and is installed in the compiler-system-
+    specific directory.
 
 2. Configure and make
 
@@ -21,9 +21,9 @@ To compile MCPP, the configure script can be used on UNIX-like systems
 and CygWIN.  You can do configure and make in any directory.  In this
 document ${mcpp-dir} represents the path of 'mcpp-2.6' directory.
 
-2.1 The stand-alone build
+2.1. The stand-alone-build
 
-if you type the commands as:
+If you type the commands as:
 
     ${mcpp-dir}/configure; make; make install
 
@@ -31,18 +31,16 @@ the stand-alone executable will be generated and installed.
 
     ${mcpp-dir}/configure --prefix=/usr; make; make install
 
-will install the executable into 'bin' in the directory specified by
-'--prefix' option.  If this option is omitted, the directory defaults to
-'/usr/local'.
+will install the executable into 'bin' directory in the directory
+specified by '--prefix' option.  If this option is omitted, the
+directory defaults to '/usr/local'.
 
 'make install' usually requires root privilege, and you can do it by:
 
     sudo make install
 
 or by first 'su', then 'configure; make; make install'.
-
 On FreeBSD, you'd do better to use 'gmake' instead of 'make'.
-
 To strip the executable, do:
 
     make install-strip
@@ -56,7 +54,7 @@ To uninstall the executable, do:
 
     make uninstall
 
-The documents and the validation suite will get deleted, if you do:
+The documents and the validation suite will get deleted if you do:
 
     make uninstall-data
 
@@ -66,7 +64,8 @@ For example,
 
     make DESTDIR=/tmp install
 
-will install mcpp into '/tmp/usr/local/bin', and
+will install mcpp into '/tmp/usr/local/bin', (non-existent directories
+will be generated), and
 
     make DESTDIR=/tmp install-data
 
@@ -74,101 +73,100 @@ will install the documents into '/tmp/usr/local/share/doc/mcpp/'.  (If
 '--prefix=DIR' option was specified in configure, '/usr/local' part will
 be replaced by 'DIR').  This option is used to make a binary package.
 
-2.2 The compiler-specific build
+2.2. The compiler-specific-build
 
 This command will generate a compiler-specific executable and will
 install it into the compiler-specific directory.
 
     ${mcpp-dir}/configure --enable-replace-cpp; make; make install
 
-'make install', 'make install-strip', 'make install-data',
-'make uninstall', 'make uninstall-data' are the same as stand-alone
-build.  '--prefix' option of configure is also the same, though this is
+'make install', 'make install-strip', 'make install-data', 'make
+uninstall', 'make uninstall-data' are the same as stand-alone-build.
+'--prefix' option of configure is also the same, though this is
 irrelevant to the installation directory of the executable.  'DESTDIR'
 option of make has also no relevance to the executable's installation.
 
-For the compiler systems other than GNU C, however, it may not be
-compiled or installed properly if some porting work has not been done
-beforehand and if some of the options are not specified with configure.
+For the compiler systems other than GCC, however, it may not be compiled
+or installed properly if some porting work has not been done beforehand
+and if some of the options are not specified with configure.
 
-2.2.1 When the compiler system is GNU C.
+2.2.1 When the compiler system is GCC.
 
-When the compiler system is GNU C, the appropriate settings will be set
-by the configure without any options other than '--enable-replace-cpp'.
+When the compiler system is GCC, the appropriate settings will be set by
+the configure without any options other than '--enable-replace-cpp'.
 After configuring, do 'make'.
 
-2.2.1.1 make install
+2.2.1.1. make install
 
 After configuring and 'make', the 'make install' command installs mcpp
 into the compiler's directory (e.g. /usr/libexec or /usr/lib/gcc-lib/
 i686-pc-linux-gnu/VERSION).  This is the directory where cpp (cc1),
-which is called by gcc, is located.  'make install' saves GNU C / cpp0
-(cc1) and setups gcc appropriately to call mcpp.  This setting is
-different depending on GNU C being V.2.* or V.3.*-4.*. (Refer section 3.
-9.5 and 3.9.7 of mcpp-manual.txt).
+which is called by gcc, is located.  'make install' saves GCC / cpp0
+(cc1) and setups gcc and g++ command appropriately to call mcpp.  This
+setting is different depending on GCC being V.2.* or V.3.*-4.*. (Refer
+section 3.9.5 and 3.9.7 of mcpp-manual.txt).
 
-2.1.1.2 make check
+2.1.1.2. make check
 
 In the MCPP Validation Suite, there is an edition which can be used as
-testsuite of GNU C.  If GNU C / testsuite has been installed,
-'make check' can test mcpp using the testsuite edition of Validation
-Suite.  Because this edition is to be used as a part of GNU C /
-testsuite, the testsuite should be installed and ready to execute in
-advance.  GNU C / testsuite is usually a part of the source code of GNU
-C. (It can be a separate package in some cases.)
+testsuite of GCC.  If GCC / testsuite has been installed, 'make check'
+can test mcpp using the testsuite edition of Validation Suite.  Because
+this edition is to be used as a part of GCC / testsuite, the testsuite
+should be installed and ready to execute in advance.  GCC / testsuite is
+usually a part of the source code of GCC. (It can be a separate package
+in some cases.)
 
-Also, 'configure' needs an option to specify the directory where GNU C /
+Also, 'configure' needs an option to specify the directory where GCC /
 testsuite is located, as below:
 
     ${mcpp-dir}/configure --with-gcc-testsuite-dir=DIR  \
             --enable-replace-cpp
 
-If the directory where GNU C source is located is ${gcc-source}, this
+If the directory where GCC source is located is ${gcc-source}, this
 'DIR' should become:
 
     ${gcc-source}/gcc/testsuite
 
 Configured as above, 'make check' after 'make; make install' copies the
-testsuite edition of Validation Suite into GNU C / testsuite.  After the
-required settings are applied according to whether GNU C is V.2.* or V.3.
-*-4.*, the testsuite will be executed.  Usually, 'make check' would run
+testsuite edition of Validation Suite into GCC / testsuite.  After the
+required settings are applied according to whether GCC is V.2.* or V.3.*
+-4.*, the testsuite will be executed.  Usually, 'make check' would run
 before 'make install' in the normal software, but this order is reversed
 in MCPP.  This is because testsuite cannot be applied to mcpp unless
 mcpp is called from gcc.  Due to this, the option '--enable-replace-cpp'
 is also required.
 
 The testsuite edition of Validation Suite can also be applied to cpp0
-(cc1) of GNU C V.2.95 and later, not only for MCPP.  (Refer cpp-test.txt
+(cc1) of GCC V.2.95 and later, not only for MCPP.  (Refer cpp-test.txt
 section 2.2.3).
 
-2.2.1.3 make uninstall
+2.2.1.3. make uninstall
 
 When you type 'make uninstall', the executables of MCPP will get deleted.
 The settings of gcc and cpp0 (cc1) will be reset to the initial state.
 When the re-execution of configure is required after completing
 'make install' for some reason, 'make uninstall' needs to be done
-beforehand.  This is because the configure must check GNU C, not MCPP.
+beforehand.  This is because the configure must check GCC, not MCPP.
 
 If you have done 'make check', the 'make uninstall' will also remove the
 testsuite edition of Validation Suite.  If you want to use Validation
-Suite for GNU C, copy it manually.
+Suite for GCC, copy it manually.
 
-2.2.2 When the compiler system is not GNU C.
+2.2.2. When the compiler system is not GCC
 
-When the compiler system is not GNU C, some options need to be specified
+When the compiler system is not GCC, some options need to be specified
 in the configure.  Also, to use MCPP replacing the preprocessor of the
 compiler system, the "porting" or adding source code is required.  MCPP
-have already been ported to GNU C, because the author is using GNU C on
+have already been ported to GCC, because the author is using GCC on
 Linux, FreeBSD or CygWIN systems, and so the informations can be
 collected by the configure.  However, as he does not know any compiler
-systems on UNIX-like systems other than GNU C, he does not even know
-what or how it needs to be checked by the configure, let alone the
-porting.
+systems on UNIX-like systems other than GCC, he does not even know what
+or how it needs to be checked by the configure, let alone the porting.
 
-For compiler systems other than GNU C on UNIX systems, please compile
-with the following procedures.
+For compiler systems other than GCC on UNIX systems, please compile with
+the following procedures.
 
-2.2.2.1 Configure by specifying options
+2.2.2.1. Configure by specifying options
 
 First, do configure by specifying some options, for example:
 
@@ -190,9 +188,9 @@ some options will be displayed.
 
 Then, after doing 'make; make install', some work for making mcpp
 callable from the compiler driver is required.  Please see the setup on
-GNU C for how to do this.
+GCC for how to do this.
 
-2.2.2.2 "Porting" work
+2.2.2.2. "Porting" work
 
 To be able to use the MCPP replacing the preprocessor of the compiler
 system, it is required to do "porting" work by adding source code.
@@ -203,22 +201,23 @@ they at least need to be implemented.  In order to do that, define the
 macro to designate the compiler in configed.H, and write some codes in
 system.c. (Refer mcpp-porting.txt 4.2).
 
-2.2.2.3 Re-configure by adding an option
+2.2.2.3. Re-configure by adding an option
 
 Once porting of source is completed, re-configure by adding the option
 --with-compiler-name=COMPILER.  'COMPILER' is the macro for the compiler
 defined in configed.H.
 
-2.2.3 The limitations of the configure
+2.2.3. The limitations of the configure
 
-In the compilation of compiler-specific build of MCPP, the
-specifications of the target system (the compiler system which will be
-using MCPP as a preprocessor) must be understood in detail.  At the same
-time the compiler system doing the compiling need to be understood.  In
-case these two are not the same, the source code of MCPP is written with
-the settings of both systems separately in the header file (configed.H).
-However, the configure cannot detect both of them at the same time.
-Therefore, it assumes the target system is the same as the host system.
+In the compilation of compiler-specific-build of MCPP, the
+specifications of the target system (the compiler system which will use
+MCPP as a preprocessor) must be understood in detail.  At the same time
+the host system (the compiler system with which MCPP is compiled) need
+to be understood.  In case these two are not the same, the source code
+of MCPP is written with the settings of both systems separately in the
+header file (configed.H).  However, the configure cannot detect both of
+them at the same time.  Therefore, it assumes the target system is the
+same as the host system.
 
 If these two systems are not the same, Part 2 of the configed.H needs to
 be modified.
@@ -232,24 +231,21 @@ cross-compiler, so he is not sure.
 3. 'make' on the Windows compiler systems
 
 Since all compiler systems on Windows other than CygWIN are not subject
-to the 'configure', they need a bit of modification of the source to do
-'make'.  As there are difference files for already ported systems, a
-patch can be applied by using them.  The procedure for the use of the
-difference files is explained below.
+to the 'configure', they need a bit of modification of the source in
+order to do 'make'.  As there are difference files for already ported
+systems, a patch can be applied by using them.  The procedure for the
+use of the difference files is explained below.
 
 Even the systems subject to the 'configure' can also be controlled in
 detail by editing the makefile and header files directly.
 
-Please change the newline code of files for Windows systems beforehand.
-
-3.1 Applying a patch
+3.1. Applying a patch
 
 The difference files and makefiles for various compiler systems are
-available in the directory named 'noconfig'.  The source of MCPP is
-defaulted to FreeBSD / GNU C 3.4 setting.  The difference files are used
-in order to modify this source for the target compiler systems.  The
-makefile is written for using the make command attached to each compiler
-system.
+available in 'noconfig' directory.  The source of MCPP is defaulted to
+FreeBSD / GCC 3.4 setting.  The difference files are used in order to
+modify this source for the target compiler systems.  The makefile is
+written for using the make command attached to each compiler system.
 
 In the 'src' directory, run as below.  All of the following process
 should be done within the 'src' directory.
@@ -258,16 +254,16 @@ should be done within the 'src' directory.
     copy ..\noconfig\which-compiler.mak Makefile
 
 'patch' is a UNIX command, but it can be used in Windows as it has been
-ported.  Of cource, you can directly edit the source file refering the
-difference file.
+ported.  Of course, you can directly edit the noconfig.H file referring
+the difference file.
 
-3.2 Modifying nonconfig.H and Makefile if required
+3.2. Modifying noconfig.H and Makefile if required
 
 If the version of the compiler system is different from that of the
-difference file, modify the header file noconfig.H.  (See nonconfig.H
+difference file, modify the header file noconfig.H.  (See noconfig.H
 itself and mcpp-porting.txt 3.1).  Similarly, if the multi-byte
 character for normal use is not Japanese, change the macro definition
-MBCHAR of nonconfig.H.
+MBCHAR in noconfig.H.
 
 Also, define BINDIR in the Makefile to the directory in which mcpp
 executable should be installed.  As for the Makefile for Visual C,
@@ -275,26 +271,26 @@ remove '#' of this line and make 'install' target effective.
 
     #install :
 
-3.3 Stand-alone build
+3.3. Stand-alone-build
 
 Now, you can do 'make' and 'make install' successfully for the stand-
-alone executable. (For Visual C++, use 'nmake' instead of 'make').
+alone executable. (For Visual C, use 'nmake' instead of 'make').
 
-3.4 Compiler-specific build
+3.4. Compiler-specific-build
 
-To make the compiler-specific build, rewrite BINDIR in the Makefile to
+To make the compiler-specific-build, rewrite BINDIR in the Makefile to
 the directory in which the executables of the compiler system are
 located.  Then, rewrite this line in noconfig.H:
 
     #define COMPILER    STAND_ALONE
 
 Replace 'STAND_ALONE' with the macro to designate the compiler.  Then do
-'make' and 'make install'.  'COMPILER' can be overwritten by make option,
-for example, in Visual C, 'nmake COMPLIER=MSC' and
-'nmake COMPILER=MSC install' or in Borland C, 'make -DCOMPILER=BORLANDC'
-and 'make -DCOMPILER=BORLANDC install'.
+'make' and 'make install'.  'COMPILER' can be overwritten also by make
+option, hence the file can be left as it is.  For example, in Visual C,
+'nmake COMPLIER=MSC' and 'nmake COMPILER=MSC install' or in Borland C,
+'make -DCOMPILER=BORLANDC' and 'make -DCOMPILER=BORLANDC install'.
 
-If the target system and the compiling system are different, nonconfig.H
+If the target system and the compiling system are different, noconfig.H
 / Part 1 should be set to the specifications of the target system and
 Part 2 should be set for the compiling system.  The Makefile that should
 be used is the compiling system's one, and modify the installation
@@ -312,14 +308,14 @@ In Visual C++, if you create "makefile project" by IDE using the
 attached makefile, all the functions of IDE, such as source level debug,
 become available. (Refer mcpp-manual.txt 2.10)
 
-3.5 Test
+3.5. Test
 
-GNU C / testsuite cannot be used in Windows, MCPP needs to be checked
+GCC / testsuite cannot be used in Windows, MCPP needs to be checked
 directly by preprocessing the test samples in test-t, test-c and test-l
 directories.  If you use tool/cpp_test.c, it can test some parts
 automatically. (Refer cpp-test.txt 2.2.2).
 
-For the compiler-specific build of MCPP, if you re-compile MCPP with the
+For the compiler-specific-build of MCPP, if you re-compile MCPP with the
 "pre-preprocess" functionality of MCPP, by using MCPP itself as the
 preprocessor of the compiler system, you can check whether it has been
 ported successfully for the compiler system. (Refer mcpp-porting.txt 3.7)
@@ -330,16 +326,16 @@ To port to the compiler systems which have not been ported yet, lots of
 information is required.  It will be great to hear from many people.
 
 Please let me know if you know the values for options of the 'configure',
-for compiler systems other than GNU C.  I would like to work on
-configure.ac.
+for compiler systems other than GCC.  I would like to work on configure.
+ac.
 
 5. Validation Suite
 
 MCPP provides "Validation Suite" which tests and evaluates C/C++
-preprosessor comprehensively.  Validation Suite has 265 items and can be
+preprocessor comprehensively.  Validation Suite has 265 items and can be
 applied to any preprocessor as well as MCPP.  Refer to 2.1 and 2.2 of
 cpp-test.txt.
 
-June, 2006
+July, 2006
 Kiyoshi Matsui <kmatsui@t3.rim.or.jp>
 
