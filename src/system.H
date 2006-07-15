@@ -180,7 +180,6 @@
  *      _Pragma() operator, variable-arguments macro,
  *      macro as an argument of #include, #line directives,
  *      escape sequences \x[hex-digits], \a, \v,
- *      concatenation of string literals,
  *      '+' option (C++ preprocessing),
  *      'S<n>' option (re-defines __STDC__ as <n>, unpredefine some macros),
  *      'V<n>' option (re-defines __STDC_VERSION__ or __cplusplus as <n>),

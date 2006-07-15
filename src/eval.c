@@ -102,15 +102,15 @@
 /*
  * MCPP Version 2.6
  * 2006/07      kmatsui
- *      Removed pre-Standard compiler settings (no unsigned long, no long
- *          double, no '\a' nor '\v', non-prototype declarations).
+ *      Removed pre-C90 compiler settings (no unsigned long, no long double,
+ *          no '\a' nor '\v', non-prototype declarations).
  *      Integrated STANDARD and PRE_STANDARD into one executable.
- *      Degraded the diagnostic of #if expression from error to warning which
+ *      Degraded the diagnostic of #if expression from error to warning, which
  *          only overflows the range of 'long / unsigned long' and does not
  *          overflow the range of 'long long / unsigned long long' in modes
  *          other than C99.
- *      Enabled 'i64' ('ui64', 'i32', 'i16', etc.) suffixes are recognized
- *          when COMPILER is MSC or BORLANDC.
+ *      Enabled 'i64' ('ui64', 'i32', 'i16', etc.) suffixes for integer, which
+ *          are recognized when COMPILER is MSC or BORLANDC.
  */
 
 /*
@@ -230,6 +230,32 @@ static const char * const   non_eval
 #endif
 
 /*
+ * In KR and OLD_PREP modes.
+ * Define bits for the basic types and their adjectives.
+ */
+#define T_CHAR          1
+#define T_INT           2
+#define T_FLOAT         4
+#define T_DOUBLE        8
+#define T_LONGDOUBLE    16
+#define T_SHORT         32
+#define T_LONG          64
+#define T_LONGLONG      128
+#define T_SIGNED        256
+#define T_UNSIGNED      512
+#define T_PTR           1024        /* Pointer to data objects      */
+#define T_FPTR          2048        /* Pointer to functions         */
+
+/*
+ * The SIZES structure is used to store the values for #if sizeof.
+ */
+typedef struct sizes {
+        int             bits;       /* If this bit is set,          */
+        int             size;       /* this is the datum size value */
+        int             psize;      /* this is the pointer size     */
+} SIZES;
+
+/*
  * S_CHAR etc.  define the sizeof the basic TARGET machine word types.
  *      By default, sizes are set to the values for the HOST computer.  If
  *      this is inappropriate, see those tables for details on what to change.
@@ -265,7 +291,7 @@ static const char * const   non_eval
 #define S_PLDOUBLE  (sizeof (long double *))
 
 typedef struct types {
-    int         type;               /* This is the bit if           */
+    int         type;               /* This is the bits for types   */
     char *      token_name;         /* this is the token word       */
     int         excluded;           /* but these aren't legal here. */
 } TYPES;
@@ -278,7 +304,7 @@ typedef struct types {
 #define ANYINT      (T_CHAR | T_SHORT | T_INT | T_LONG)
 #endif
 
-static const TYPES basic_types[] = {
+static const TYPES  basic_types[] = {
     { T_CHAR,       "char",         ANYFLOAT | ANYINT },
     { T_SHORT,      "short",        ANYFLOAT | ANYINT },
     { T_INT,        "int",          ANYFLOAT | T_CHAR | T_INT },
@@ -301,7 +327,7 @@ static const TYPES basic_types[] = {
 /*
  * In this table, T_FPTR (pointer to function) should be placed last.
  */
-SIZES     size_table[] = {
+static const SIZES  size_table[] = {
     { T_CHAR,   S_CHAR,     S_PCHAR     },          /* char         */
     { T_SHORT,  S_SINT,     S_PSINT     },          /* short int    */
     { T_INT,    S_INT,      S_PINT      },          /* int          */
@@ -483,7 +509,7 @@ expr_t  eval( void)
                     return  valp[-1].val;   /* Finished ok.         */
                 break;
             case OP_LPA:                    /* ( on stack           */
-                if (op != OP_RPA) {         /* Matches ) on input   */
+                if (op != OP_RPA) {         /* Matches ) on input?  */
                     cerror( "Missing \")\"", NULLST, 0L, NULLST);   /* _E_  */
                     return  0L;
                 }
@@ -667,7 +693,7 @@ static int  do_sizeof( void)
  * Sets ev.val to the size and returns
  *      VAL             success
  *      OP_FAIL         bad parse or something.
- * This routine is never called in POST_STD mode.
+ * This routine is never called in STD and POST_STD mode.
  */
 {
     const char * const  no_type = "sizeof: No type specified";      /* _E_  */
@@ -860,8 +886,6 @@ VAL_SIGN *  eval_num(
     const char * const  not_integer = "Not an integer \"%s\"";      /* _E_  */
     const char * const  out_of_range
             = "Constant \"%s\"%.0ld%s is out of range"; /* _E_ _W1_ _W8_    */
-    const char * const  u_suffix =
-    "U suffix is used in pre-Standard mode \"%s\"%.0ld%s";  /* _W1_ _W8_    */
     expr_t          value;
     uexpr_t         v, v1;  /* unsigned long long or unsigned long  */
     int             uflag = FALSE;
@@ -933,9 +957,6 @@ VAL_SIGN *  eval_num(
             if (uflag)
                 goto  num_err;
             uflag = TRUE;
-            if (! standard && ((! skip && (warn_level & 1))
-                    || (skip && (warn_level & 8))))
-                cwarn( u_suffix, nump, 0L, skip ? non_eval : NULLST);
         } else if (c == 'l' || c == 'L') {
 #if HAVE_LONG_LONG
             if (llflag) {
@@ -1371,7 +1392,7 @@ static VAL_SIGN *   eval_eval(
     if ((op == OP_SL || op == OP_SR)
             && ((! skip && (warn_level & 1)) || (skip && (warn_level & 8)))) {
         if (v2 < 0L || v2 >= sizeof (expr_t) * CHARBIT)
-        cwarn( "Illegal shift count %.0s\"%ld\"%s"          /* _W1_ _W8_    */
+            cwarn( "Illegal shift count %.0s\"%ld\"%s"      /* _W1_ _W8_    */
                 , NULLST, (long) v2, skip ? non_eval : NULLST);
 #if HAVE_LONG_LONG
         else if (! stdc3 && v2 >= sizeof (long) * CHARBIT

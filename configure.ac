@@ -204,6 +204,17 @@ if test x${ac_cv_c_compiler_gnu} = xyes; then
 
     AC_DEFINE( [HOST_CMP_NAME], "GCC", [Define the host compiler name.])
 
+    AC_MSG_CHECKING( for value of __GNUC__)
+    gcc_maj_ver=`echo '__GNUC__' | ${CPP} - | sed 's/^ *//' | $EGREP -v '^#|^$' | sed 's/ *//'`
+    AC_MSG_RESULT( ${gcc_maj_ver})
+    AC_DEFINE_UNQUOTED( [GCC_MAJOR_VERSION], "${gcc_maj_ver}",
+        [Define gcc major version.])
+    AC_MSG_CHECKING( for value of __GNUC_MINOR__)
+    gcc_min_ver=`echo __GNUC_MINOR__ | ${CPP} - | sed 's/^ *//' | $EGREP -v '^#|^$' | sed 's/ *//'`
+    AC_MSG_RESULT( ${gcc_min_ver})
+    AC_DEFINE_UNQUOTED( [GCC_MINOR_VERSION], "${gcc_min_ver}",
+        [Define gcc minor version.])
+
     AC_CACHE_CHECK( if the library is glibc,
         gcc_cv_glibc,
         [AC_PREPROC_IFELSE( [
@@ -436,17 +447,6 @@ AC_MSG_NOTICE( checking for some compiler specific elements)
 if test x${ac_cv_c_compiler_gnu} = xyes; then
 
     AC_DEFINE( [COMPILER], [GNUC], [Define the target compiler.])
-
-    AC_MSG_CHECKING( for value of __GNUC__)
-    gcc_maj_ver=`echo '__GNUC__' | ${CPP} - | sed 's/^ *//' | $EGREP -v '^#|^$' | sed 's/ *//'`
-    AC_MSG_RESULT( ${gcc_maj_ver})
-    AC_DEFINE_UNQUOTED( [GCC_MAJOR_VERSION], "${gcc_maj_ver}",
-        [Define gcc major version.])
-    AC_MSG_CHECKING( for value of __GNUC_MINOR__)
-    gcc_min_ver=`echo __GNUC_MINOR__ | ${CPP} - | sed 's/^ *//' | $EGREP -v '^#|^$' | sed 's/ *//'`
-    AC_MSG_RESULT( ${gcc_min_ver})
-    AC_DEFINE_UNQUOTED( [GCC_MINOR_VERSION], "${gcc_min_ver}",
-        [Define gcc minor version.])
 
     cpp_call=`echo '' | ${CPP} -v - 2>&1 | $EGREP '/cpp|/cc1' | sed 's/^ *//; s/ .*//'` 
     AC_MSG_CHECKING( for the directory to install mcpp)

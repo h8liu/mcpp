@@ -365,8 +365,7 @@ operat: out = scan_op( c, out);         /* Operator or punctuator   */
             goto  ident;
         }
 #endif
-        if ((standard && ((type[ c] & SPA) || c == CAT || c == ST_QUOTE))
-                || (! standard && (type[ c] & SPA)))
+        if ((standard && (c == CAT || c == ST_QUOTE)) || (type[ c] & SPA))
             token_type = SEP;       /* Token separator or magic char*/
         else
             token_type = SPE;
@@ -525,8 +524,8 @@ char *  scan_quote(
     if (standard)
         in_token = TRUE;
     *out_p++ = delim;
-    if (delim == '<')               /*   header-name by <, > is an  */
-        delim = '>';                /*     obsolescent feature.     */
+    if (delim == '<')
+        delim = '>';
 
 scan:
     while ((c = get()) != EOS) {
@@ -777,7 +776,7 @@ static char *   scan_number(
     return  out_p;
 }
 
-/* Original version of DECUS CPP, too exact for STANDARD preprocessing.     */
+/* Original version of DECUS CPP, too exact for Standard preprocessing.     */
 static char *   scan_number_prestd(
     int         c,                          /* First char of number */
     char *      out,                        /* Output buffer        */
@@ -1282,7 +1281,7 @@ int     get( void)
      * Read a character from the current input logical line or macro.
      * At EOS, either finish the current macro (freeing temporary storage)
      * or get another logical line by parse_line().
-     * At EOF, exit the current file (#include) or, at EOF from the MCPP input
+     * At EOF, exit the current file (#included) or, at EOF from the MCPP input
      * file, return CHAR_EOF to finish processing.
      * The character is converted to int with no sign-extension.
      */
@@ -1334,7 +1333,10 @@ int     get( void)
         line = infile->line;                /* Reset line number    */
         inc_dirp = infile->dirp;            /* Includer's directory */
         include_nest--;
+        line++;                             /* Next line to #include*/
         sharp();                            /* Need a #line now     */
+        line--;
+        newlines = 0;                       /* Clear the blank lines*/
     }
     free( file);                            /* Free file space      */
     return  get();                          /* Get from the parent  */
@@ -1789,8 +1791,8 @@ static void at_eof(
 
 void    unget( void)
 /*
- * Backup the pointer to reread the last character.  Fatal error (code bug)
- * if we backup too far.  unget() may be called, without problems, at end of
+ * Back the pointer to reread the last character.  Fatal error (code bug)
+ * if we back too far.  unget() may be called, without problems, at end of
  * file.  Only one character may be ungotten.  If you need to unget more,
  * call unget_string().
  */

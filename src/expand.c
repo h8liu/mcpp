@@ -512,10 +512,8 @@ static int  prescan(
                                     /* Stringize without expansion  */
             break;
         case CAT:
-            if (*prev_token == DEF_MAGIC)
-                *prev_token++ = ' ';        /* Remove DEF_MAGIC     */
-            else if (*prev_token == IN_SRC)
-                *prev_token++ = ' ';        /* Remove IN_SRC        */
+            if (*prev_token == DEF_MAGIC || *prev_token == IN_SRC)
+                *prev_token++ = ' ';    /* Remove DEF_MAGIC, IN_SRC */
             out = catenate( defp, arglist, out, out_end, &prev_token);
             break;
         case MAC_PARM:
@@ -673,15 +671,15 @@ static char *   catenate(
         if (mode == POST_STD) {
             file = infile;
             while (c = get(), file == infile) {
-                prev_token = out;       /* Remember the last token      */
+                prev_token = out;       /* Remember the last token  */
                 scan_token( c, &out, out_end);
-            }            /* Copy rest of argument without expansion     */
+            }           /* Copy rest of argument without expansion  */
             unget();
         } else {
             while ((c = get()) != RT_END) {
-                prev_token = out;       /* Remember the last token      */
+                prev_token = out;       /* Remember the last token  */
                 scan_token( c, &out, out_end);
-            }           /* Copy rest of argument without expansion      */
+            }           /* Copy rest of argument without expansion  */
         }
     }
     *token_p = prev_token;      /* Report back the generated token  */
@@ -949,7 +947,7 @@ disable_repl(
         return  FALSE;
     }
     replacing[ rescan_level].def = defp;
-    replacing[ rescan_level++].read_over = 0;
+    replacing[ rescan_level++].read_over = NO;
     return  TRUE;
 }
 
@@ -958,7 +956,7 @@ static void enable_repl(
     int         done
 )
 /*
- * Un-the macro name just replaced for later text.
+ * Un-register the macro name just replaced for later text.
  */
 {
     if (defp == NULL)
@@ -980,9 +978,8 @@ static int  is_able_repl(
     if (defp == NULL)
         return  YES;
     for (i = rescan_level-1; i >= 0; i--) {
-        if (defp == replacing[ i].def) {
+        if (defp == replacing[ i].def)
             return  replacing[ i].read_over;
-        }
     }
     return  YES;
 }
@@ -1378,7 +1375,7 @@ static int  collect_args(
             if (((standard && var_arg && (nargs == args -1))
                                         /* Empty variable arguments */
                         || (mode == OLD_PREP))
-                    && (warn_level &1)) {
+                    && (warn_level & 1)) {
                 cwarn( narg_error, nargs < args ? "Less" : "More"
                         , (long) args, sequence);
             } else {

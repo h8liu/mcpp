@@ -93,7 +93,7 @@
 /*
  * MBCHAR means multi-byte character encoding.
  * MBCHAR means the default encoding, and you can change the encoding by
- *      #pragma MCPP setlocale, -m <encoding> option or environment variable
+ *      #pragma MCPP setlocale, -e <encoding> option or environment variable
  *      LC_ALL, LC_CTYPE, LANG.
  * MBCHAR == 0 means no multi-byte character encoding.
  */

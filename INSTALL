@@ -244,7 +244,7 @@ detail by editing the makefile and header files directly.
 The difference files and makefiles for various compiler systems are
 available in 'noconfig' directory.  The source of MCPP is defaulted to
 FreeBSD / GCC 3.4 setting.  The difference files are used in order to
-modify this source for the target compiler systems.  The makefile is
+modify this source for the particular compiler systems.  The makefile is
 written for using the make command attached to each compiler system.
 
 In the 'src' directory, run as below.  All of the following process

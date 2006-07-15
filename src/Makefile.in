@@ -436,7 +436,7 @@ system.H    :   configed.H
 @GNUC_TRUE@@REPLACE_CPP_TRUE@	@if test x"$(gcc_path)" = x""; then	exit 1; fi
 @GNUC_TRUE@@REPLACE_CPP_TRUE@	@$(srcdir)/set_mcpp.sh '$(gcc_path)' $(gcc_maj_ver) $(gcc_min_ver) '$(cpp_call)' '$(CC)' '$(CXX)' 'x$(EXEEXT)' '$(LN_S)' '$(inc_dir)'
 @GNUC_TRUE@@REPLACE_CPP_TRUE@uninstall-hook:
-@GNUC_TRUE@@REPLACE_CPP_TRUE@	@$(srcdir)/unset_mcpp.sh '$(gcc_path)' $(gcc_maj_ver) $(gcc_min_ver) '$(cpp_call)' '$(CC)' '$(CXX)' 'x$(EXEEXT)' '$(inc_dir)'
+@GNUC_TRUE@@REPLACE_CPP_TRUE@	@$(srcdir)/unset_mcpp.sh '$(gcc_path)' $(gcc_maj_ver) $(gcc_min_ver) '$(cpp_call)' '$(CC)' '$(CXX)' 'x$(EXEEXT)' '$(LN_S)' '$(inc_dir)'
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

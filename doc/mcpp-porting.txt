@@ -144,8 +144,8 @@ system.c, would be enough.
 
 To process multi-byte characters (Kanji), it supports Japanese EUC-JP,
 shift-JIS and ISO2022-JP, Chinese GB-2312, Taiwanese Big-5 and Korean
-KSC-5601 (KSX 1001), as well as UTF-8.  For shift-JIS or Big-5, MCPP can
-complement the compiler-proper if it does not recognize them.
+KSC-5601 (KSX 1001), as well as UTF-8.  For shift-JIS, ISO2022-JP or Big-
+5, MCPP can complement the compiler-proper if it does not recognize them.
 
 
 1.2     Standard C mode with highest conformance and other modes

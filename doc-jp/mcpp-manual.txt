@@ -151,9 +151,9 @@ V.2.6           2006/07     Integrated STANDARD and PRE_STANDARD
 てソースに若干の変更を加えた上でコンパイルして MCPP の実行プログラムを作
 る必要があります。
   このマニュアルでは、すでに特定の処理系に移植された実行プログラムの仕様
-を説明しています（移植方法に関する記載も一部に含んでいる）。さらに詳細を
-知りたい人、ソースから何らかの処理系に移植してみたい人は、ソースと mcpp-
-porting.txt というドキュメントを参照してください。
+を説明しています。さらに詳細を知りたい人、ソースから何らかの処理系に移植
+してみたい人は、ソースと mcpp-porting.txt というドキュメントを参照してく
+ださい。
   これらのソース、ドキュメントはすべて free software として提供します。
   マニュアルの内容に入る前に、まず MCPP の特徴を紹介しておきます（この
 [1.1] - [1.2] は mcpp-porting.txt と重複している）。
@@ -169,8 +169,8 @@ porting.txt というドキュメントを参照してください。
 というソースファイルに数十行書き足す程度である。
   Multi-byte character（漢字）の処理は日本の EUC-JP, shift-JIS, ISO2022-
 JP、中国の GB-2312、台湾の Big-5、韓国の KSC-5601 (KSX 1001) に対応して
-いる。UTF-8 も使える。Shift-JIS や Big-5 の場合、コンパイラ本体が漢字を
-認識しない処理系では、MCPP がそれを補う。
+いる。UTF-8 も使える。Shift-JIS, ISO2022-JP, Big-5 の場合、コンパイラ本
+体が漢字を認識しない処理系では、MCPP がそれを補う。
 
     [1.2]       正確な Standard C モードに加えてその他の各種モードも
 
@@ -2876,9 +2876,8 @@ interface および cpplib を使うユーザプログラムとの外部的な interface を
   また、GCC V.3.2 では cpp0 の呼び出しを MCPP に置き換えればすんだところ
 が、今度は cc1 (cc1plus) の呼び出しを MCPP と cc1 (cc1plus) とに振り分け
 ることが必要になります。このための shell-script は src/set_mcpp.sh の中
-に用意しました。
-  大量の事前定義マクロは１つ１つ対応しているわけにはいかないので、GCC の
--dM オプションの出力を一括して利用するようにしました。
+に用意しました。大量の事前定義マクロは１つ１つ対応しているわけにはいかな
+いので、GCC の -dM オプションの出力を一括して利用するようにしました。
 
   GCC V.3.4 ではさらに、ソースファイルはすべて UTF-8 に変換してから処理
 するように変わりました。ドキュメントによると、具体的には次のようになって
@@ -2928,8 +2927,8 @@ charset オプションも -e オプションと同じものとして扱います。これは次のよ
     encoding に戻せない。
   3.  GCC の近い将来の仕様変更を期待したい。
 
-  *1 私のところの FreeBSD 5.3 に同梱されている GCC 3.4.2 ではなぜかこの
-    機能は動作しない。libiconv は存在しているのであるが。
+  *1 私のところの FreeBSD 5.3 ではなぜか GCC のこの変換はまったく動作し
+    ない。libiconv はリンクされているのであるが。
   *2 MCPP の出力を cc1 に渡す時には finput-charset はもちろん fexec-
     charset オプションも付けてはいけない。
   *3 MCPP V.2.5 では GCC が V.3.4 の場合は <backslash> を補うこともやめ
@@ -2992,7 +2991,7 @@ local/lib/gcc となります。C++ では /usr/local/include の前にさらにいくつ
 を使うしかありません。GCC V.2.95 では C++ の include directory は次のも
 のでした。
 
-    /usr/include/g++-v3
+    /usr/include/g++-3
 
   さらに -I オプションや環境変数で指定されたディレクトリが、このリストの
 前に追加されます。
@@ -3211,13 +3210,15 @@ directory も組み込みません。
   *1 この [3.9.8] の記載は Linux / GCC 2.95.3, 3.3.2, 3.4.3, 4.0.2, 4.1.
     1 および CygWIN / GCC 2.95.3, 3.4.4 で確認したものである。CygWIN /
     GCC 2.95.3 では #include_next の動作は仕様通りであったが、3.4.4 では
-    Linux と同じになった。
+    Linux と同じになった。また、CygWIN の C++ の include directory は 2.
+    95.3 では /usr/include/g++-3 であったが、3.4.4 では /usr/lib/gcc/
+    i686-pc-cygwin/3.4.4/include/c++ 以下となっている。
   *2 FreeBSD 5.3 / GCC 3.4.2 では /usr/include に C のすべての標準ヘッダ
     があり、GCC 固有の include directory も C では存在しない。#
     include_next もシステムヘッダには無い。ただ、C++ の include
     directory は残念ながら /usr/include/c++/3.4, /usr/include/c++/3.4/
     backward と GCC のバージョン依存となっている。
-      FreeBSD でも別バージョンの GCC をインストールすると GCC-version-
+    FreeBSD でも別バージョンの GCC をインストールすると GCC-version-
     specific な include directory が作られる。そこにできるヘッダファイル
     の多くはムダなものである。しかし、/usr/include のヘッダファイルが書
     き換えられることはない。
@@ -3912,14 +3913,14 @@ translation phase でのエラー等では、その phase の行が表示される。
     class 16:   trigraph, digraph についての warning
 
   MCPP はきわめて多種の診断メッセージを用意しています。std モードでは次
-のような種類にのぼっています（こまかく分ければもっと多くなる）。
+のような種類にのぼっています。
 
     fatal error     :   19 種
     error           :   75 種
-    warning class 1 :   40 種
-    warning class 2 :   12 種
+    warning class 1 :   42 種
+    warning class 2 :   14 種
     warning class 4 :   15 種
-    warning class 8 :   27 種
+    warning class 8 :   31 種
     warning class 16:    2 種
 
   これらについて、原則としてその行の中の問題の部分を具体的に指摘します。
@@ -4795,11 +4796,12 @@ Undefined escape sequence '\x'
     sequence として評価します（\x に１６進文字列が続く escape sequence
     はもちろんある）。UCN のケタ数が足りない場合も同様です。
 
-  次は #if (#elif, #assert) 行の定数式の演算に関するウォーニングです。や
-はりスキップされる部分式に関しては出ません（-W8 オプションでは出る）。
+  次は #if (#elif, #assert) 行の定数式の演算と型に関するウォーニングです。
+やはりスキップされる部分式に関しては出ません（-W8 オプションでは出る）。
   Standard モードでは #if 式は C90, C++98 でも long long / unsigned long
 long で評価します。ただし、C90, C++98 で long / unsigned long の範囲を超
-えた場合はウォーニングを出します。このウォーニングは stand-alone-build
+えた場合はウォーニングを出します。LL という suffix についても同様に、C99
+以外ではウォーニングが出ます。これらのウォーニングは stand-alone-build
 では class 1 で、compiler-specific-build では class 2 です。
   poststd モードでは文字定数は #if 式には使えないので、ウォーニングも出
 ません（エラーになる）。
@@ -4817,6 +4819,11 @@ Result of "op" is out of range of (unsigned) long
     の場合は、単項 - 演算子も -LONG_MIN でオーバーフローとなります。
     Unsigned long はオーバーフローすることがないのでエラーにはなりません
     が、代数的な演算結果が範囲外となる場合はウォーニングが出ます。
+LL suffix is used in other than C99 mode "123LL"
+    C99 以外のモードで LL という接尾子が使われています。
+Shift count "40" is larger than bit count of long
+    ビットシフト演算子 <<, >> の右 operand の値が long のビット幅を超え
+    ています。
 
 Negative value "-1" is converted to positive "18446744073709551615"
     符号なしと符号つきとの混合演算の結果、符号つきの負数が符号なしの正数
@@ -4852,11 +4859,11 @@ Replacement text "sub(" of macro "head" involved subsequent text
     ーニングが出たなら、それはマクロ定義またはマクロ呼び出しの間違いです。
     意図して使ったのであれば異常なマクロです。
     このウォーニングは std モードの場合だけです。compat モードではこのウ
-    ォーニングは出ません。pre-Standard モードでも同じ現象は起こりますが、
-    ウォーニングは出ません。poststd では再走査で置換リストの後ろのテキス
-    トは取り込まないので、このウォーニングは決して出ません（unterminated
-    macro call のエラーになる場合と、まったく違った展開結果になる場合と
-    ある）。
+    ォーニングは class 8 でしか出ません。pre-Standard モードでも同じ現象
+    は起こりますが、ウォーニングは出ません。poststd では再走査で置換リス
+    トの後ろのテキストは取り込まないので、このウォーニングは決して出ませ
+    ん（unterminated macro call のエラーになる場合と、まったく違った展開
+    結果になる場合とある）。
 Less than necessary N argument(s) in macro call "macro( a)"
     マクロ呼び出しの引数が足りません。通常はこれはエラーですが、可変引数
     マクロで引数が一つだけ足りなかった場合はウォーニングにとどめています。
@@ -4915,13 +4922,19 @@ Line number 32769 is out of range
 
   #if 式は Standard モードでは C90, C++98 でも long long / unsigned long
 long で評価します。ただし、C90, C++98 で long / unsigned long の範囲を超
-えた場合はウォーニングを出します。このウォーニングは stand-alone-build
-では class 1 で、compiler-specific-build では class 2 です。
+えた場合はウォーニングを出します。LL という suffix についても同様に、C99
+以外ではウォーニングが出ます。Visual C, Borland C の compiler-specific-
+build では I64 という suffix が使えますが、これについても同様です。これ
+らのウォーニングは stand-alone-build では class 1 で、compiler-specific-
+build では class 2 です。
 
-Constant \"123456789012\" is out of range of (unsigned) long
+Constant "123456789012" is out of range of (unsigned) long
 Integer character constant 'abcde' is out of range of unsigned long
 Wide character constant L'abc' is out of range of unsigned long
-Result of \"op\" is out of range of (unsigned) long
+Result of "op" is out of range of (unsigned) long
+LL suffix is used in other than C99 mode "123LL"
+I64 suffix is used in other than C99 mode "123i64"
+Shift count "40" is larger than bit count of long
 
   次の５つは Standard モードの場合だけです。
 
@@ -5129,6 +5142,9 @@ More than 8 nesting of #if (#ifdef) sections (in skipped block)
 
 Constant "123456789012345678901" is out of range
 Constant "123456789012" is out of range of (unsigned) long
+LL suffix is used in other than C99 mode "123LL"
+I64 suffix is used in other than C99 mode "123i64"
+Shift count "40" is larger than bit count of long
 Integer character constant 'abcdefghi' is out of range
 Integer character constant 'abcde' is out of range of unsigned long
 Wide character constant L'abcdef' is out of range
@@ -5159,6 +5175,10 @@ Macro "macro" needs arguments
     引数付きマクロとして定義されているものと同じ名前が単独で現れています。
     展開せず、そのまま残します。pre-Standard モードの場合だけ出ます
     （Standard モードでは何ら問題ないので、ウォーニングは出ない）。
+Replacement text "sub(" of macro "head" involved subsequent text
+    マクロ "head" の置換リスト "sub(" の再走査でマクロ呼び出しの後ろのテ
+    キストが取り込まれました。このウォーニングは std モードでは class 1
+    ですが、compat モードでは class 8 です。
 
     [5.9]       Warning (class 16)
 
@@ -5266,6 +5286,8 @@ File read error             [5.3.2]
 File write error            [5.3.2]
 Header-name enclosed by <, > is an obsolescent feature <stdio.h>
                                                   [5.6]
+I64 suffix is used in other than C99 mode "123i64"
+                                                  [5.6]       [5.8]
 Identifier longer than 31 bytes "very_very_long_name"   [5.7]
 Ignored #ident                              [5.5.3]           [5.8]
 Ignored #sccs                               [5.5.3]           [5.8]
@@ -5298,6 +5320,8 @@ Line number "2147483648" is out of range of [1,2147483647]
                                     [5.4.4]
 Line number "32768" is out of range of [1,32767]
                                             [5.5.6]
+LL suffix is used in other than C99 mode "123LL"
+                                            [5.5.4][5.6]      [5.8]
 Logical source line longer than 509 bytes               [5.7]
 Macro "MACRO" is expanded to "defined"      [5.5.4]
 Macro "MACRO" is expanded to "sizeof"       [5.5.4]
@@ -5368,11 +5392,13 @@ Quotation longer than 509 bytes "very_very_long_string"
 Recursive macro definition of "macro" to "macro"
                                     [5.4.9]
 Replacement text "sub(" of macro "head" involved subsequent text
-                                            [5.5.5]
+                                            [5.5.5]           [5.8]
 Rescanning macro "macro" more than RESCAN_LIMIT times at "something"
                                     [5.4.9]
 Result of "op" is out of range      [5.4.6]                   [5.8]
 Result of "op" is out of range of (unsigned) long
+                                            [5.5.4][5.6]      [5.8]
+Shift count "40" is larger than bit count of long
                                             [5.5.4][5.6]      [5.8]
 sizeof is disallowed in C Standard                            [5.8]
 sizeof: Illegal type combination with "type"

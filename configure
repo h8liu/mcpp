@@ -4123,6 +4123,27 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 
+    echo "$as_me:$LINENO: checking for value of __GNUC__" >&5
+echo $ECHO_N "checking for value of __GNUC__... $ECHO_C" >&6
+    gcc_maj_ver=`echo '__GNUC__' | ${CPP} - | sed 's/^ *//' | $EGREP -v '^#|^$' | sed 's/ *//'`
+    echo "$as_me:$LINENO: result: ${gcc_maj_ver}" >&5
+echo "${ECHO_T}${gcc_maj_ver}" >&6
+
+cat >>confdefs.h <<_ACEOF
+#define GCC_MAJOR_VERSION "${gcc_maj_ver}"
+_ACEOF
+
+    echo "$as_me:$LINENO: checking for value of __GNUC_MINOR__" >&5
+echo $ECHO_N "checking for value of __GNUC_MINOR__... $ECHO_C" >&6
+    gcc_min_ver=`echo __GNUC_MINOR__ | ${CPP} - | sed 's/^ *//' | $EGREP -v '^#|^$' | sed 's/ *//'`
+    echo "$as_me:$LINENO: result: ${gcc_min_ver}" >&5
+echo "${ECHO_T}${gcc_min_ver}" >&6
+
+cat >>confdefs.h <<_ACEOF
+#define GCC_MINOR_VERSION "${gcc_min_ver}"
+_ACEOF
+
+
     echo "$as_me:$LINENO: checking if the library is glibc" >&5
 echo $ECHO_N "checking if the library is glibc... $ECHO_C" >&6
 if test "${gcc_cv_glibc+set}" = set; then
@@ -4824,27 +4845,6 @@ if test x${ac_cv_c_compiler_gnu} = xyes; then
 
 cat >>confdefs.h <<\_ACEOF
 #define COMPILER GNUC
-_ACEOF
-
-
-    echo "$as_me:$LINENO: checking for value of __GNUC__" >&5
-echo $ECHO_N "checking for value of __GNUC__... $ECHO_C" >&6
-    gcc_maj_ver=`echo '__GNUC__' | ${CPP} - | sed 's/^ *//' | $EGREP -v '^#|^$' | sed 's/ *//'`
-    echo "$as_me:$LINENO: result: ${gcc_maj_ver}" >&5
-echo "${ECHO_T}${gcc_maj_ver}" >&6
-
-cat >>confdefs.h <<_ACEOF
-#define GCC_MAJOR_VERSION "${gcc_maj_ver}"
-_ACEOF
-
-    echo "$as_me:$LINENO: checking for value of __GNUC_MINOR__" >&5
-echo $ECHO_N "checking for value of __GNUC_MINOR__... $ECHO_C" >&6
-    gcc_min_ver=`echo __GNUC_MINOR__ | ${CPP} - | sed 's/^ *//' | $EGREP -v '^#|^$' | sed 's/ *//'`
-    echo "$as_me:$LINENO: result: ${gcc_min_ver}" >&5
-echo "${ECHO_T}${gcc_min_ver}" >&6
-
-cat >>confdefs.h <<_ACEOF
-#define GCC_MINOR_VERSION "${gcc_min_ver}"
 _ACEOF
 
 

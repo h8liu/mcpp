@@ -336,8 +336,8 @@
     int     stdc_val = 0;           /* Value of __STDC__            */
     int     stdc2;                  /* cplus || stdc_ver >= 199901L */
     int     stdc3;              /* cplus >= 199901L || stdc_ver >= 199901L.
-        (cplus >= 199901L) specifies compatibility to C99 (extended feature
-        of this cpp)    */
+        (cplus >= 199901L) specifies compatible mode to C99 (extended feature
+        of this preprocessor)   */
     int     standard = TRUE;    /* TRUE, if mode is STD or POST_STD */
 
 /*
@@ -381,10 +381,10 @@
  * inc_dirp     Directory of #includer with trailing PATH_DELIM.  This points
  *              to one of incdir[] or to the current directory (represented as
  *              "".  This should not be NULL.
- * flbuf        is used for diagnostics on macro call.
  */
     long        line;               /* Current line number          */
     int         wrong_line;         /* Force #line to compiler      */
+    int         newlines;           /* Count of blank lines         */
     int         errors = 0;         /* Cpp error counter            */
     int         warn_level = -1;    /* Level of warning (have to initialize)*/
     FILEINFO *  infile = NULL;      /* Current input file           */
@@ -394,7 +394,7 @@
     const char *    cur_fname;      /* Current source file name     */
                 /* cur_fname is not rewritten by #line directive    */
     char        cur_fullname[ FILENAMEMAX + 1];
-        /* Full name of current source file (i.e. *inc_dirp/cur_fname)      */
+        /* Full path of current source file (i.e. *inc_dirp/cur_fname)      */
     int         no_source_line;     /* Do not output line in diag.  */
     char        identifier[ IDMAX + IDMAX/8];       /* Current identifier   */
     int         debug = 0;          /* != 0 if debugging now        */
@@ -473,7 +473,8 @@
                 /* Note: '+1' is necessary for the initial state.   */
     IFINFO *    ifptr = ifstack;        /* -> current ifstack[]     */
 
-/* In POST_STD mode, insert_sep is set to INSERT_SEP when :
+/*
+ * In POST_STD mode, insert_sep is set to INSERT_SEP when :
  *  1. the next get() shall insert a token separator.
  *  2. unget() has been called when insert_sep == INSERTED_SEP.
  * set to INSERTED_SEP when :
@@ -483,7 +484,8 @@
  */
     int     insert_sep = NO_SEP;
 
-/* has_pragma is set to TRUE so as to execute _Pragma() operator when the
+/*
+ * has_pragma is set to TRUE so as to execute _Pragma() operator when the
  * psuedo macro _Pragma() is found.
  */
     int     has_pragma = FALSE;
@@ -531,7 +533,7 @@ static void     putout( char * out);
 static void     put_a_line( char * out);
                 /* Put out the processed line       */
 static void     do_pragma_op( void);
-                /* Exucute the _Pragma() operator   */
+                /* Execute the _Pragma() operator   */
 static void     put_seq( char * begin, char * seq);
                 /* Put out the failed sequence      */
 static char *   de_stringize( char * in, char * out);
@@ -848,7 +850,6 @@ static void mcpp_main( void)
  */
 {
     int     c;                      /* Current character            */
-    int     newlines;               /* Blank lines and control lines*/
     char *  wp;                     /* Temporary pointer            */
     DEFBUF *    defp;               /* Macro definition             */
 
@@ -867,8 +868,9 @@ static void mcpp_main( void)
      * 'newlines' variable counts the number of blank lines that have been
      * skipped over.  These are then either output via #line records or
      * by outputting explicit blank lines.
+     * 'newlines' will be cleared on end of an included file by get().
      */
-    while (1) {                             /* For the whole file   */
+    while (1) {                             /* For the whole input  */
         newlines = 0;                       /* Count empty lines    */
 
         while (1) {                         /* For each line, ...   */
@@ -881,11 +883,11 @@ static void mcpp_main( void)
             if (mode == OLD_PREP && c == COM_SEP)
                  c = get();                 /* Skip 0-length comment*/
             if (c == '#') {                 /* Is 1st non-space '#' */
-                newlines = control( newlines);      /* Do a #command*/
+                newlines = control();       /* Do a #directive      */
             } else if (mode == STD && dig_flag && c == '%') {
                     /* In POST_STD digraphs are already converted   */
                 if (get() == ':') {         /* '%:' i.e. '#'        */
-                    newlines = control( newlines);  /* Do a #command*/
+                    newlines = control();   /* Do a #directive      */
                 } else {
                     unget();
                     if (! compiling) {
@@ -1216,7 +1218,7 @@ static void put_a_line(
 
 
 /*
- * 2006/06      kmatsui
+ * 2006/07      kmatsui
  *      Removed the implementation of post_preproc() for pre-Standard compiler.
  *      Removed conv_esc(), is_last_esc(), conv2oct().
  *      Removed HAVE_C_BACKSLASH_A and CONCAT_STRINGS macros.

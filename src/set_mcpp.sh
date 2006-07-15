@@ -108,13 +108,13 @@ fi
 echo "  cd ${gcc_path}"
 cd ${gcc_path}
 
-sym_link=`ls -l ${CC}${EXEEXT} | sed 's/^l.*/l/; s/^[^l].*//'`
-if test x${sym_link} = xl; then     # symbolic link
-    clink=`ls -L -i ${CC}${EXEEXT}`                         # dereference
-    inode=`echo ${clink} | sed 's/^ *//' | sed 's/ .*//'`
-    c_entity=`ls -i | grep ${inode} | sed '1p; 1,$d' | sed 's/^[ 0-9]*//'   \
-            | sed 's/\*$//'`
-    if test x${c_entity} = x${CC}.sh; then
+ref=${CC}${EXEEXT}
+while ref=`readlink ${ref}`
+do
+    c_entity=${ref};
+done
+if test x${c_entity} != x; then     # symbolic linked file dereferenced
+    if test ${c_entity} = ${CC}.sh; then    # gcc.sh already installed
         exit 0
     fi
     if test x${EXEEXT} != x; then
@@ -122,22 +122,19 @@ if test x${sym_link} = xl; then     # symbolic link
     else
         c_entity_base=${c_entity}
     fi
-    echo "  mv ${c_entity} ${c_entity_base}_proper${EXEEXT}"
-    mv -f ${c_entity} ${c_entity_base}_proper${EXEEXT}
 else                                # not symbolic link
     echo "  mv ${CC}${EXEEXT} ${CC}_proper${EXEEXT}"
     mv -f ${CC}${EXEEXT} ${CC}_proper${EXEEXT}
-    c_entity=${CC}${EXEEXT}
-    c_entity_base=${CC}
+    c_entity_base=${gcc_path}/${CC}_proper
 fi
 
-sym_link=`ls -l ${CXX}${EXEEXT} | sed 's/^l.*/l/; s/^[^l].*//'`
-if test x${sym_link} = xl; then     # symbolic link
-    clink=`ls -L -i ${CXX}${EXEEXT}`
-    inode=`echo ${clink} | sed 's/^ *//' | sed 's/ .*//'`
-    cxx_entity=`ls -i | grep ${inode} | sed '1p; 1,$d' | sed 's/^[ 0-9]*//' \
-            | sed 's/\*$//'`
-    if test x${cxx_entity} = x${CXX}.sh; then
+ref=${CXX}${EXEEXT}
+while ref=`readlink ${ref}`
+do
+    cxx_entity=${ref};
+done
+if test x${cxx_entity} != x; then      # symbolic linked file dereferenced
+    if test ${cxx_entity} = ${CXX}.sh; then
         exit 0
     fi
     if test x${EXEEXT} != x; then
@@ -145,25 +142,22 @@ if test x${sym_link} = xl; then     # symbolic link
     else
         cxx_entity_base=${cxx_entity}
     fi
-    echo "  mv ${cxx_entity} ${cxx_entity_base}_proper${EXEEXT}"
-    mv -f ${cxx_entity} ${cxx_entity_base}_proper${EXEEXT}
 else
     echo "  mv ${CXX}${EXEEXT} ${CXX}_proper${EXEEXT}"
     mv -f ${CXX}${EXEEXT} ${CXX}_proper${EXEEXT}
-    cxx_entity=${CXX}${EXEEXT}
-    cxx_entity_base=${CXX}
+    cxx_entity_base=${gcc_path}/${CXX}_proper
 fi
 
 echo '#!/bin/sh' > ${CC}.sh
-echo ${gcc_path}/${c_entity_base}_proper -no-integrated-cpp '"$@"'      \
+echo ${c_entity_base} -no-integrated-cpp '"$@"'     \
         >> ${CC}.sh
 echo '#!/bin/sh' > ${CXX}.sh
-echo ${gcc_path}/${cxx_entity_base}_proper -no-integrated-cpp '"$@"'    \
+echo ${cxx_entity_base} -no-integrated-cpp '"$@"'   \
         >> ${CXX}.sh
 chmod a+x ${CC}.sh ${CXX}.sh
 
-echo "  ${LN_S} ${CC}.sh ${c_entity_base}"
-${LN_S} ${CC}.sh ${c_entity_base}
-echo "  ${LN_S} ${CXX}.sh ${cxx_entity_base}"
-${LN_S} ${CXX}.sh ${cxx_entity_base}
+echo "  ${LN_S} ${CC}.sh ${CC}"
+${LN_S} -f ${CC}.sh ${CC}
+echo "  ${LN_S} ${CXX}.sh ${CXX}"
+${LN_S} -f ${CXX}.sh ${CXX}
 

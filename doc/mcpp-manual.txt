@@ -160,8 +160,7 @@ to the compiler system are required before it can be compiled into an
 executable.
 
 This document describes the specification for a MCPP executable that has
-been already ported to a certain compiler system.  It also explains
-briefly how to port MCPP to a compiler system.  For those who want to
+been already ported to a certain compiler system.  For those who want to
 know more about MCPP or want to port it to other compiler systems, refer
 to MCPP source and its document "mcpp-porting.txt".
 
@@ -186,8 +185,8 @@ system.c, would be enough.
 
 To process multi-byte characters (Kanji), it supports Japanese EUC-JP,
 shift-JIS and ISO2022-JP, Chinese GB-2312, Taiwanese Big-5 and Korean
-KSC-5601 (KSX 1001), as well as UTF-8.  For shift-JIS or Big-5, MCPP can
-complement the compiler-proper if it does not recognize them.
+KSC-5601 (KSX 1001), as well as UTF-8.  For shift-JIS, ISO2022-JP or Big-
+5, MCPP can complement the compiler-proper if it does not recognize them.
 
 
 1.2     Standard C mode with highest conformance and other modes
@@ -1078,9 +1077,8 @@ be specified on gcc invocation.
 [3] GCC V.3.3 or later predefines several dozen of macros.  -dD option
 does not regard these macros as predefined and output them.
 
-[4] The output of -dM option is similar to that of
-'#pragma MCPP put_defines' ('#put_defines') with the following
-differences:
+[4] The output of -dM option is similar to that of '#pragma MCPP
+put_defines' ('#put_defines') with the following differences:
 1. 'put_defines' outputs also Standard predefined macros as comments.
 2. 'put_defines' outputs also the file name and the line number of the
 macro definition as a comment, arranging to readable format.  On the
@@ -3247,24 +3245,22 @@ Note:
 [1] MCPP gets all the necessary informations by 'configure' and sets
 these scripts by 'make install'.
 
-3.9.7.1     To Use MCPP with GCC 3.3 and 3.4-4.0
+3.9.7.1     To Use MCPP with GCC 3.3 and 3.4-4.1
 
 Although GCC 3.2 seemed to go in the direction of better portability,
 GCC turned its direction to a different goal on 3.3 and 3.4.  V.3.3 and
 3.4 differ from 3.2 in the following points.
 
-1. Independent preprocessor cpp0 was abolished.  The execution option
-'-no-integrated-cpp' changed its meaning, gcc invokes cc1 (cc1plus)
-instead of cpp0 as a preprocessor even if this option is specified, and
-gcc passes to the preprocessor some options which are irrelevant to
-preprocessing. (What a dirty implementation!)
-
-2. Many (several dozen of) macros are predefined.  The relationship
-between the system headers and GCC became more complicated.
-
-3. Tradcpp was also abolished and absorbed to an execution option of cc1.
-Some old specifications, which were obsoleted or deprecated in V.3.2,
-were restored.
+  1. Independent preprocessor cpp0 was abolished.  The execution option
+    '-no-integrated-cpp' changed its meaning, gcc invokes cc1 (cc1plus)
+    instead of cpp0 as a preprocessor even if this option is specified,
+    and gcc passes to the preprocessor some options which are irrelevant
+    to preprocessing. (What a dirty implementation!)
+  2. Many (several dozen of) macros are predefined.  The relationship
+    between the system headers and GCC became more complicated.
+  3. Tradcpp was also abolished and absorbed to an execution option of
+    cc1.  Some old specifications, which were obsoleted or deprecated in
+    V.3.2, were restored.
 
 GCC / cc1 is becoming one huge and complex compiler absorbing
 preprocessor and some system header's contents.  I doubt whether this is
@@ -3282,11 +3278,10 @@ options, -c to -@compat, -m to -e, and some others.
 
 To use MCPP with GCC 3.2 or former, it is necessary only to replace
 invoking of cpp0 by MCPP.  To use MCPP with GCC 3.3 or later, it is
-necessary to divide invoking of cc1 to MCPP and cc1.  The shell-script
-for this purpose is in src/set_mcpp.sh, which will be set in the GCC
-libexec directory by 'configure' and 'make'.  The 'make install' command
-will also get GCC predefined macros using -dM option and set those for
-MCPP.
+necessary to divide invoking of cc1 to MCPP and cc1.  src/set_mcpp.sh
+will write shell-scripts for this purpose in the GCC libexec directory
+on MCPP installation.  The 'make install' command will also get GCC
+predefined macros using -dM option and set those for MCPP.
 
 In addition, GCC 3.4 changed processing of multi-byte characters.  Its
 document says as:
@@ -3301,12 +3296,12 @@ document says as:
   4. It has also '-fexec-charset=<encoding>' option to specify the
     output encoding which defaults to UTF-8.
 
-    There is a trend to identify "internationalization" with
-    "unicodization", especially in the Western people who do not use
-    multi-byte characters.  It seems that this trend has reached to GCC.
+There is a trend to identify "internationalization" with "unicodization",
+especially in the Western people who do not use multi-byte characters.
+It seems that this trend has reached to GCC.
 
-    What is worse, GCC 3.4 or later does not implement their
-    specification sufficiently.  In actual, it behaves as follows:
+What is worse, GCC 3.4 or later does not implement their specification
+sufficiently.  In actual, it behaves as: [1]
 
   1. As for EUC-JP, GB2312 and KSC-5601, it converts these encodings to
     UTF-8 correctly with -finput-charset option, and it passes them as
@@ -3318,8 +3313,8 @@ document says as:
     misbehaves in converting back to Big5 with -fexec-charset option
     even on V.4.1.
   4. With ISO2022-JP, it cannot preprocess on V.3.4 or 4.0, whereas on V.
-    4.1 it can preprocess the encoding, and misbehaves in converting
-    back with -fexec-charset option.
+    4.1 it can preprocess the encoding and misbehaves in converting back
+    with -fexec-charset option.
   5. On shift-JIS, all the versions confuse in preprocessing.
 
 MCPP takes -e <encoding> option to specify an encoding, and the GCC-
@@ -3341,113 +3336,108 @@ adopted these specifications because: [2], [3]
   3. I hope that GCC will change the multi-byte character handling in
     the near future.
 
-    Note:
-    [1] On GCC 3.4.2 bundled in my FreeBSD 5.3, multi-byte character
-    conversion to UTF-8 does not work at all, though libiconv exists.
+Note:
+[1] On GCC in my FreeBSD 5.3, multi-byte character conversion to UTF-8
+does not work at all, though libiconv is linked.
 
-    [2] When you pass the output of MCPP to cc1, you should not specify
-    -fexec-charset option as well as -finput-charset option.
+[2] When you pass the output of MCPP to cc1, you should not specify
+-fexec-charset option as well as -finput-charset option.
 
-    [3] MCPP V.2.5 did not supplement <backslash> for GCC V.3.4.  Since
-    GCC's behavior was not stable, I have waited to see where it settles
-    down.  However, it is still not stable on V.4.1, hence I reverted
-    the MCPP specification of V.2.6 to that of V.2.4, that is it
-    supplements <backslash> for GCC V.3.4 and later as well as for V.3.3
-    and former.
+[3] MCPP V.2.5 did not supplement <backslash> for GCC V.3.4.  Since
+GCC's behavior was not stable, I have waited to see where it settles
+down.  However, it is still not stable on V.4.1, hence I reverted the
+MCPP specification of V.2.6 to that of V.2.4, that is it supplements
+<backslash> for GCC V.3.4 and later as well as for V.3.3 and former.
 
-    3.9.8   The Problems of Linux / stddef.h, limits.h and #include_next
+3.9.8   The Problems of Linux / stddef.h, limits.h and #include_next
 
-    On Linux, GCC installs a version specific include directory such as
-    /usr/lib/gcc-lib/i386-vine-linux/3.3.2/include where the Standard
-    headers stddef.h, limits.h and some others are located.  These
-    headers and GCC behavior on them have some problems.  The problems
-    are the same on CygWIN as on Linux.
+On Linux, GCC installs a version specific include directory such as
+/usr/lib/gcc-lib/i386-vine-linux/3.3.2/include where the Standard
+headers stddef.h, limits.h and some others are located.  These headers
+and GCC behavior on them have some problems.  The problems are the same
+on CygWIN as on Linux.
 
-    3.9.8.1     /usr/include Lacks Standard Headers
+3.9.8.1     /usr/include Lacks Standard Headers
 
-    To begin with, on Linux, five of the Standard C header files float.h,
-    iso646.h, stdarg.h, stdbool.h, stddef.h are located only in the GCC
-    version specific directory, not in /usr/include nor /usr/local/
-    include.  The system headers on Linux seem to intend that compiler
-    systems other than GCC use only /usr/include and GCC uses its
-    version specific directory too in addition to /usr/include.  In fact,
-    /usr/include lacks some Standard headers, that is the problem for
-    non-GCC compilers or preprocessors.
+To begin with, on Linux, five of the Standard C header files float.h,
+iso646.h, stdarg.h, stdbool.h, stddef.h are located only in the GCC
+version specific directory, not in /usr/include nor /usr/local/include.
+The system headers on Linux seem to intend that compiler systems other
+than GCC use only /usr/include and GCC uses its version specific
+directory too in addition to /usr/include.  In fact, /usr/include lacks
+some Standard headers, that is the problem for non-GCC compilers or
+preprocessors.
 
-    If so, how about non-GCC preprocessor uses also GCC version specific
-    directory?  Then, on limits.h in this directory, the preprocessor
-    encounters #include_next which is a GCC specific directive.  If that
-    is the case, why doesn't the preprocessor implement #include_next?
-    Then, the limits.h causes a problem, because it is not cleanly
-    written.  What is worse, GCC V.3.3 or later predefines practically
-    by itself the macros to be defined by limits.h, hence the header is
-    useless for other preprocessors.
+If so, how about non-GCC preprocessor uses also GCC version specific
+directory?  Then, on limits.h in this directory, the preprocessor
+encounters #include_next which is a GCC specific directive.  If that is
+the case, why doesn't the preprocessor implement #include_next?  Then,
+the limits.h causes a problem, because it is not cleanly written.  What
+is worse, GCC V.3.3 or later predefines practically by itself the macros
+to be defined by limits.h, hence the header is useless for other
+preprocessors.
 
-    Besides, as for GCC itself, it shows queer behavior with #
-    include_next in this header.
+Besides, as for GCC itself, it shows queer behavior with #include_next
+in this header.
 
-    Although these problems are complicated to explain, I will describe
-    them here, because they have been neglected for years for some
-    reason.
+Although these problems are complicated to explain, I will describe them
+here, because they have been neglected for years for some reason.
 
-    3.9.8.2     Queer Handling of #include_next
+3.9.8.2     Queer Handling of #include_next
 
-    The include directories for GCC are typically set as:
+The include directories for GCC are typically set as:
 
-        /usr/local/include
-        /usr/lib/gcc-lib/SYSTEM/VERSION/include
-        /usr/include
+    /usr/local/include
+    /usr/lib/gcc-lib/SYSTEM/VERSION/include
+    /usr/include
 
-    These are searched from upper to lower.  The second is the GCC
-    specific include directory.  SYSTEM is i386-vine-linux, i368-redhat-
-    linux or such, VERSION is 3.3.2, 3.4.3 or such.  If you install
-    another version of GCC into /usr/local, the /usr/lib/gcc-lib part
-    above will become /usr/local/lib/gcc.  In C++, some other
-    directories are set with higher priority than /usr/local/include.
-    For GCC V.3.* and 4.*, those are:
+These are searched from upper to lower.  The second is the GCC specific
+include directory.  SYSTEM is i386-vine-linux, i368-redhat-linux or such,
+VERSION is 3.3.2, 3.4.3 or such.  If you install another version of GCC
+into /usr/local, the /usr/lib/gcc-lib part above will become /usr/local/
+lib/gcc.  In C++, some other directories are set with higher priority
+than /usr/local/include.  For GCC V.3.* and 4.*, those are:
 
-        /usr/include/c++/VERSION
-        /usr/include/c++/VERSION/SYSTEM
-        /usr/include/c++/VERSION/backward
+    /usr/include/c++/VERSION
+    /usr/include/c++/VERSION/SYSTEM
+    /usr/include/c++/VERSION/backward
 
-    The name of these directories seem GCC specific, nevertheless no
-    other
-    C++ standard directories do not exist, so the other preprocessors
-    can use no directories but these.  For GCC 2.95, the include
-    directory in C++ was:
+The name of these directories seem GCC specific, nevertheless no other
+C++ standard directories do not exist, so the other preprocessors can
+use no directories but these.  For GCC 2.95, the include directory in C+
++ was:
 
-        /usr/include/g++-v3
+    /usr/include/g++-3
 
-    In addition, the directories specified by -I option or by
-    environment variables are prepended to the list.
+In addition, the directories specified by -I option or by environment
+variables are prepended to the list.
 
-    Let me take an example of limits.h in C on GCC V.3.3 or later
-    focusing on definition of LONG_MAX, in order to make the
-    explanations below simple.  There are two limits.h: one in /usr/
-    include and another in the version specific directory.
+Let me take an example of limits.h in C on GCC V.3.3 or later focusing
+on definition of LONG_MAX, in order to make the explanations below
+simple.  There are two limits.h: one in /usr/include and another in the
+version specific directory.
 
-        #include <limits.h>
+    #include <limits.h>
 
-    By this line, GCC includes /usr/lib/gcc-lib/SYSTEM/VERSION/include/
-    limits.h.  This header file starts as:
+By this line, GCC includes /usr/lib/gcc-lib/SYSTEM/VERSION/include/
+limits.h.  This header file starts as:
 
-        #ifndef _GCC_LIMITS_H_
-        #define _GCC_LIMITS_H_
-        #ifndef _LIBC_LIMITS_H_
-        #include "syslimits.h"
-        #endif
+    #ifndef _GCC_LIMITS_H_
+    #define _GCC_LIMITS_H_
+    #ifndef _LIBC_LIMITS_H_
+    #include "syslimits.h"
+    #endif
 
-    Then, GCC includes /usr/lib/gcc-lib/SYSTEM/VERSION/include/syslimits.
-    h which is a short file as:
+Then, GCC includes /usr/lib/gcc-lib/SYSTEM/VERSION/include/syslimits.h
+which is a short file as:
 
-        #define _GCC_NEXT_LIMITS_H
-        #include_next <limits.h>
-        #undef _GCC_NEXT_LIMITS_H
+    #define _GCC_NEXT_LIMITS_H
+    #include_next <limits.h>
+    #undef _GCC_NEXT_LIMITS_H
 
-    Now, limits.h is included again.  Which limits.h?  Since this
-    directive is #include_next, it would skip the /usr/lib/gcc-lib/
-    SYSTEM/VERSION/include, and would search /usr/include.  GCC's cpp.
-    info says:
+Now, limits.h is included again.  Which limits.h?  Since this directive
+is #include_next, it would skip the /usr/lib/gcc-lib/SYSTEM/VERSION/
+include, and would search /usr/include.  GCC's cpp.info says:
 
     This directive works like `#include' except in searching for the
     specified file: it starts searching the list of header file
@@ -3513,8 +3503,8 @@ same as LONG_MAX, because they are defined using the predefined ones.
 If so, what is the purpose of these complicated header files and #
 include_next handling at all?
 
-The behavior of GCC V.2.95, V.3.4 and V.4.0 on #include_next is the same
-as V.3.3.  That is to say:
+The behavior of GCC V.2.95, V.3.4, V.4.0 and V.4.1 on #include_next is
+the same as V.3.3.  That is to say:
 
     #include_next <limits.h>
 
@@ -3604,12 +3594,12 @@ The problems are summarized as below: [1], [2]
     and is inconsistent.
   4. It is meaningless to process the complicated limits.h headers,
     since GCC practically predefines the Standard required macros.  It
-    is more meaningless, since /usr/lib/gcc-lib/SYSTEM/VERSION/include/
-    limits.h does #undef all.  As far as Linux and CygWIN are concerned,
+    is doubly meaningless, since /usr/lib/gcc-lib/SYSTEM/VERSION/include
+    /limits.h does #undef all.  As far as Linux and CygWIN are concerned,
     there seems to be no necessity for splitting limits.h to two.  Since
     these headers in this directory are autogenarated ones by GCC
-    installation, some redundancies are inevitable.  Nevertheless, a
-    more clean method is desirable.
+    installation, some redundancies are inevitable.  Yet, a more clean
+    method is desirable.
 
 Under these problems lies the excessively complicated system header
 structure.  The extension directive #include_next enhances the
@@ -3652,6 +3642,9 @@ Note:
 2.95.3, 3.3.2, 3.4.3, 4.0.2, 4.1.1 and on CygWIN / GCC 2.95.3, 3.4.4.
 As with CygWIN, the behavior on #include_next was as its specification
 on GCC 2.95.3, but on 3.4.4 it changed to the same behavior as Linux.
+The C++ include directories in CygWIN was /usr/include/g++-3 on 2.95.3,
+whereas /usr/lib/gcc/i686-pc-cygwin/3.4.4/include/c++ and its sub-
+directories on 3.4.4.
 
 [2] On FreeBSD 5.3 and its bundled GCC 3.4.2, all the Standard C headers
 are present in /usr/include, #include_next is not used in any system
@@ -3660,8 +3653,8 @@ C++ include directories are GCC version dependent as /usr/include/c++/3.
 4, /usr/include/c++/3.4/backward, that is a pity.
 Even on FreeBSD, an installation of another version of GCC makes GCC-
 version-specific include directory.  Most of the headers in the
-directory are redundant.  However, the headers in /usr/include are not
-changed.
+directory are redundant.  However, the headers in /usr/include remain
+unchanged.
 
 [3] It can be written as follows referring to GCC's setting:
 
@@ -4062,7 +4055,7 @@ using the 2-byte encoding scheme that define wchar_t as 4-byte, MCPP has
 no relevance to wchar_t.  The following paragraphs describe two-byte
 multi-byte character encodings.
 
-Multi-byte character constants, such as '帤', are evaluated to ((First
+Multi-byte character constants, such as '机', are evaluated to ((First
 byte value << CHARBIT) + Second byte value).  CHARBIT has the value of
 CHAR_BIT in <limits.h>.
 
@@ -4076,7 +4069,7 @@ of range error occurs.  Therefore, in the implementation with CHARBIT ==
 8 and the ASCII character set, the above three tokens are evaluated to
 0x6162, 0x1203 and error, respectively.
 
-L'帤' is evaluated to the same value as '帤'.  Let me take an example of
+L'机' is evaluated to the same value as '机'.  Let me take an example of
 multi-character wide character constants, such as L'ab', L'\x12\x3', and
 L'\x123\x45'.  L'a', L'b', L'\x12', L'\x3', L'\x123', and L'\x45' are
 regarded as one wide character.  When a multi-character wide character
@@ -4501,15 +4494,13 @@ Warnings other than Class 1 or 2 are rather specific to MCPP.
 
 MCPP has various types of diagnostic messages.  For example, STD mode
 provides the following types of diagnostics for each level and class.
-(This number will increase if they are further subdivided into smaller
-categories.)
 
     fatal error     : 19 types
     error           : 75 types
-    warning class 1 : 40 types
-    warning class 2 : 12 types
+    warning class 1 : 42 types
+    warning class 2 : 14 types
     warning class 4 : 15 types
-    warning class 8 : 27 types
+    warning class 8 : 31 types
     warning class 16:  2 types
 
 Principally, these messages point the coding in question.  The
@@ -5319,7 +5310,7 @@ instead of issuing a warning.
 
 2. Evaluation of a single byte character constant, such as 'a', and of a
 wide character constant that consists of only one multi-byte character,
-such as L'帤', in a #if expression.: MCPP does not issue a warning
+such as L'机', in a #if expression.: MCPP does not issue a warning
 because even with the same basic character set used, there are an
 unlimited number of factors that limits the portability, such as single
 byte Katakana, presence or absence of a sign, encoding scheme of Kanji,
@@ -5596,16 +5587,18 @@ Undefined escape sequence '\x'
     hex string is valid)  This warning is also issued to a UCN with an
     insufficient number of orders.
 
-The followings warnings are relevant to operations in a constant
-expression on #if, #elif or #assert lines.  No warnings are also issued
-in a skipped sub-expression. (MCPP invoked with -W8 issues them.)
+The followings warnings are relevant to operations and types in a
+constant expression on #if, #elif or #assert lines.  No warnings are
+also issued in a skipped sub-expression. (MCPP invoked with -W8 issues
+them.)
 
 MCPP evaluate #if expression by long long / unsigned long long even if
 in C90 or C++98, and issues a warning on the value outside of long /
-unsigned long in C90 and in C++98.  These warnings are of class 1 in
-stand-alone-build and class 2 in compiler-specific-build.  In POSTSTD
-mode, character constants are not used in #if expression, hence no
-warning is issued. (Those make errors.)
+unsigned long in C90 and in C++98.  Also on LL suffix in other than C99,
+MCPP issues a warning.  These warnings are of class 1 in stand-alone-
+build and class 2 in compiler-specific-build.  In POSTSTD mode,
+character constants are not used in #if expression, hence no warning is
+issued. (Those make errors.)
 
 Constant "123456789012" is out of range of (unsigned) long
     An integer constant has a value that exceeded the range of unsigned
@@ -5623,6 +5616,11 @@ Result of "op" is out of range of (unsigned) long
     will cause an overflow with -LONG_MIN.  Unsigned long will never
     cause an overflow, so it does not cause an error.  If the result of
     an algebraic calculation is out of range, a warning is issued.
+LL suffix is used in other than C99 mode "123LL"
+    LL suffix is used for an integer in other than C99 mode.
+Shift count "40" is larger than bit count of long
+    The value of the right operand of a bit shift operator, << or >>,
+    exceeds the bit count of long.
 
 Negative value "-1" is converted to positive "18446744073709551615"
     A mixture of signed and unsigned operations results in conversion of
@@ -5635,8 +5633,8 @@ Negative value "-1" is converted to positive "18446744073709551615"
 
 Illegal shift count "-1"
     The value of the right operand of a bit shift operator, << or >>, is
-    a negative number or has exceeded the bit width of long long.
-    Probably, this is also a bug in source code.
+    a negative number or exceeds the bit count of long long.  Probably,
+    this is also a bug in source code.
 
 "op" of negative number isn't portable
     If an operation using a binary operator (op) results in either or
@@ -5667,12 +5665,12 @@ Replacement text "sub(" of macro "head" involved subsequent text
     type of macro without having these standards in mind to receive this
     warning, your macro definition or macro invocation is probably not
     correct.  If you are intended to use such macro, it is an unusual
-    macro.  The only STD mode issues this warning.  COMPAT mode does not
-    issues this warning.  In pre-Standard mode, the same situation may
-    arise but no warning is issued.  POSTSTD mode never issues this
-    warning because rescanning does not involve the text succeeding the
-    replacement list. (A macro may be expanded quite differently or
-    causes an "unterminated macro call" error.)
+    macro.  The only STD mode issues this warning.  COMPAT mode issues
+    this warning only on class 8.  In pre-Standard mode, the same
+    situation may arise but no warning is issued.  POSTSTD mode never
+    issues this warning because rescanning does not involve the text
+    succeeding the replacement list. (A macro may be expanded quite
+    differently or causes an "unterminated macro call" error.)
 
 Less than necessary N argument (s) in macro call "macro( a)"
     An insufficient number of arguments of a macro invocation.  Normally,
@@ -5727,13 +5725,18 @@ causes a portability problem.
 
 MCPP evaluate #if expression by long long / unsigned long long even if
 in C90 or C++98, and issues a warning on the value outside of long /
-unsigned long in C90 and in C++98.  These warnings are of class 1 in
-stand-alone-build and class 2 in compiler-specific-build.
+unsigned long in C90 and in C++98.  Also LL suffix in other than C99
+mode gets a warning as well as i64 suffix of compiler-specific-builds
+for Visual C and Borland C.  These warnings are of class 1 in stand-
+alone-build and class 2 in compiler-specific-build.
 
-Constant \"123456789012\" is out of range of (unsigned) long
+Constant "123456789012" is out of range of (unsigned) long
 Integer character constant 'abcde' is out of range of unsigned long
 Wide character constant L'abc' is out of range of unsigned long
-Result of \"op\" is out of range of (unsigned) long
+Result of "op" is out of range of (unsigned) long
+LL suffix is used in other than C99 mode "123LL"
+I64 suffix is used in other than C99 mode "123i64"
+Shift count "40" is larger than bit count of long
 
 Only the Standard mode issues the following five warnings:
 
@@ -5922,7 +5925,7 @@ Multi-character wide character constant L'ab' isn't portable
     POSTSTD mode does not permit character literal in #if expression, so
     this causes an error. (The next item is also treated the same way.)
 
-Multi-character or multi-byte character constant '帤' isn't portable
+Multi-character or multi-byte character constant '机' isn't portable
     Since how to evaluate the value of a multi-character or multi-byte
     character constant depends on compiler systems,  #if expressions
     using them do not provide portability.  The only STD mode issues
@@ -5972,6 +5975,9 @@ evaluated sub-expression" is appended.
 
 Constant "123456789012345678901" is out of range
 Constant "123456789012" is out of range of (unsigned) long
+LL suffix is used in other than C99 mode "123LL"
+I64 suffix is used in other than C99 mode "123i64"
+Shift count "40" is larger than bit count of long
 Integer character constant 'abcdefghi' is out of range
 Integer character constant 'abcde' is out of range of unsigned long
 Wide character constant L'abcdef' is out of range
@@ -5983,7 +5989,7 @@ Undefined symbol "name", evaluated to 0
 sizeof: Unknown type "type"
 sizeof: Illegal type combination with "type"
 Multi-character wide character constant L'ab' isn't portable
-Multi-character or multi-byte character constant '帤' isn't portable
+Multi-character or multi-byte character constant '机' isn't portable
 Undefined escape sequence '\x'
 UCN cannot specify the value "0000007f"
 Negative value "-1" is converted to positive "18446744073709551615"
@@ -6006,6 +6012,12 @@ Macro "macro" needs arguments
     stand-alone manner.  MCPP does not expand it and leave it as it is.
     The only pre-Standard mode issues this warning. (Standard mode does
     not issue a warning since such a token does not cause any problem.)
+
+Replacement text "sub(" of macro "head" involved subsequent text
+    Rescanning of the replacement list "sub(" of the macro "head" has
+    involved the text succeeding the macro invocation.  COMPAT mode
+    issues this warning only on class 8, whereas STD mode issues on
+    class 1.
 
 
 5.9     Warnings (Class 16)
@@ -6123,6 +6135,8 @@ File read error             [5.3.2]
 File write error            [5.3.2]
 Header-name enclosed by <, > is an obsolescent feature <stdio.h>
                                                   [5.6]
+I64 suffix is used in other than C99 mode "123i64"
+                                                  [5.6]       [5.8]
 Identifier longer than 31 bytes "very_very_long_name"   [5.7]
 Ignored #ident                              [5.5.3]           [5.8]
 Ignored #sccs                               [5.5.3]           [5.8]
@@ -6155,6 +6169,8 @@ Line number "2147483648" is out of range of [1,2147483647]
                                     [5.4.4]
 Line number "32768" is out of range of [1,32767]
                                             [5.5.6]
+LL suffix is used in other than C99 mode "123LL"
+                                            [5.5.4][5.6]      [5.8]
 Logical source line longer than 509 bytes               [5.7]
 Macro "MACRO" is expanded to "defined"      [5.5.4]
 Macro "MACRO" is expanded to "sizeof"       [5.5.4]
@@ -6225,11 +6241,13 @@ Quotation longer than 509 bytes "very_very_long_string"
 Recursive macro definition of "macro" to "macro"
                                     [5.4.9]
 Replacement text "sub(" of macro "head" involved subsequent text
-                                            [5.5.5]
+                                            [5.5.5]           [5.8]
 Rescanning macro "macro" more than RESCAN_LIMIT times at "something"
                                     [5.4.9]
 Result of "op" is out of range      [5.4.6]                   [5.8]
 Result of "op" is out of range of (unsigned) long
+                                            [5.5.4][5.6]      [5.8]
+Shift count "40" is larger than bit count of long
                                             [5.5.4][5.6]      [5.8]
 sizeof is disallowed in C Standard                            [5.8]
 sizeof: Illegal type combination with "type"
@@ -6286,7 +6304,6 @@ Wide character constant L'abc' is out of range
                                     [5.4.6]                   [5.8]
 Wide character constant L'abc' is out of range of unsigned long
                                             [5.5.4][5.6]      [5.8]
-Without #asm                        [5.4.3]
 
 
                     6.  Reporting on Bugs and Others

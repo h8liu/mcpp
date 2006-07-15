@@ -175,8 +175,8 @@
 #endif
 
 #if     HOST_SYS_FAMILY == SYS_UNIX
-#include    "unistd.h"              /* For getcwd(), readlink() */
-#elif   HOST_COMPILER == MSC
+#include    "unistd.h"              /* For getcwd(), readlink(), getopt()   */
+#elif   HOST_COMPILER == MSC || HOST_COMPILER == LCC
 #include    "direct.h"
 #define getcwd( buf, size)  _getcwd( buf, size)
 #endif
@@ -289,7 +289,7 @@ static int      is_junk( void);
 static void     do_once( const char * filename);
                 /* Process #pragma once             */
 static int      included( const char * filename);
-                /* The file has been included ?     */
+                /* The file has been once included? */
 static void     push_or_pop( int direction);
                 /* Push or pop a macro definition   */
 static void     do_prestd_directive( void);
@@ -339,6 +339,13 @@ static int      search_rule = SEARCH_INIT;  /* Rule to search include file  */
 
 static int      dDflag = FALSE;         /* Flag of -dD option (for GCC)     */
 static int      nflag = FALSE;          /* Flag of -N (-undef) option       */
+
+/* Values of mkdep. */
+#define MD_MKDEP        1   /* Output source file dependency line   */
+#define MD_SYSHEADER    2   /* Print also system-header names       */
+#define MD_FILE         4   /* Output to the file named *.d         */
+#define MD_PHONY        8   /* Print also phony targets for each header */
+#define MD_QUOTE        16  /* 'Quote' $ and space in target name   */
 
 static FILE *   mkdep_fp;                       /* For -Mx option   */
 static char *   mkdep_target;
@@ -570,6 +577,7 @@ plus:
             break;                          /* Ignore this option   */
         case 'f':
             if (memcmp( optarg, "input-charset=", 14) == 0) {
+                /* Treat -finput-charset= as the same option as -e  */
                 if (set_encoding( optarg + 14, FALSE, 0) == NULL)
                     usage( opt);
                 mb_changed = TRUE;
@@ -697,6 +705,7 @@ plus:
                                             /* -iwithprefixbefore   */
                     || str_eq( optarg, "dirafter")) {   /* -idirafter       */
                 optind++;                   /* Skip the argument    */
+                /* Ignore these options */
             } else {
                 usage( opt);
             }
@@ -1511,7 +1520,7 @@ static void     chk_opts(
 )
 /*
  * Check consistency between the specified options.
- * Set some default value of variables for each 'mode'.
+ * Set default value of some variables for each 'mode'.
  */
 {
     int     incompat = FALSE;
@@ -1916,9 +1925,9 @@ static char *   norm_path(
     char *  abs_path;
     size_t  len, slen;
     size_t  start_pos = 0;
-    int     real_len = 0;
 #if SYS_FAMILY == SYS_UNIX
-    char    slbuf[ FILENAMEMAX];    
+    int     real_len = 0;
+    char    slbuf[ FILENAMEMAX];
 #endif
 
     len = slen = strlen( dirname);
@@ -1932,7 +1941,11 @@ static char *   norm_path(
     }
 #endif
     start = norm_name = xmalloc( len + 2);  /* Need a new buffer    */
+#if SYS_FAMILY == SYS_UNIX
     strcpy( norm_name, real_len > 0 ? slbuf : dirname);
+#else
+    strcpy( norm_name, dirname);
+#endif
 #if SYS_FAMILY == SYS_WIN
     bsl2sl( norm_name);
 #endif
@@ -3535,7 +3548,7 @@ static void dump_path( void)
 
 /*
  * list_heap() is a function to print out information of heap-memory.
- * See "kmmalloc-2.5.lzh" by kmatsui.
+ * See "kmmalloc-2.5.1.lzh" by kmatsui.
  */
 #if     KMMALLOC
 #ifdef  __cplusplus

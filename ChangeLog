@@ -1,7 +1,7 @@
 ChangeLog of MCPP and its accompanying Validation Suite
 
-2006/07/07  kmatsui
-        * V.2.6-prerelease
+2006/07/15  kmatsui
+        * V.2.6
         * Integrated STANDARD mode and PRE_STANDARD mode into one
         executable, differentiating the modes by the execution time
         options.
@@ -12,6 +12,8 @@ ChangeLog of MCPP and its accompanying Validation Suite
         * Revised #pragma once and handling of include directories list,
         judging a identity of directory and file by absolute path, and
         dereferencing symbolic linked file.
+        * Revised #line output and its related problem at the end of an
+        included file.
         * Added portings to GCC V.4.0, CygWIN 1.5.18, Visual C++ 2005
         and LCC-Win32 V.3.8.
         * Removed support for pre-C90 compilers, MS-DOS and Plan 9.

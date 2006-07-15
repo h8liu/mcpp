@@ -212,7 +212,7 @@
 /*
  * The DEFBUF structure stores information about #defined macros.
  * Note that DEFBUF->parmnames is parameter names catenated with commas,
- * which is saved for the check of redefinition for Standard mode.
+ * which is saved for the check of redefinition for STD mode.
  * 'parmnames' and 'repl' are allocated to the area succeding to name.
  */
 typedef struct defbuf {
@@ -275,13 +275,6 @@ typedef struct val_sign {
 /* Value of macro_line on macro call error.         */
 #define MACRO_ERROR     (-1L)
 
-/* Values of mkdep. */
-#define MD_MKDEP        1   /* Output source file dependency line   */
-#define MD_SYSHEADER    2   /* Print also system-header names       */
-#define MD_FILE         4   /* Output to the file named *.d         */
-#define MD_PHONY        8   /* Print also phony targets for each header */
-#define MD_QUOTE        16  /* 'Quote' $ and space in target name   */
-
 /*
  * Values of insert_sep (flag of insertion of token separator).
  * Used only in POST_STD mode.
@@ -289,31 +282,6 @@ typedef struct val_sign {
 #define NO_SEP          0   /* No separator is inserted             */
 #define INSERT_SEP      1   /* Next get() shall insert a separator  */
 #define INSERTED_SEP    2   /* Last get() has Inserted a separator  */
-
-/* In KR and OLD_PREP modes.    */
-/*
- * Define bits for the basic types and their adjectives.
- */
-#define T_CHAR          1
-#define T_INT           2
-#define T_FLOAT         4
-#define T_DOUBLE        8
-#define T_LONGDOUBLE    16
-#define T_SHORT         32
-#define T_LONG          64
-#define T_LONGLONG      128
-#define T_SIGNED        256
-#define T_UNSIGNED      512
-#define T_PTR           1024        /* Pointer to data objects      */
-#define T_FPTR          2048        /* Pointer to functions         */
-/*
- * The SIZES structure is used to store the values for #if sizeof.
- */
-typedef struct sizes {
-        int             bits;       /* If this bit is set,          */
-        int             size;       /* this is the datum size value */
-        int             psize;      /* this is the pointer size     */
-} SIZES;
 
 #define str_eq(s1, s2)  (strcmp(s1, s2) == 0)
 
@@ -359,6 +327,7 @@ extern int      warn_level;         /* Level of warning             */
 extern int      errors;             /* Error counter                */
 extern long     line;               /* Current source line number   */
 extern int      wrong_line;         /* Force #line to compiler      */
+extern int      newlines;           /* Count of blank lines         */
 extern int      keep_comments;      /* Don't remove comments        */
 extern int      include_nest;       /* Nesting level of #include    */
 extern const char *     null;       /* "" string for convenience    */
@@ -388,13 +357,11 @@ extern int      bsl_need_escape;/* '\\' in mbchar should be escaped */
 extern char *   workp;              /* Free space in work[]         */
 extern char * const     work_end;   /* End of work[] buffer         */
 extern char     identifier[];       /* Lastly scanned name          */
-extern short    *type;              /* Character classifier         */
+extern short *  type;               /* Character classifier         */
 extern IFINFO   ifstack[];          /* Information of #if nesting   */
 extern char     cur_fullname[];     /* Full name of current source  */
 extern char     work[];
         /* Temporary buffer for directive line and macro expansion  */
-
-extern SIZES    size_table[];       /* For #if sizeof sizes         */
 extern int      debug;              /* Debug class                  */
 extern long     in_asm;             /* In #asm - #endasm block      */
 
@@ -407,7 +374,7 @@ extern void     undef_a_predef( const char * name);
                 /* Remove a non-standard predef */
 
 /* control.c    */
-extern int      control( int newlines);
+extern int      control( void);
                 /* Process #directive lines     */
 extern DEFBUF * do_define( int ignore_redef);
                 /* Do #define directive         */

@@ -155,9 +155,7 @@ static const char * const   no_arg = "No argument";     /* _E_      */
 static const char * const   excess
             = "Excessive token sequence \"%s\"";        /* _E_ _W1_ */
 
-int control(
-    int         newlines                        /* Pending newlines */
-)
+int control( void)
 /*
  * Process #directive lines.  Each directive have their own subroutines.
  */
@@ -682,7 +680,7 @@ DEFBUF *    do_define(
     int     c;
     int     redefined;                      /* TRUE if redefined    */
     int     dnargs;                         /* defp->nargs          */
-    int     cmp;            /* Result of definition comparison      */
+    int     cmp;                    /* Result of name comparison    */
 
     repl_base = repl_list;
     repl_end = & repl_list[ NMACWORK];
@@ -773,7 +771,7 @@ static int  get_parm( void)
  *   Get parameters i.e. numbers into nargs, name into work[], name-length
  * into parlen[].
  *   Return TRUE if the parameters are legal, else return FALSE.
- *   In STANDARD mode preprocessor must remember the parameter names, only for
+ *   In STD mode preprocessor must remember the parameter names, only for
  * checking the validity of macro redefinitions.  This is required by the
  * Standard (what an overhead !).
  */
@@ -900,7 +898,7 @@ static int  get_repl( const char * macroname)
 
     *repl_cur = EOS;
     token_p = NULL;
-    if (standard) {
+    if (STD) {
         c = get();
         unget();
         if (((type[ c] & SPA) == 0) && (nargs < 0) && (warn_level & 1))
@@ -1226,7 +1224,7 @@ DEFBUF **   look_prev(
     hash += s_name = (size_t)(np - name);
     s_name++;
     prevp = & symtab[ hash & SBMASK];
-    *cmp = -1;                              /* Initialize !         */
+    *cmp = -1;                              /* Initialize           */
 
     while ((dp = *prevp) != NULL) {
         if ((*cmp = memcmp( dp->name, name, s_name)) >= 0)
