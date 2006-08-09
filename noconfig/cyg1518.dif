@@ -1,7 +1,7 @@
-*** noconfig.H	2006-07-03 00:29:27.000000000 +0900
---- noconfig.H.cyg1518	2006-07-03 00:32:45.000000000 +0900
+*** noconfig.H	2006-08-07 19:04:19.000000000 +0900
+--- noconfig.H.cyg1518	2006-08-07 21:54:11.000000000 +0900
 ***************
-*** 27,33 ****
+*** 15,21 ****
    */
   
   /* Define target operating-system.  */
@@ -9,7 +9,7 @@
   
   /* Define target compiler.          */
   #ifndef COMPILER
---- 27,33 ----
+--- 15,21 ----
    */
   
   /* Define target operating-system.  */
@@ -48,7 +48,7 @@
   #define COMPILER_SP1_VAL    "unsigned int"
   #define COMPILER_SP2_VAL    "int"
 ! #define COMPILER_SP3_VAL    "int"
-      /* SYS_FREEBSD: "int" , SYS_CYGWIN: "short unsigned int"
+      /* SYS_FREEBSD: "int" , SYS_CYGWIN, SYS_MINGW: "short unsigned int"
           , others: "long int"    */
   #endif  /* COMPILER_FAMILY == GNUC   */
 --- 323,329 ----
@@ -56,6 +56,6 @@
   #define COMPILER_SP1_VAL    "unsigned int"
   #define COMPILER_SP2_VAL    "int"
 ! #define COMPILER_SP3_VAL    "short unsigned int"
-      /* SYS_FREEBSD: "int" , SYS_CYGWIN: "short unsigned int"
+      /* SYS_FREEBSD: "int" , SYS_CYGWIN, SYS_MINGW: "short unsigned int"
           , others: "long int"    */
   #endif  /* COMPILER_FAMILY == GNUC   */

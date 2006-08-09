@@ -1,5 +1,5 @@
 # makefile to compile MCPP version 2.6 for Linux / GCC / GNU make
-#       2006/05     kmatsui
+#       2006/08     kmatsui
 #
 # First, you must edit GCCDIR, BINDIR, INCDIR, gcc_maj_ver and gcc_min_ver.
 # To make stand-alone-build of MCPP:
@@ -141,6 +141,6 @@ uninstall:
 	rm -f $(BINDIR)/$(NAME)
 ifeq    ($(COMPILER), GNUC)
 	@./unset_mcpp.sh '$(GCCDIR)' '$(gcc_maj_ver)' '$(gcc_min_ver)'   \
-            '$(cpp_call)' '$(CC)' '$(GPP)' 'x' '$(INCDIR)'
+            '$(cpp_call)' '$(CC)' '$(GPP)' 'x' 'ln -s' '$(INCDIR)'
 endif
 

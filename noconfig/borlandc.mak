@@ -1,5 +1,5 @@
 # makefile to compile MCPP version 2.6 for Borland C / BC make
-#       2006/05 kmatsui
+#       2006/08 kmatsui
 # You must first edit BINDIR according to your system.
 # To make stand-alone-build of MCPP do:
 #       make
@@ -53,7 +53,7 @@ MEM_LIB =
 !endif
 
 OBJS = main.obj control.obj eval.obj expand.obj support.obj system.obj	\
-	mbchar.obj lib.obj
+        mbchar.obj lib.obj
 
 $(NAME).exe : $(OBJS)
 	$(CC) $(LINKFLAGS) $(OBJS) $(MEMLIB)
@@ -66,7 +66,7 @@ $(OBJS) : mcpp.H
 !else
 $(OBJS) : noconfig.H
 main.obj control.obj eval.obj expand.obj support.obj system.obj mbchar.obj:	\
-	    system.H internal.H
+        system.H internal.H
 !endif
 
 !if 	$d( PREPROCESSED)
