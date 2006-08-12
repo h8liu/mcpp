@@ -1,6 +1,6 @@
 ChangeLog of MCPP and its accompanying Validation Suite
 
-2006/08/09  kmatsui
+2006/08/12  kmatsui
         * V.2.6.1
         * Enabled automatic conversion from [CR+LF] to [LF].  (support.c)
         * Set the limit of #include nesting to INCLUDE_NEST (default:
@@ -10,9 +10,10 @@ ChangeLog of MCPP and its accompanying Validation Suite
         header-name which is defined by macro.  (system.c)
         * Enabled -fworking-directory option for GCC-specific-build.
         created put_info().  (system.c)
-        * Fixed the bug of #include.  (lib.c)
-        * Fixed the bug of '#pragma once' failure.  (by Greg Kress).
+        * Fixed a bug of macro definition.  (lib.c)
+        * Fixed a bug of '#pragma once' failure.  (by Greg Kress).
         (system.c)
+        * Fixed some other minor bugs in sources.
         * Revised path-list handling on CygWIN.  Enabled -mno-cygwin
         option for CygWIN GCC-specific-build.  (configure.ac, noconfig.H,
         system.c)
@@ -21,7 +22,7 @@ ChangeLog of MCPP and its accompanying Validation Suite
         GCC rejects to invoke a shell-script even if it is named cc1 and
         because MinGW does not support symbolic link.  (configure.ac,
         src/Makefile.am, configed.H, noconfig.H, system.c)
-        * Fixed the bugs in some noconfig/*.mak.
+        * Fixed bugs in some noconfig/*.mak.
         * Moved changelogs from the source files to ChangeLog and
         ChangeLog.old.
 

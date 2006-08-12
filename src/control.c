@@ -655,8 +655,8 @@ DEFBUF *    do_define(
             } else {                        /* It's known:          */
                 if (ignore_redef)
                     return  defp;
-                    dnargs = (defp->nargs == DEF_NOARGS-1) ? DEF_NOARGS
-                            : defp->nargs;
+                dnargs = (defp->nargs == DEF_NOARGS-1) ? DEF_NOARGS
+                        : defp->nargs;
                 if (dnargs < DEF_NOARGS - 1 /* Standard predefined  */
                         || dnargs == DEF_PRAGMA /* _Pragma() pseudo-macro   */
                         ) {
@@ -846,7 +846,7 @@ static int  get_repl( const char * macroname)
 
     *repl_cur = EOS;
     token_p = NULL;
-    if (STD) {
+    if (mode == STD) {
         c = get();
         unget();
         if (((type[ c] & SPA) == 0) && (nargs < 0) && (warn_level & 1))

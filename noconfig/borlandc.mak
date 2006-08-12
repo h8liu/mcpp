@@ -24,7 +24,7 @@ CPPFLAGS = -DCOMPILER=BORLANDC
 # BINDIR : Adjust to your system.
 #	for Borland C V.5.5
 CFLAGS = $(CFLAGS) -Oi
-BINDIR = \BCC55\BIN
+BINDIR = \PUBLIC\COMPILERS\BCC55\BIN
 #	for Borland C V.4.0
 #BINDIR = E:\BC4\BIN
 !else
@@ -52,7 +52,7 @@ MEM_MACRO =
 MEM_LIB =
 !endif
 
-OBJS = main.obj control.obj eval.obj expand.obj support.obj system.obj	\
+OBJS = main.obj control.obj eval.obj expand.obj support.obj system.obj  \
         mbchar.obj lib.obj
 
 $(NAME).exe : $(OBJS)
@@ -60,13 +60,13 @@ $(NAME).exe : $(OBJS)
 
 !if 	$d( PREPROCESSED)
 # Make a "pre-preprocessed" header file to recompile MCPP with MCPP.
-mcpp.H	: system.H noconfig.H internal.H
+mcpp.H  : system.H noconfig.H internal.H
 	$(NAME) $(CPPFLAGS) $(CPP_LANG) $(MEM_MACRO) $(preproc) mcpp.H
 $(OBJS) : mcpp.H
 !else
-$(OBJS) : noconfig.H
-main.obj control.obj eval.obj expand.obj support.obj system.obj mbchar.obj:	\
-        system.H internal.H
+main.obj control.obj eval.obj expand.obj support.obj system.obj mbchar.obj: \
+        system.H internal.H noconfig.H
+lib.obj : noconfig.H
 !endif
 
 !if 	$d( PREPROCESSED)

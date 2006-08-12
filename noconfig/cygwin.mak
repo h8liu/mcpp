@@ -8,8 +8,6 @@
 #       make COMPILER=GNUC
 # To re-compile MCPP using GCC-specific-build of MCPP do:
 #       make COMPILER=GNUC PREPROCESSED=1
-# To link malloc() package of kmatsui do:
-#       make [COMPILER=GNUC] [PREPROCESSED=1] MALLOC=KMMALLOC
 # To compile cpp with C++, rename *.c other than lib.c and preproc.c to *.cc,
 #   and do:
 #       make CPLUS=1

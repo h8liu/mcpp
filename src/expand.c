@@ -799,8 +799,8 @@ static char *   rescan(
             if (is_macro_call( inner, &out_p)
                     && ((mode == POST_STD && is_able_repl( inner))
                         || (mode == STD
-                            && ((is_able = is_able_repl( inner)) == YES)
-                                || (is_able == READ_OVER && c == IN_SRC)))) {
+                            && (((is_able = is_able_repl( inner)) == YES)
+                                || (is_able == READ_OVER && c == IN_SRC))))) {
                                             /* Really a macro call  */
                 if ((out_p = replace( inner, tp, out_end, outer, file))
                         == NULL)            /* Error of macro call  */
@@ -950,6 +950,7 @@ static char *   expand_prestd(
     if (setjmp( jump) == 1) {
         skip_macro();
         mp = macrobuf;
+        *mp = EOS;
         macro_line = MACRO_ERROR;
         goto  err_end;
     }
@@ -1007,8 +1008,12 @@ exp_end:
     while (macrobuf < mp && *(mp - 1) == ' ')
         mp--;                           /* Remove trailing blank    */
     macro_line = 0;
-err_end:
     *mp = EOS;
+    if (mp - macrobuf > out_end - out) {
+        cerror( macbuf_overflow, defp->name, 0L, macrobuf);
+        macro_line = MACRO_ERROR;
+    }
+err_end:
     out_p = stpcpy( out, macrobuf);
     if (debug & EXPAND) {
         dump_string( "expand_prestd exit", out);

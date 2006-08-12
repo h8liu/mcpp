@@ -928,13 +928,12 @@ VAL_SIGN *  eval_num(
     ev.val = value;
     if (erange && (warn_level & 8))
         cwarn( out_of_range, nump, 0L, non_eval);
-    return  & ev;
 #if HAVE_LONG_LONG
-    if (erange_long && ((skip && (warn_level & 8))
+    else if (erange_long && ((skip && (warn_level & 8))
             || (! stdc3 && ! skip && (warn_level & w_level))))
         cwarn( out_of_range_long, nump, 0L, skip ? non_eval : NULLST);
-    return  & ev;
 #endif
+    return  & ev;
 
 range_err:
     cerror( out_of_range, nump, 0L, NULLST);
@@ -1511,7 +1510,7 @@ static expr_t   eval_unsigned(
     case OP_NEG:
         v1 = -v1u;
         if (v1u)
-            overflow( op_name, valpp, v1u);
+            overflow( op_name, valpp, TRUE);
         break;
     case OP_COM:    v1 = ~v1u;          break;
     case OP_NOT:    v1 = !v1u;          break;

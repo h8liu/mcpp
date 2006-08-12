@@ -49,6 +49,8 @@
 #elif   HOST_COMPILER == MSC || HOST_COMPILER == LCC
 #include    "direct.h"
 #define getcwd( buf, size)  _getcwd( buf, size)
+#elif   HOST_COMPILER == BORLANDC
+#include    "dir.h"
 #endif
 
 /* Functions other than standard.   */
@@ -1631,11 +1633,6 @@ void    at_start( void)
         set_encoding( env, "LANG", 0);
 
 #if COMPILER == GNUC || COMPILER == MSC
-    /*
-     * Do the -include (-Fl for MSC) options in the specified order.
-     * Note: This functionality is implemented as nested #includes
-     *   which results the same effect as sequential #includes.
-     */
 #if COMPILER == GNUC
     /* -fworking-directory  */
     if (gcc_work_dir && (preinclude <= --preinc_end && *preinc_end != NULL)) {
@@ -1645,6 +1642,11 @@ void    at_start( void)
         line--;
     }
 #endif
+    /*
+     * Do the -include (-Fl for MSC) options in the specified order.
+     * Note: This functionality is implemented as nested #includes
+     *   which results the same effect as sequential #includes.
+     */
     while (preinclude <= --preinc_end && *preinc_end != NULL)
         open_include( *preinc_end, TRUE, FALSE);
 #endif
@@ -2424,7 +2426,6 @@ int     do_include(
     else                                    /* Any other token in-  */
         goto not_header;                    /*   cluding <=, <<, <% */
 
-scanned:
     if (workp == NULL)                      /* Missing closing '>'  */
         goto  syntax_error;
 

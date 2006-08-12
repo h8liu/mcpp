@@ -1688,7 +1688,6 @@ static void at_eof(
 
     len = strlen( cp);
     if (len && *(cp += (len - 1)) != '\n') {
-        line++;
         *++cp = '\n';                       /* Supplement <newline> */
         *++cp = EOS;
         if (standard && (warn_level & 1))
