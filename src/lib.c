@@ -40,6 +40,14 @@ int     opterr = 1;
 int     optopt;
 char *  optarg;
 
+#if MCPP_LIB
+void    init_lib( void)
+{
+    optind = 1;
+    opterr = 1;
+}
+#endif
+
 int     getopt(
     int         argc,
     char * const *  argv,
