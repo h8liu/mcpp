@@ -2539,8 +2539,7 @@ static int  open_include(
 {
     int     full_path;              /* Filename is full-path-list   */
     int     has_dir = FALSE;        /* Includer has directory part  */
-    char    fullname[ FILENAMEMAX + 1] = { EOS, };
-                                    /* Directory/filename           */
+    char    dir[ FILENAMEMAX] = { EOS, };   /* Directory part of includer   */
 #if FNAME_FOLD
     char *  dirend;         /* End of directory part (if any) of filename   */
 #endif
@@ -2573,8 +2572,8 @@ static int  open_include(
         full_path = FALSE;
 
     if (!full_path && searchlocal && (search_rule & SOURCE))
-        has_dir = (**(infile->dirp) != EOS)
-                || has_directory( infile->filename, fullname);
+        has_dir = has_directory( infile->filename, dir)
+                || (**(infile->dirp) != EOS);
 
 #if COMPILER == GNUC
     if (!full_path) {
@@ -2601,8 +2600,8 @@ static int  open_include(
          * Look in local directory of source file.
          * Try to open filename relative to the "source directory".
          */
-        strcat( fullname, filename);
-        if (open_file( infile->dirp, fullname, TRUE))
+        strcat( dir, filename);
+        if (open_file( infile->dirp, dir, TRUE))
             return  TRUE;
     }
 
