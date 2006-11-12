@@ -593,11 +593,13 @@ CPU にも、対応していません。２の補数でない場合は、#if 式でオーバーフローが発生し
 
 <h2><a name="3.12" href="#toc.3.12">3.12. Subroutine-build のコンパイル</a></h2>
 <p><b>mcpp</b> を他の何らかのメインプログラムからサブルーチンとして呼び出すようにコンパイルすることもできます。これは独立したプリプロセッサと同じように、呼び出し元から実行時オプションを受取り、指定された入力ファイルをプリプロセスして出力ファイルに出力して、呼び出し元に戻るものです。必要なら複数のファイルについて繰り返し呼び出すこともできます。しかし、呼び出し元とトークン単位のやりとりをするものではありません。</p>
-<p><b>mcpp</b> のソースは、<i>MCPP_LIB</i> というマクロを non-0 に定義してコンパイルすると、サブルーチン版としてコンパイルされるようになっています。実際にコンパイルする時の手順は次の通りです。</p>
+<p><b>mcpp</b> のソースは、<i>MCPP_LIB</i> というマクロを non-0 に定義してコンパイルすると、サブルーチン版としてコンパイルされるようになっています。サブルーチンの入り口は stand-alone 版の main() が次のように mcpp_lib_main() という名前に変わるだけです。</p>
+<pre>    int mcpp_lib_main( int argc, char ** argv);</pre>
+<p>実際にコンパイルする時の手順は次の通りです。</p>
 <p>サブルーチン版のコンパイルでは noconfig.H と noconfig ディレクトリの makefile を使います。makefile 中に testmain.c というサンプルをメインプログラムとして使う場合の設定が書いてあり、'make MCPP_LIB=1' とすることで有効になります。これを参考に makefile を書いてください。</p>
-<p>GCC では <i>COMPILER</i> マクロは <i>GNUC</i> ではなく <i>INDEPENDENT</i> のままでコンパイルします。<i>GNUC</i> とすると、GCC の libexec ディレクトリにインストールされて GCC から呼び出されるものができてしまうからです。<br>
-他方で、Visual C, Borland C, LCC-Win32 等では <i>COMPILER</i> は <i>INDEPENDENT</i> でも <i>MSC, BORLANDC, LCC</i> 等のどちらでもかまいません。これらの処理系ではプリプロセッサが独立していないので、compiler-specific-build でも処理系から呼び出されることはないからです。compiler-specific-build では処理系固有の事前定義マクロやいくつかの処理系固有の仕様が定義されるので、それがつごうが良いか悪いかでコンパイルの仕方を選びます。</p>
 <p>Subroutine 版のコンパイルには configure は使えません。メインプログラムが決まらないと、どう make するかが決まらないからです。</p>
+<p>GCC では <i>COMPILER</i> マクロは <i>GNUC</i> ではなく <i>INDEPENDENT</i> のままでコンパイルします。<i>GNUC</i> とすると、GCC の libexec ディレクトリにインストールされて GCC から呼び出されるものができてしまうからです。<br>
+他方で、Visual C, Borland C, LCC-Win32 等では <i>COMPILER</i> は <i>INDEPENDENT</i> でも <i>MSC, BORLANDC, LCC</i> 等のどちらでもかまいません。これらの処理系ではプリプロセッサが独立していないので、compiler-specific-build でも処理系から呼び出されることはないからです。compiler-specific-build では処理系固有の事前定義マクロやオプションやいくつかの処理系固有の仕様が定義されるので、それがつごうが良いか悪いかでコンパイルの仕方を選びます。</p>
 <br>
 
 <h1><a name="4" href="#toc.4">4. 各処理系に移植する方法：詳細</a></h1>
@@ -651,8 +653,8 @@ CPU にも、対応していません。２の補数でない場合は、#if 式でオーバーフローが発生し
 サーチパスはその外、<samp>system.c</samp> で設定されるもの、-I オプションで設定されるものがあります（それらの優先順位については <a href="mcpp-manual.html#4.2">mcpp-manual.html#4.2</a> を参照）。<br>
 <li><samp><i>ENV_SEP</i></samp><br>
 この環境変数に複数のパスを書く時の separator を文字定数で書きます。<br>
-/usr/local/abc/include:/usr/local/xyz/include と書く時の ':' や<br>
-C:BC55/INCLUDE;C:BC55/LOCAL/INCLUDE と書く時の ';' がこれです。<br>
+<samp>/usr/local/abc/include:/usr/local/xyz/include</samp> と書く時の ':' や<br>
+<samp>C:/BC55/INCLUDE;C:/BC55/LOCAL/INCLUDE</samp> と書く時の ';' がこれです。<br>
 <li><samp><i>SEARCH_INIT</i></samp><br>
 ターゲット処理系が include ファイルをサーチする時のルールを書きます。#include "../dir/header.h" といったディレクティブを処理する時に、include ディレクトリをサーチする前にどのディレクトリをサーチするのかというルールです。カレントディレクトリからの相対パスをサーチする処理系では <i>CURRENT</i> とし、ソースファイル（include 元）のあるディレクトリからの相対パスをサーチする処理系では <i>SOURCE</i> とします。この両者の組合わせである場合は (<i>CURRENT</i> &amp; <i>SOURCE</i>) とします。<br>
 </ul>

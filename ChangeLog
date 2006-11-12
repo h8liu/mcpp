@@ -1,7 +1,7 @@
 ChangeLog of MCPP and its accompanying Validation Suite
 
-2006/11/07  kmatsui
-        * V.2.6.2-prerelease
+2006/11/12  kmatsui
+        * V.2.6.2
         * Renamed control.c as directive.c and renamed control() as
         directive().
         * Fixed a bug of #else handling in pre-Standard modes.
@@ -16,14 +16,16 @@ ChangeLog of MCPP and its accompanying Validation Suite
         to system.c.  (main.c, eval.c, system.c)
         * Revised diagnostic messages for some macro expansions.
         (internal.H, expand.c, support.c)
+        * Fixed a bug of nested includes with relative paths.  (thanks
+        to Leo Savernik).  (system.c)
         * Fixed memory leaks in routines related to normalizing path-
         list.  (by Juergen Mueller).  (system.c)
         * Added MCPP_LIB setting to use mcpp as a subroutine from other
         main program.  Created init_main(), init_directive(), init_eval(),
         init_support(), init_system(), init_lib(), clear_filelist() and
-        clear_symtable().  Created testmain.c as a sample source.
-        (almost all contributed by Juergen Mueller and slightly modified
-        by kmatsui).  (internal.H, main.c, directive.c, eval.c, expand.c,
+        clear_symtable().  Created testmain.c as a sample source.  (all
+        were contributed by Juergen Mueller and slightly modified by
+        kmatsui).  (internal.H, main.c, directive.c, eval.c, expand.c,
         support.c, system.c, lib.c)
         * Changed the macro STAND_ALONE to INDEPENDENT.
         * Changed the terminology of building methods in the documents.
@@ -79,7 +81,7 @@ ChangeLog of MCPP and its accompanying Validation Suite
         to absolute path, and dereferencing symbolic linked file.
         (system.c)
         * Revised #line output and its related problem at the end of an
-        included file.  (internal.H, support.c)
+        included file.  (thanks to Jay Prakash).  (internal.H, support.c)
         * Added portings to GCC V.4.0, CygWIN 1.5.18, Visual C++ 2005
         and LCC-Win32 2006-03.  (noconfig.H, system.c)
         * Added some options for Visual C++.  (system.c)

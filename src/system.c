@@ -1136,7 +1136,7 @@ static void usage(
     const char *     mes[] = {
 
 "Usage:  ",
-    NULL,
+"mcpp",
 " [-<opts> [-<opts>]] [<infile> [-<opts>] [<outfile>] [-<opts>]]\n",
 "    <infile> defaults to stdin and <outfile> defaults to stdout.\n",
 
@@ -1304,7 +1304,9 @@ static void usage(
     if (opt != '?')
         fprintf( fp_err, illegopt, opt, optarg ? optarg : "");
     version();
+#if MCPP_LIB
     mes[ 1] = argv0;
+#endif
     while (*mpp)
         fputs( *mpp++, fp_err);
     longjmp( error_exit, -1);

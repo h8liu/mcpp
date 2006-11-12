@@ -574,6 +574,12 @@
 #include    "time.h"
 #include    "setjmp.h"
 
+#if     ! HOST_HAVE_GETOPT || HOST_LIB_IS_GLIBC || HOST_SYSTEM == SYS_MINGW
+#define NEED_GETOPT     TRUE
+#else
+#define NEED_GETOPT     FALSE
+#endif
+
 #if     ! (HOST_LIB_IS_GLIBC && COMPILER == GNUC && __cplusplus)
         /* Avoid conflict with glibc's declaration in C++.  */
 #ifdef  __cplusplus

@@ -352,7 +352,9 @@ int     main
     init_eval();
     init_support();
     init_system();
+#if NEED_GETOPT
     init_lib();
+#endif
 #endif
 
     fp_in = stdin;

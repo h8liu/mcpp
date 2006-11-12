@@ -481,7 +481,9 @@ extern void     init_eval( void);
 extern void     init_support( void);
 /* system.c */
 extern void     init_system( void);
+#if NEED_GETOPT
 /* lib.c    */
 extern void     init_lib( void);
+#endif
 #endif
 

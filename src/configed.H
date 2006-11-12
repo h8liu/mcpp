@@ -355,6 +355,12 @@
 #include    "setjmp.h"
 
 /* Functions other than standard.   */
+#if     ! HOST_HAVE_GETOPT || HOST_LIB_IS_GLIBC || HOST_SYSTEM == SYS_MINGW
+#define NEED_GETOPT     TRUE
+#else
+#define NEED_GETOPT     FALSE
+#endif
+
 #ifdef  __cplusplus
 extern "C" {
     char *  stpcpy( char * dest, const char * src);

@@ -18,7 +18,7 @@
 #include    "noconfig.H"
 #endif
 
-#if ! HOST_HAVE_GETOPT || HOST_LIB_IS_GLIBC || HOST_SYSTEM == SYS_MINGW
+#if NEED_GETOPT
 
 /*
  * Note: The getopt() of glibc should not be used since the specification

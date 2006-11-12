@@ -146,7 +146,7 @@ ifeq    ($(COMPILER), GNUC)
 endif
 
 clean	:
-	-rm *.o mcpp mcpp.H mcpp.err
+	-rm *.o $(NAME) mcpp.H mcpp.err
 
 uninstall:
 	rm -f $(BINDIR)/$(NAME)

@@ -30,9 +30,10 @@ OBJS = main.obj directive.obj eval.obj expand.obj support.obj system.obj  \
     mbchar.obj lib.obj
 
 # To use mcpp as a subroutine from testmain.c,
-# uncomment the following 3 lines.
-#OBJS = $(OBJS) testmain.obj
-#CFLAGS = $(CFLAGS) -DMCPP_LIB
+# uncomment the following 4 lines.
+#OBJS = main.obj directive.obj eval.obj expand.obj support.obj system.obj  \
+    mbchar.obj lib.obj testmain.obj
+#CFLAGS = -A -DMCPP_LIB
 #NAME = testmain.exe
 
 $(NAME) : $(OBJS)
@@ -64,7 +65,7 @@ install :
 
 clean	:
 	-del *.obj
-	-del *.exe
+	-del $(NAME)
 	-del mcpp.H
 	-del _*.c
 
