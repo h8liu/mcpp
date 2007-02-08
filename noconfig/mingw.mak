@@ -1,5 +1,5 @@
 # makefile to compile MCPP version 2.6.* for MinGW / GCC / GNU make
-#   2006/11   kmatsui
+#   2007/02   kmatsui
 #
 # First, you must edit GCCDIR, BINDIR, INCDIR, gcc_maj_ver and gcc_min_ver.
 # To make compiler-independent-build of MCPP do:
@@ -86,6 +86,10 @@ ifeq    ($(MCPP_LIB), 1)
 OBJS += testmain.o
 CFLAGS += -DMCPP_LIB
 NAME = testmain
+ifeq    ($(OUT2MEM), 1)
+# output to memory buffer
+CFLAGS += -DOUT2MEM
+endif
 endif
 endif
 

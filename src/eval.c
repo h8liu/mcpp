@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1998, 2002-2006 Kiyoshi Matsui <kmatsui@t3.rim.or.jp>
+ * Copyright (c) 1998, 2002-2007 Kiyoshi Matsui <kmatsui@t3.rim.or.jp>
  * All rights reserved.
  *
  * Some parts of this code are derived from the public domain software
@@ -267,11 +267,6 @@ static const SIZES  size_table[] = {
 void    init_eval( void)
 {
     skip = 0;
-#if HAVE_LONG_LONG && COMPILER == INDEPENDENT
-    w_level = 1;
-#else
-    w_level = 2;
-#endif
 }
 #endif
 
@@ -303,7 +298,7 @@ expr_t  eval( void)
 
     while (1) {
         if (debug & EXPRESSION)
-            fprintf( fp_debug
+            mcpp_fprintf( DBG
                     , "In eval loop skip = %d, binop = %d, line is: %s\n"
                     , opp->skip, binop, infile->bptr);
         skip = opp->skip;
@@ -322,22 +317,22 @@ expr_t  eval( void)
             return  0L;                     /* Token error          */
         }
         if (debug & EXPRESSION)
-            fprintf( fp_debug
+            mcpp_fprintf( DBG
                     , "op = %s, opdope = %04o, binop = %d, skip = %d\n"
                     , opname[ op], opdope[ op], binop, opp->skip);
         if (op == VAL) {                    /* Value?               */
             if (binop != 0) {               /* Binop is needed      */
                 cerror( "Misplaced constant \"%s\""         /* _E_  */
-                        , work, 0L, NULLST);
+                        , work, 0L, NULL);
                 return  0L;
             } else if (& value[ NEXP * 2] <= valp) {
                 cerror( "More than %.0s%ld constants stacked at %s" /* _E_  */
-                        , NULLST, (long) (NEXP * 2 - 1), work);
+                        , NULL, (long) (NEXP * 2 - 1), work);
                 return  0L;
             } else {
                 if (debug & EXPRESSION) {
                     dump_val( "pushing ", &ev);
-                    fprintf( fp_debug, " onto value stack[%d]\n"
+                    mcpp_fprintf( DBG, " onto value stack[%d]\n"
                             , (int)(valp - value));
                 }
                 valp->val = ev.val;
@@ -350,17 +345,17 @@ expr_t  eval( void)
         if (binop != (prec & 1)) {
             if (op == OP_EOE)
                 cerror( "Unterminated expression"           /* _E_  */
-                        , NULLST, 0L, NULLST);
+                        , NULL, 0L, NULL);
             else
                 cerror( "Operator \"%s\" in incorrect context"      /* _E_  */
-                        , opname[ op], 0L, NULLST);
+                        , opname[ op], 0L, NULL);
             return  0L;
         }
         binop = (prec & 2) >> 1;            /* Binop should follow? */
 
         while (1) {
             if (debug & EXPRESSION)
-                fprintf( fp_debug
+                mcpp_fprintf( DBG
                         , "op %s, prec %d, stacked op %s, prec %d, skip %d\n"
                 , opname[ op], prec, opname[ opp->op], opp->prec, opp->skip);
 
@@ -372,7 +367,7 @@ expr_t  eval( void)
                             && ++parens == exp_nest_min + 1)
                         cwarn(
                     "More than %.0s%ld nesting of parens"   /* _W4_ */
-                            , NULLST, (long) exp_nest_min, NULLST);
+                            , NULL, (long) exp_nest_min, NULL);
                 } else if (op == OP_QUE) {
                     prec = OP_QUE_PREC;
                 } else if (is_unary( op)) {
@@ -386,7 +381,7 @@ expr_t  eval( void)
                 if (& opstack[ NEXP * 3] <= opp) {
                     cerror(
             "More than %.0s%ld operators and parens stacked at %s"  /* _E_  */
-                            , NULLST, (long) (NEXP * 3 - 1), opname[ op]);
+                            , NULL, (long) (NEXP * 3 - 1), opname[ op]);
                     return  0L;
                 }
                 opp->op = op;
@@ -412,10 +407,10 @@ expr_t  eval( void)
                     opp->skip = op1;        /*  skipping unchanged. */
                 }
                 if (debug & EXPRESSION) {
-                    fprintf( fp_debug, "stacking %s, ", opname[ op]);
+                    mcpp_fprintf( DBG, "stacking %s, ", opname[ op]);
                     if (&value[0] < valp)
                         dump_val( "valp[-1].val == ", valp - 1);
-                    fprintf( fp_debug, " at %s\n", infile->bptr);
+                    mcpp_fprintf( DBG, " at %s\n", infile->bptr);
                     dump_stack( opstack, opp, value, valp);
                 }
                 break;
@@ -431,7 +426,7 @@ expr_t  eval( void)
             switch ((op1 = opp->op)) {      /* Look at stacked op   */
             case OP_END:                    /* Stack end marker     */
                 if (op == OP_RPA) {         /* No corresponding (   */
-                    cerror( "Excessive \")\"", NULLST, 0L, NULLST); /* _E_  */
+                    cerror( "Excessive \")\"", NULL, 0L, NULL);     /* _E_  */
                     return  0L;
                 }
                 if (op == OP_EOE)
@@ -439,7 +434,7 @@ expr_t  eval( void)
                 break;
             case OP_LPA:                    /* ( on stack           */
                 if (op != OP_RPA) {         /* Matches ) on input?  */
-                    cerror( "Missing \")\"", NULLST, 0L, NULLST);   /* _E_  */
+                    cerror( "Missing \")\"", NULL, 0L, NULL);       /* _E_  */
                     return  0L;
                 }
                 opp--;                      /* Unstack it           */
@@ -452,14 +447,14 @@ expr_t  eval( void)
                 if (opp->op != OP_QUE) {    /* Matches ? on stack?  */
                     cerror(
                     "Misplaced \":\", previous operator is \"%s\""  /* _E_  */
-                            , opname[opp->op], 0L, NULLST);
+                            , opname[opp->op], 0L, NULL);
                     return  0L;
                 }
                 /* Evaluate op1.            Fall through            */
             default:                        /* Others:              */
                 opp--;                      /* Unstack the operator */
                 if (debug & EXPRESSION) {
-                    fprintf( fp_debug, "Stack before evaluation of %s\n"
+                    mcpp_fprintf( DBG, "Stack before evaluation of %s\n"
                             , opname[ op1]);
                     dump_stack( opstack, opp, value, valp);
                 }
@@ -473,7 +468,7 @@ expr_t  eval( void)
                 valp++;
                 skip = 0;
                 if (debug & EXPRESSION) {
-                    fprintf( fp_debug, "Stack after evaluation\n");
+                    mcpp_fprintf( DBG, "Stack after evaluation\n");
                     dump_stack( opstack, opp, value, valp);
                 }
             }                               /* op1 switch end       */
@@ -529,7 +524,7 @@ static int  eval_lex( void)
                     return  VAL;            /* Parsed ok            */
             }
             cerror( "Bad defined syntax: %s"                /* _E_  */
-                    , infile->fp ? "" : infile->buffer, 0L, NULLST);
+                    , infile->fp ? "" : infile->buffer, 0L, NULL);
             break;
         } else if (cplus) {
             if (str_eq( identifier, "true")) {
@@ -562,7 +557,7 @@ static int  eval_lex( void)
     case WCHR:                              /* Wide char constant   */
         if (mode == POST_STD) {
             cerror( "Can't use a character constant %s"     /* _E_  */
-                    , work, 0L, NULLST);
+                    , work, 0L, NULL);
             break;
         }
         valp = eval_char( work);            /* 'valp' points 'ev'   */
@@ -570,12 +565,12 @@ static int  eval_lex( void)
             break;
         if (debug & EXPRESSION) {
             dump_val( "eval_char returns ", &ev);
-            fputc( '\n', fp_debug);
+            mcpp_fputc( '\n', DBG);
         }
         return  VAL;                        /* Return a value       */
     case STR:                               /* String literal       */
     case WSTR:                              /* Wide string literal  */
-        cerror( "Can't use a string literal %s", work, 0L, NULLST); /* _E_  */
+        cerror( "Can't use a string literal %s", work, 0L, NULL);   /* _E_  */
         break;
     case NUM:                               /* Numbers are harder   */
         valp = eval_num( work);             /* 'valp' points 'ev'   */
@@ -583,7 +578,7 @@ static int  eval_lex( void)
             break;
         if (debug & EXPRESSION) {
             dump_val( "eval_num returns ", &ev);
-            fputc( '\n', fp_debug);
+            mcpp_fputc( '\n', DBG);
         }
         return  VAL;
     case OPE:                           /* Operator or punctuator   */
@@ -591,7 +586,7 @@ static int  eval_lex( void)
 
     default:                                /* Total nonsense       */
         cerror( "Can't use the character %.0s0x%02lx"       /* _E_  */
-                , NULLST, (long) c, NULLST);
+                , NULL, (long) c, NULL);
         break;
     }
 
@@ -609,7 +604,7 @@ static int  chk_ops( void)
     case OP_STR:    case OP_CAT:    case OP_ELL:
     case OP_1:      case OP_2:      case OP_3:
         cerror( "Can't use the operator \"%s\""             /* _E_  */
-                , work, 0L, NULLST);
+                , work, 0L, NULL);
         return  OP_FAIL;
     default:
         return  openum;
@@ -699,7 +694,7 @@ static int  do_sizeof( void)
                     typecode &= ~T_INT;
             }
             if ((typecode & ~T_PTR) == 0) {
-                cerror( no_type, NULLST, 0L, NULLST);
+                cerror( no_type, NULL, 0L, NULL);
                 return  OP_FAIL;
             } else {
                 /*
@@ -722,7 +717,7 @@ static int  do_sizeof( void)
 
     if (debug & EXPRESSION) {
         if (sizp)
-            fprintf( fp_debug,
+            mcpp_fprintf( DBG,
             "sizp->bits:0x%x sizp->size:0x%x sizp->psize:0x%x ev.val:0x%lx\n"
                     , sizp->bits, sizp->size, sizp->psize
                     , (unsigned long) ev.val);
@@ -731,7 +726,7 @@ static int  do_sizeof( void)
 
 no_good:
     unget();
-    cerror( "sizeof: Syntax error", NULLST, 0L, NULLST);    /* _E_  */
+    cerror( "sizeof: Syntax error", NULL, 0L, NULL);        /* _E_  */
     return  OP_FAIL;
 }
 
@@ -763,7 +758,7 @@ static int  look_type(
                 goto  basic;
             }
         }
-        unget_string( work, NULLST);        /* Not long long        */
+        unget_string( work, NULL);          /* Not long long        */
         strcpy( work, "long");              /*   nor long double    */
     }
 
@@ -778,7 +773,7 @@ basic:
 
     if (tp->token_name == NULL) {
         if (! skip) {
-            cerror( unknown_type, work, 0L, NULLST);
+            cerror( unknown_type, work, 0L, NULL);
             return  0;
         } else if (warn_level & 8) {
             cwarn( unknown_type, work, 0L, non_eval);
@@ -786,7 +781,7 @@ basic:
     }
     if ((typecode & tp->excluded) != 0) {
         if (! skip) {
-            cerror( illeg_comb, work, 0L, NULLST);
+            cerror( illeg_comb, work, 0L, NULL);
             return  0;
         } else if (warn_level & 8) {
             cwarn( illeg_comb, work, 0L, non_eval);
@@ -795,7 +790,7 @@ basic:
 
     if (debug & EXPRESSION) {
         if (tp->token_name)
-            fprintf( fp_debug,
+            mcpp_fprintf( DBG,
             "sizeof -- typecode:0x%x tp->token_name:\"%s\" tp->type:0x%x\n"
                     , typecode, tp->token_name, tp->type);
     }
@@ -894,7 +889,7 @@ VAL_SIGN *  eval_num(
                 llflag = TRUE;
                 if (! stdc3 && ((! skip && (warn_level & w_level))
                         || (skip && (warn_level & 8))))
-                    cwarn( ll_suffix, nump, 0L, skip ? non_eval : NULLST);
+                    cwarn( ll_suffix, nump, 0L, skip ? non_eval : NULL);
             } else {
                 lflag = TRUE;
             }
@@ -913,7 +908,7 @@ VAL_SIGN *  eval_num(
         if (c1 == 64) {
             if (! stdc3 && ((! skip && (warn_level & w_level))
                     || (skip && (warn_level & 8))))
-                cwarn( i64_suffix, nump, 0L, skip ? non_eval : NULLST);
+                cwarn( i64_suffix, nump, 0L, skip ? non_eval : NULL);
             cp += 2;
         } else if (c1 == 32 || c1 == 16) {
             cp += 2;
@@ -945,16 +940,16 @@ VAL_SIGN *  eval_num(
 #if HAVE_LONG_LONG
     else if (erange_long && ((skip && (warn_level & 8))
             || (! stdc3 && ! skip && (warn_level & w_level))))
-        cwarn( out_of_range_long, nump, 0L, skip ? non_eval : NULLST);
+        cwarn( out_of_range_long, nump, 0L, skip ? non_eval : NULL);
 #endif
     return  & ev;
 
 range_err:
-    cerror( out_of_range, nump, 0L, NULLST);
+    cerror( out_of_range, nump, 0L, NULL);
     ev.sign = VAL_ERROR;
     return  & ev;
 num_err:
-    cerror( not_integer, nump, 0L, NULLST);
+    cerror( not_integer, nump, 0L, NULL);
     ev.sign = VAL_ERROR;
     return  & ev;
 }
@@ -1058,9 +1053,9 @@ static VAL_SIGN *   eval_char(
     } else if (erange_long && ((skip && (warn_level & 8))
             || (! stdc3 && ! skip && (warn_level & w_level)))) {
         if (wide)
-            cwarn( w_out_of_range_long, token, 0L, skip ? non_eval : NULLST);
+            cwarn( w_out_of_range_long, token, 0L, skip ? non_eval : NULL);
         else
-            cwarn( c_out_of_range_long, token, 0L, skip ? non_eval : NULLST);
+            cwarn( c_out_of_range_long, token, 0L, skip ? non_eval : NULL);
 #endif
     }
 
@@ -1071,19 +1066,19 @@ static VAL_SIGN *   eval_char(
         if (mode == STD && wide)
             cwarn(
 "Multi-character wide character constant %s%.0ld%s isn't portable"  /* _W4_ _W8_    */
-                    , token, 0L, skip ? non_eval : NULLST);
+                    , token, 0L, skip ? non_eval : NULL);
         else
             cwarn(
 "Multi-character or multi-byte character constant %s%.0ld%s isn't portable" /* _W4_ _W8_    */
-                    , token, 0L, skip ? non_eval : NULLST);
+                    , token, 0L, skip ? non_eval : NULL);
     }
     return  & ev;
 
 range_err:
     if (wide)
-        cerror( w_out_of_range, token, 0L, NULLST);
+        cerror( w_out_of_range, token, 0L, NULL);
     else
-        cerror( c_out_of_range, token, 0L, NULLST);
+        cerror( c_out_of_range, token, 0L, NULL);
     ev.sign = VAL_ERROR;
     return  & ev;
 }
@@ -1216,9 +1211,9 @@ static expr_t   eval_one(
                     && value != 0x24L && value != 0x40L && value != 0x60L)
                 || (!stdc3 && value >= 0xD800L && value <= 0xDFFFL)) {
             if (!skip)
-                cerror( ucn_malval, NULLST, (long) value, NULLST);
+                cerror( ucn_malval, NULL, (long) value, NULL);
             else if (warn_level & 8)
-                cwarn( ucn_malval, NULLST, (long) value, NULLST);
+                cwarn( ucn_malval, NULL, (long) value, NULL);
         }
         if (count >= 8 && uc1 == 'U')
             *ucn8 = TRUE;
@@ -1237,7 +1232,7 @@ undefined:
     if ((! skip && (warn_level & 1)) || (skip && (warn_level & 8)))
         cwarn(
     "Undefined escape sequence%s %.0ld'%s'"         /* _W1_ _W8_    */
-                , skip ? non_eval : NULLST, 0L, seq);
+                , skip ? non_eval : NULL, 0L, seq);
     **seq_pp = uc1;
     *seq_pp = seq + 1;
     return  (expr_t) '\\';              /* Returns the escape char  */
@@ -1247,12 +1242,12 @@ range_err:
     **seq_pp = EOS;                         /* For diagnostic       */
     if (wide) {
         if (! skip)
-            cerror( out_of_range, NULLST, (long) mbits, seq);
+            cerror( out_of_range, NULL, (long) mbits, seq);
         else if (warn_level & 8)
             cwarn( out_of_range, non_eval, (long) mbits, seq);
     } else {
         if (! skip)
-            cerror( out_of_range, NULLST, (long) CHARBIT, seq);
+            cerror( out_of_range, NULL, (long) CHARBIT, seq);
         else if (warn_level & 8)
             cwarn( out_of_range, non_eval, (long) CHARBIT, seq);
     }
@@ -1296,12 +1291,12 @@ static VAL_SIGN *   eval_eval(
     v1 = (--valp)->val;
     sign1 = valp->sign;
     if (debug & EXPRESSION) {
-        fprintf( fp_debug, "%s op %s", (is_binary( op)) ? "binary" : "unary"
+        mcpp_fprintf( DBG, "%s op %s", (is_binary( op)) ? "binary" : "unary"
                 , opname[ op]);
         dump_val( ", v1 = ", valp);
         if (is_binary( op))
             dump_val( ", v2 = ", valp + 1);
-        fputc( '\n', fp_debug);
+        mcpp_fputc( '\n', DBG);
     }
 
     if (standard
@@ -1315,7 +1310,7 @@ static VAL_SIGN *   eval_eval(
 
             v3 = (sign1 == SIGNED ? v1 : v2);
             sprintf( negate, neg_format, v3, v3);
-            cwarn( negate, skip ? non_eval : NULLST, 0L, NULLST);
+            cwarn( negate, skip ? non_eval : NULL, 0L, NULL);
         }
         valp->sign = sign1 = sign2 = UNSIGNED;
     }
@@ -1323,24 +1318,24 @@ static VAL_SIGN *   eval_eval(
             && ((! skip && (warn_level & 1)) || (skip && (warn_level & 8)))) {
         if (v2 < 0L || v2 >= sizeof (expr_t) * CHARBIT)
             cwarn( "Illegal shift count %.0s\"%ld\"%s"      /* _W1_ _W8_    */
-                , NULLST, (long) v2, skip ? non_eval : NULLST);
+                , NULL, (long) v2, skip ? non_eval : NULL);
 #if HAVE_LONG_LONG
         else if (! stdc3 && v2 >= sizeof (long) * CHARBIT
                 && ((! skip && (warn_level & w_level))
                     || (skip && (warn_level & 8))))
             cwarn(
 "Shift count %.0s\"%ld\" is larger than bit count of long%s"    /* _W1_ _W8_*/
-                , NULLST, (long) v2, skip ? non_eval : NULLST);
+                , NULL, (long) v2, skip ? non_eval : NULL);
 #endif
     }
     if ((op == OP_DIV || op == OP_MOD) && v2 == 0L) {
         if (! skip) {
-            cerror( zero_div, NULLST, 0L, NULLST);
+            cerror( zero_div, NULL, 0L, NULL);
             valp->sign = VAL_ERROR;
             return  valp;
         } else {
             if (warn_level & 8)
-                cwarn( zero_div, NULLST, 0L, non_eval);
+                cwarn( zero_div, NULL, 0L, non_eval);
             valp->sign = sign1;
             valp->val = (expr_t) EXPR_MAX;
             return  valp;
@@ -1431,7 +1426,7 @@ static expr_t   eval_signed(
         else if (! stdc3 && (v1 < 0L || v2 < 0L)
                 && ((! skip && (warn_level & 1))
                     || (skip && (warn_level & 8))))
-            cwarn( not_portable, op_name, 0L, skip ? non_eval : NULLST);
+            cwarn( not_portable, op_name, 0L, skip ? non_eval : NULL);
         if (op == OP_DIV)
             v1 /= v2;
         else
@@ -1468,7 +1463,7 @@ static expr_t   eval_signed(
         if (v1 < 0L
                 && ((!skip && (warn_level & 1))
                     || (skip && (warn_level & 8))))
-            cwarn( not_portable, op_name, 0L, skip ? non_eval : NULLST);
+            cwarn( not_portable, op_name, 0L, skip ? non_eval : NULL);
         v1 >>= v2;
         break;
     case OP_LT:     v1 = (v1 < v2);     break;
@@ -1490,7 +1485,7 @@ static expr_t   eval_signed(
         v1 = (--*valpp)->val ? v1 : v2;
         break;
     default:
-        cfatal( illeg_op, op_name, 0L, NULLST);
+        cfatal( illeg_op, op_name, 0L, NULL);
     }
 
     *valpp = valp;
@@ -1585,7 +1580,7 @@ static expr_t   eval_unsigned(
             v1 = v2u;
         break;
     default:
-        cfatal( illeg_op, op_name, 0L, NULLST);
+        cfatal( illeg_op, op_name, 0L, NULL);
     }
 
     *valpp = valp;
@@ -1614,9 +1609,9 @@ static void overflow(
         /* Else don't warn  */
     } else if (standard && (*valpp)->sign == UNSIGNED) {/* Never overflow   */
         if (warn_level & 1)
-            cwarn( out_of_range, op_name, 0L, NULLST);
+            cwarn( out_of_range, op_name, 0L, NULL);
     } else {
-        cerror( out_of_range, op_name, 0L, NULLST);
+        cerror( out_of_range, op_name, 0L, NULL);
         (*valpp)->sign = VAL_ERROR;
     }
 }
@@ -1637,7 +1632,7 @@ static void dump_val(
 #endif
     int     sign = valp->sign;
 
-    fprintf( fp_debug, format, msg, sign ? "" : "un", valp->val);
+    mcpp_fprintf( DBG, format, msg, sign ? "" : "un", valp->val);
 }
 
 static void dump_stack(
@@ -1651,19 +1646,19 @@ static void dump_stack(
  */
 {
     if (opstack < opp)
-        fprintf( fp_debug, "Index op prec skip name -- op stack at %s"
+        mcpp_fprintf( DBG, "Index op prec skip name -- op stack at %s"
                 , infile->bptr);
 
     while (opstack < opp) {
-        fprintf( fp_debug, " [%2d] %2d %04o    %d %s\n", (int)(opp - opstack)
+        mcpp_fprintf( DBG, " [%2d] %2d %04o    %d %s\n", (int)(opp - opstack)
                 , opp->op, opp->prec, opp->skip, opname[ opp->op]);
         opp--;
     }
 
     while (value <= --valp) {
-        fprintf( fp_debug, "value[%d].val = ", (int)(valp - value));
+        mcpp_fprintf( DBG, "value[%d].val = ", (int)(valp - value));
         dump_val( "", valp);
-        fputc( '\n', fp_debug);
+        mcpp_fputc( '\n', DBG);
     }
 }
 

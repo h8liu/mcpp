@@ -11,7 +11,7 @@
 <h2>== How to Port MCPP ==</h2>
 </div>
 <div align="right">
-<h4>for V.2.6.2 (2006/11)<br>
+<h4>for V.2.6.3 (2007/01)<br>
 Kiyoshi Matsui (kmatsui@t3.rim.or.jp)</h4>
 </div>
 <div align="center">
@@ -20,7 +20,7 @@ Kiyoshi Matsui (kmatsui@t3.rim.or.jp)</h4>
 
 <h4><dl><dt><a name="toc.1" href="#1">1. Overview</a>
 <dd><a name="toc.1.1" href="#1.1">1.1. High portability</a>
-<dd><a name="toc.1.2" href="#1.2">1.2. Standard mode with highest conformance and other modes</a>
+<dd><a name="toc.1.2" href="#1.2">1.2. Standard C mode with highest conformance and other modes</a>
 <dd><a name="toc.1.3" href="#1.3">1.3. Notations in this document</a>
 <br><br>
 <dt><a name="toc.2" href="#2">2. History</a>
@@ -30,12 +30,12 @@ Kiyoshi Matsui (kmatsui@t3.rim.or.jp)</h4>
 <dd><a name="toc.3.1.1" href="#3.1.1">3.1.1. Commonly required settings</a>
 <dd><a name="toc.3.1.2" href="#3.1.2">3.1.2. FreeBSD / GCC V.2.*, V.3.*, V.4.*</a>
 <dd><a name="toc.3.1.3" href="#3.1.3">3.1.3. Linux / GCC V.2.*, V.3.*, V.4.*</a>
-<dd><a name="toc.3.1.4" href="#3.1.4">3.1.4. CygWIN V.1.* / GCC V.2.*, V.3.*</a>
+<dd><a name="toc.3.1.4" href="#3.1.4">3.1.4. CygWIN / GCC V.2.*, V.3.*</a>
 <dd><a name="toc.3.1.5" href="#3.1.5">3.1.5. MinGW / GCC V.3.*</a>
 <dd><a name="toc.3.1.6" href="#3.1.6">3.1.6. LCC-Win32 2003-08, 2006-03</a>
 <dd><a name="toc.3.1.7" href="#3.1.7">3.1.7. Visual C++ 2002, 2003, 2005</a>
 <dd><a name="toc.3.1.8" href="#3.1.8">3.1.8. Borland C V.4.*, V.5.*</a></dl>
-<dd><a name="toc.3.2" href="#3.2">3.2. Compiler systems to which DECUS cpp had been ported</a>
+<dd><a name="toc.3.2" href="#3.2">3.2. Compiler systems to which DECUS-cpp had been ported</a>
 <dd><a name="toc.3.3" href="#3.3">3.3. noconfig.H, configed.H, system.H</a>
 <dd><a name="toc.3.4" href="#3.4">3.4. system.c</a>
 <dd><a name="toc.3.5" href="#3.5">3.5. lib.c</a>
@@ -83,10 +83,15 @@ Kiyoshi Matsui (kmatsui@t3.rim.or.jp)</h4>
 <br>
 
 <h1><a name="1" href="#toc.1">1. Overview</a></h1>
-<p><b>mcpp</b> is a C preprocessor developed by kmatsui (Kiyoshi Matsui) based on the DECUS cpp written by Martin Minow, and then rewritten entirely.  <b>mcpp</b> means Matsui cpp.  This software is supplied as source codes, and to use <b>mcpp</b> in any compiler systems, a small amount of compiler-system-specific modifications are required before it can be compiled into an executable.</p>
+<p><b>mcpp</b> is a C preprocessor developed by kmatsui (Kiyoshi Matsui) based on the DECUS cpp written by Martin Minow, and then rewritten entirely.  <b>mcpp</b> means Matsui cpp.  This software is supplied as source codes, and to use <b>mcpp</b> in any systems, a small amount of compiler-system-specific modifications are required before it can be compiled into an executable. *1</p>
 <p>This document explains how to port the source to different compiler systems.  Please refer to the separate manual called "mcpp-manual.html" for the operating instructions of the generated executable.</p>
-<p>All these sources and related documents are provided as free software.</p>
+<p>All these sources and related documents are provided as an open-source-software.</p>
 <p>Before going into detail, some of the <b>mcpp</b> features are introduced here.</p>
+<p>Note:</p>
+<p>*1 <b>mcpp</b> V.2.6.3 onward provides some binary packages too, at the following site.  This document, however, does not explain them.  As for the binary packages, see the web page.</p>
+<blockquote>
+<p><a href="http://mcpp.sourceforge.net/">http://mcpp.sourceforge.net/</a></p>
+</blockquote>
 <br>
 
 <h2><a name="1.1" href="#toc.1.1">1.1. High portability</a></h2>
@@ -133,7 +138,7 @@ This document uses the following typographical conventions:</p>
 <li>The one ported to Microware C of OS-9/6x09, by Gigo &amp; others, had been registered in NIFTY-SERVE / FOS9 / lib 2 in April 1989.<br>
 <br>
 <li><b>mcpp</b> V.2 is based on these, and I rewrote it entirely.  I improved the portability further.  In order to completely comply with the Standard C, I changed the partitioning of source files, added lots of macros and drastic addition/separation/rewriting/renaming of functions and variables has been done.  The size of the source is three times that of the original version.  All the documents and the Validation Suite are written completely new by me.<br>
-I release these as free software.  I do not have any relationship with DECUS.<br>
+I release these as an open-source-software.  I do not have any relationship with DECUS.<br>
 The original version does not have a version number, but I refer to them as "DECUS cpp" to differentiate them from <b>mcpp</b>.<br>
 <br>
 <li>For the algorithm of macro expansion for Standard C, the source of CPP V.5.3 (Aug 1989, CUG #319) - PDS on MS-DOS by E.Ream, was also referred to.  Additionally, I took some hints from the behavior of GCC/cpp and J. Roskind's JRCPP document.<br>
@@ -172,11 +177,10 @@ In November 2006, V.2.6.2 was released.  In this version, most of the text file 
 </blockquote>
 <p>The older version of <b>mcpp</b>, cpp V.2.2 and Validation Suite V.1.2 are located in the following Vector's web site.  They are in the directory called dos/prog/c, but they are not for MS-DOS exclusively.  Sources are for UNIX, WIN32, MS-DOS.</p>
 <blockquote>
-<p><a href="http://download.vector.co.jp/pack/dos/prog/c/cpp22src.lzh">http://download.vector.co.jp/pack/dos/prog/c/cpp22src.lzh</a><br>
-<a href="http://download.vector.co.jp/pack/dos/prog/c/cpp22bin.lzh">http://download.vector.co.jp/pack/dos/prog/c/cpp22bin.lzh</a><br>
-<a href="http://download.vector.co.jp/pack/dos/prog/c/cpp12tst.lzh">http://download.vector.co.jp/pack/dos/prog/c/cpp12tst.lzh</a></p>
+<a href="http://www.vector.co.jp/soft/dos/prog/se081188.html">http://www.vector.co.jp/soft/dos/prog/se081188.html</a><br>
+<a href="http://www.vector.co.jp/soft/dos/prog/se081189.html">http://www.vector.co.jp/soft/dos/prog/se081189.html</a><br>
+<a href="http://www.vector.co.jp/soft/dos/prog/se081186.html">http://www.vector.co.jp/soft/dos/prog/se081186.html</a><br>
 </blockquote>
-<p>http://download.vector.co.jp/ and ftp://ftp.vector.co.jp/ seem to be the same.</p>
 <p>The text files in these archive files available at Vector use [CR]+[LF] as a &lt;newline&gt; and encode Kanji in shift-JIS for DOS/Windows.  On the other hand, those from V.2.3 through V.2.5 available at SourceForge use [LF] as a &lt;newline&gt; and encode Kanji in EUC-JP for UNIX.  From V.2.6 on two types of archive, .tar.gz file with [LF]/EUC-JP and .zip file with [CR]+[LF]/shift-JIS, are provided.</p>
 <br>
 
@@ -199,7 +203,7 @@ This build is explained in <a href="#3.12">3.12</a>.
 <ul>
 <li><b>compiler-independent-build</b>:  The preprocessor which behaves on its own not depending on any compiler system.  The invocation options, for example, are the same across the compilers with which <b>mcpp</b> is compiled.  Although it can preprocess source files, it cannot behave as an integrated part of the compiler system.<br>
 While V.2.6 and V.2.6.1 called this as 'stand-alone-build', V.2.6.2 changed the name according to the creation of subroutine-build.<br>
-It is quite easy to make a compiler-independent-build.  It is explained in <a href="#3.11">3.11</a>.
+It is quite easy to make a compiler-independent-build.  It is explained in <a href="#3.11">3.11</a>. *1
 <li><b>compiler-specific-build</b>:  The preprocessor to replace (if possible)
 the resident preprocessor of certain compiler system.
 It has some peculiar specifications for the compiler system and is installed
@@ -210,10 +214,12 @@ into the compiler-system-specific directory.
 <p>There are two ways to compile <b>mcpp</b>.  The first is to automatically generate a header file named <samp>config.h</samp> and a Makefile by executing the 'configure' script. After generating them, just run 'make; make install'.  The header file named <samp>configed.H</samp> will be used in this way.  However, the configure script can only be used in UNIX-like systems and CygWIN or MinGW.</p>
 <p>Another way is to 'make' using a makefile for each compiler system, with the modified/edited (if required) header file by difference files.  <samp>noconfig.H</samp> will be used in this case.  Difference files and makefiles are in the 'noconfig' directory.  Even for systems which can use the configure script, editing header files and makefiles directly allows you to control compilation in detail.  However, difference files are only available for supported compiler systems.</p>
 <p>In this chapter, I explain how to compile <b>mcpp</b> using the difference files.  Please refer to INSTALL for the configure script.</p>
+<p>Note:<p>
+<p>*1 <b>mcpp</b> V.2.6.3 and later provides some binary packages at the SourceForge site.  They are all stand-alone and compiler-independent-builds.</p>
 <br>
 
 <h2><a name="3.1" href="#toc.3.1">3.1. Already supported compiler systems: Making Compiler-specific-build of <b>mcpp</b></a></h2>
-<p>The C/C++ compiler systems I could use are the following, and <b>mcpp</b> has been ported to all of these.  Therefore, it has been verified that this source code can be compiled, and that generated preprocessors run correctly.  In any case the CPU used is the x86 type.</p>
+<p>The C/C++ compiler systems I could use are the following, and <b>mcpp</b> has been ported to all of these.  Therefore, it has been verified that this source code can be compiled, and that generated preprocessors run correctly on each compiler system.  In any case the CPU used is the x86 type.</p>
 <blockquote>
 <table>
   <tr><th>FreeBSD 5.3        </th><td>GCC V.3.4.2</td></tr>
@@ -344,7 +350,7 @@ echo '' | g++ -xc++ -E -v -
 <p>The difference files in 'noconfig' directory named <samp>linux_gcc2953.dif, linux_gcc32.dif, linux_gcc332.dif and linux_gcc343.dif</samp> are for VineLinux 3.* / GCC V.2.95.3, V.3.2, V.3.3.2 and V.3.4.3, respectively.  <samp>linux_gcc402.dif</samp> is for openSUSE Linux / GCC V.4.0.2.  For the compiler-specific-build, change <i>COMPILER</i> too.  The include directories may vary between distributions of Linux.  Also, if another version is installed in addition to the system standard version of GCC, it should create another include directory for the specific version.  Specify the particular directory using the above macros.</p>
 <p>The specification of getopt() of glibc is different from the standard ones such as POSIX, please use the one in <samp>lib.c</samp> instead.  I assume glibc is used by default for <samp>noconfig.H</samp> in Linux.</p>
 
-<h3><a name="3.1.4" href="#toc.3.1.4">3.1.4. CygWIN V.1.* / GCC V.2.*, 3.*</a></h3>
+<h3><a name="3.1.4" href="#toc.3.1.4">3.1.4. CygWIN / GCC V.2.*, 3.*</a></h3>
 <p>For CygWIN V.1.3.10 / GCC V.2.95.3, add the changes in cyg1310.dif to <samp>noconfig.H</samp>.<br>
 For CygWIN V.1.5.18 / GCC V.3.4.4, apply cyg1518.dif.</p>
 <p>Then, rewrite the macro <i>CYGWIN_ROOT_DIRECTORY</i> to define CygWIN's root directory on Windows as:</p>
@@ -383,12 +389,12 @@ For CygWIN V.1.5.18 / GCC V.3.4.4, apply cyg1518.dif.</p>
 </pre>
 <br>
 
-<h2><a name="3.2" href="#toc.3.2">3.2. Compiler systems to which the DECUS cpp had been ported</a></h2>
+<h2><a name="3.2" href="#toc.3.2">3.2. Compiler systems to which the DECUS-cpp had been ported</a></h2>
 <p>The DECUS cpp seems to had supported RT-11/DECUS C and RSX/DECUS C on PDP-11, VMS/VAX-11C, PDP-11/UNIX and VAX/ULTRIX - some kind of C on VAX.  It also seemed to have supported a quite old version of Microsoft C and Lattice C on MS-DOS.  I removed these, as I suppose it is no longer required and I cannot maintain them.</p>
 <br>
 
 <h2><a name="3.3" href="#toc.3.3">3.3. noconfig.H, configed.H, system.H</a></h2>
-<p><samp>system.H</samp> includes <samp>configed.H</samp> when the macro <i>HAVE_CONFIG_H</i> is defined to 1, otherwise it includes <samp>noconfig.H</samp>.  PART 1 and PART 2 of the <b>mcpp</b> setting are in <samp>configed.H</samp> and <samp>noconfig.H</samp>, and PART 3 is in <samp>system.H</samp>.</p>
+<p><samp>system.H</samp> includes <samp>configed.H</samp> when the macro <i>HAVE_CONFIG_H</i> is defined to non-0, otherwise it includes <samp>noconfig.H</samp>.  PART 1 and PART 2 of the <b>mcpp</b> setting are in <samp>configed.H</samp> and <samp>noconfig.H</samp>, and PART 3 is in <samp>system.H</samp>.</p>
 <p>In these files, some macros which are required to port to each compiler system are defined.  When porting to compiler systems which have not been ported to yet, one needs to add from a few lines to a dozen lines in Part 1.</p>
 <p>Part 1 is the definition dependent on OS and target compilers, Part 2 is the definition dependent on host systems, and Part 3 is the definition of the <b>mcpp</b> behavior specification.</p>
 <p>In <samp>configed.H</samp> and <samp>noconfig.H</samp>, the target compiler system is assumed to be the same as the host, so PART 2 needs to be modified when it is different.</p>
@@ -537,6 +543,7 @@ However, since memory is scarce on MS-DOS, you may get an "out of memory" error 
 <p>PART 2 depends on the extent to which the host compiler implements the Standard's specifications, and also depends on whether the necessary functions are provided.  The most often encountered discrepancy among the compilers is implementation of 'long long' or its corresponding data type.  In Visual C 2002, 2003, 2005 and Borland C 5.5, the type is <samp>__int64</samp>.  It's length modifier for printf() is 'I64', not 'j' nor 'll', except Visual C 2005.  Hence, define the macro <i>LL_FORM</i> as "I64" for these compilers.  On MinGW, the specifier is also "I64", though it has long long.</p>
 <p>If the compiler's library has not the function stpcpy() or getopt(), define <i>HOST_HAVE_STPCPY</i> or <i>HOST_HAVE_GETOPT</i> to <i>FALSE</i>.</p>
 <p>Write makefile yourself referring the *.mak files. (Refer <a href="#3.7">3.7</a> too.)</p>
+<p>By the way, at the SourceForge site, <b>mcpp</b> V.2.6.3 and later supplies some binary packages of compiler-independent-build.  These are the ones packaged after each packaging method, and their packaging specifications are found in the setting files contained in each corresponding source package.  All the packages on FreeBSD and Linux use configure script to compile.</p>
 <p>Note:</p>
 <p>*1 In <b>mcpp</b> V.2.4 and V.2.5, the specification of the compiler-independent-build was a compromise with the compiler's specification.  From V.2.6 on, the specification is its own and independent from the compiler.</p>
 <p>*2 Even if you could compile <b>mcpp</b> on MS-DOS, you may run into shortage of memory on execution, since the memory is very scarce on MS-DOS.  You must largely cut down translation limits before compiling.  Refer 3.10.</p>
@@ -894,8 +901,8 @@ To test C99 compatibility, check n_std99.t, e_std99.t with -V199901L option.</p>
 <a href="mcpp-manual.html#3.9.7">mcpp-manual.html#3.9.7</a>.</p>
 <br>
 
-<h2><a name="5." href="#toc.5.">5.5 Information about Configure for other compiler systems than GCC</a></h2>
-<p><b>mcpp</b> provides the configure script available in UNIX-like systems.  However, I do not have any idea for other compiler systems besides GCC in UNIX systems, so some options need to be specified to configure.</p>
+<h2><a name="5.5" href="#toc.5.5">5.5. Information about Configure for other compiler systems than GCC</a></h2>
+<p><b>mcpp</b> provides the configure script available in UNIX-like systems.  However, I do not have any idea for other compiler systems besides GCC in UNIX systems, so some options need to be specified to configure compiler-specific-build.</p>
 <p>Someone who is using these compiler systems should know or be able to check about details of specifying these options.  If you know, please let me know.  I would like to do further work with the configure script.</p>
 <p>Please refer INSTALL for the configure script.</p>
 <br>
@@ -1012,8 +1019,10 @@ main(void)
 </ol>
 <p>Then, Project Manager Niibe proposed the following points:</p>
 <ol>
-<li>Support GCC 3.x and make the Validation Suite to be able to be used in testsuite of GCC.<br>
-<li>Make everything public during the development.<br>
+<li>Support GCC 3.x and make the Validation Suite to be able to be used in testsuite of GCC.
+<li>Make everything public during the development.
+Adopt standard methods of sharing development and sharing the result,
+in order to ease sharing.
 </ol>
 <p>As I wanted to do these things too, I gratefully added these points to the project.</p>
 <p>Actually, however, my project had delay after delay for various reasons.  First, I was hit by a disc crash.  Whenever I did new things, it took a long time as I had to use new software never used before.  It was also the first time to compile GCC from the source, but also I had got a few problems.  The updating of massive volumes of documents and the review and the correction of English version also took a considerable time.  Furthermore, my mother was admitted to hospital.  As a result, a part of the project, such as the support of the commercial compiler systems, had to be given up at the end.</p>

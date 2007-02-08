@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1998, 2002-2006 Kiyoshi Matsui <kmatsui@t3.rim.or.jp>
+ * Copyright (c) 1998, 2002-2007 Kiyoshi Matsui <kmatsui@t3.rim.or.jp>
  * All rights reserved.
  *
  * Some parts of this code are derived from the public domain software
@@ -354,10 +354,10 @@ const char *    set_encoding(
 
     if (strlen( name) >= NAMLEN) {
         if ((env || pragma) && (warn_level & 1)) {
-            cwarn( too_long, name, 0L, NULLST);
+            cwarn( too_long, name, 0L, NULL);
         } else {
-            fprintf( fp_err, too_long, name);
-            fputc( '\n', fp_err);
+            mcpp_fprintf( ERR, too_long, name);
+            mcpp_fputc( '\n', ERR);
         }
     }
     strcpy( norm, name);
@@ -387,10 +387,10 @@ const char *    set_encoding(
     }
     if (loc == NULL) {
         if ((env || pragma) && (warn_level & 1)) {
-            cwarn( unknown_encoding, name, 0L, NULLST);
+            cwarn( unknown_encoding, name, 0L, NULL);
         } else {                        /* -m option            */
-            fprintf( fp_err, unknown_encoding, name);
-            fputc( '\n', fp_err);
+            mcpp_fprintf( ERR, unknown_encoding, name);
+            mcpp_fputc( '\n', ERR);
         }
     } else {
         mb_init();                      /* Re-initialize        */

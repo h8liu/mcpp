@@ -1,5 +1,5 @@
 # makefile to compile MCPP version 2.6 for Linux / GCC / GNU make
-#       2006/11 kmatsui
+#       2007/02 kmatsui
 #
 # First, you must edit GCCDIR, BINDIR, INCDIR, gcc_maj_ver and gcc_min_ver.
 # To make compiler-independent-build of MCPP:
@@ -23,15 +23,15 @@
 NAME = mcpp
 
 # CC:   name of gcc executable
-#       e.g. cc, gcc, gcc-2.95.3, i686-pc-linux-gnu-gcc-3.4.3
+#       e.g. cc, gcc, gcc-2.95.3, i686-pc-linux-gnu-gcc-4.1.1
 CC = gcc
 GPP = g++
 CFLAGS = -c -O2 -Wall   # -v
+#CFLAGS += -fstack-protector-all     # for gcc 4.1 or later
 CPPFLAGS =
-#CPPFLAGS = -Wp,-v,-Q,-W3
-    # for MCPP to output a bit verbose diagnosis to "mcpp.err"
 
 LINKFLAGS = -o $(NAME)
+#LINKFLAGS += -fstack-protector-all  # for gcc 4.1 or later
 
 ifeq    ($(COMPILER), )
 # compiler-independent-build
@@ -48,15 +48,13 @@ CPPOPTS = -DCOMPILER=$(COMPILER)
 # BINDIR:   the directory where cpp0 or cc1 resides
 #BINDIR = /usr/lib/gcc-lib/i386-redhat-linux/2.95.3
 #BINDIR = /usr/local/gcc-3.2/lib/gcc-lib/i686-pc-linux-gnu/3.2
-BINDIR = /usr/lib/gcc-lib/i386-vine-linux/3.3.2
-#BINDIR = /usr/local/libexec/gcc/i686-pc-linux-gnu/3.4.3
-#BINDIR = /usr/lib/gcc/i586-suse-linux/4.0.2
+BINDIR = /usr/lib/gcc-lib/i386-vine-linux/3.3.6
+#BINDIR = /usr/local/libexec/gcc/i686-pc-linux-gnu/4.1.1
 # INCDIR:   version specific include directory
 #INCDIR = /usr/lib/gcc-lib/i386-redhat-linux/2.95.3/include
 #INCDIR = /usr/local/gcc-3.2/lib/gcc-lib/i686-pc-linux-gnu/3.2/include
-INCDIR = /usr/lib/gcc-lib/i386-vine-linux/3.3.2/include
-#INCDIR = /usr/local/lib/gcc/i686-pc-linux-gnu/3.4.3/include
-#INCDIR = /usr/lib/gcc/i586-suse-linux/4.0.2/include
+INCDIR = /usr/lib/gcc-lib/i386-vine-linux/3.3.6/include
+#INCDIR = /usr/local/lib/gcc/i686-pc-linux-gnu/4.1.1/include
 # set GCC version
 gcc_maj_ver = 3
 gcc_min_ver = 3
@@ -69,8 +67,8 @@ endif
 endif
 
 # The directory where 'gcc' (cc) command is located
-GCCDIR = /usr/bin
-#GCCDIR = /usr/local/bin
+#GCCDIR = /usr/bin
+GCCDIR = /usr/local/bin
 
 CPLUS =
 ifeq	($(CPLUS), 1)
@@ -101,6 +99,10 @@ ifeq    ($(MCPP_LIB), 1)
 OBJS += testmain.o
 CFLAGS += -DMCPP_LIB
 NAME = testmain
+ifeq    ($(OUT2MEM), 1)
+# output to memory buffer
+CFLAGS += -DOUT2MEM
+endif
 endif
 endif
 
@@ -111,6 +113,8 @@ PREPROCESSED = 0
 
 ifeq	($(PREPROCESSED), 1)
 CMACRO = -DPREPROCESSED
+#CPPFLAGS = -Wp,-v,-Q,-W3
+    # for MCPP to output a bit verbose diagnosis to "mcpp.err"
 # Make a "pre-preprocessed" header file to recompile MCPP with MCPP.
 mcpp.H	: system.H noconfig.H internal.H
 ifeq    ($(COMPILER), GNUC)

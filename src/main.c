@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1998, 2002-2006 Kiyoshi Matsui <kmatsui@t3.rim.or.jp>
+ * Copyright (c) 1998, 2002-2007 Kiyoshi Matsui <kmatsui@t3.rim.or.jp>
  * All rights reserved.
  *
  * Some parts of this code are derived from the public domain software
@@ -128,8 +128,8 @@
  */
     int     in_directive = FALSE;   /* TRUE scanning directive line */
     int     in_define = FALSE;      /* TRUE scanning #define line   */
-    int     in_getarg;              /* TRUE collecting macro arguments      */
-    int     in_include;             /* TRUE scanning #include line  */
+    int     in_getarg = FALSE;      /* TRUE collecting macro arguments      */
+    int     in_include = FALSE;     /* TRUE scanning #include line  */
     long    in_asm = 0L;    /* Starting line of #asm - #endasm block*/
 
 /*
@@ -188,7 +188,7 @@
  * falsified when compilation is supressed by a false #if or when no_output
  * is TRUE.
  */
-    int     keep_comments;              /* Write out comments flag  */
+    int     keep_comments = 0;          /* Write out comments flag  */
 
 /*
  * ifstack[] holds information about nested #if's.  It is always accessed via
@@ -294,14 +294,10 @@ static void     init_main( void)
 /* Initialize global variables on re-entering.  */
 {
     mode = STD;
-    cflag = FALSE;
-    zflag = FALSE;
-    pflag = FALSE;
-    qflag = FALSE;
+    cflag = zflag = pflag = qflag = FALSE;
     trig_flag = TRIGRAPHS_INIT;
     dig_flag = DIGRAPHS_INIT;
-    cplus = 0L;
-    stdc_ver = 0L;
+    cplus = stdc_ver = 0L;
     stdc_val = 0;
     standard = TRUE;
     lang_asm = FALSE;
@@ -312,18 +308,13 @@ static void     init_main( void)
     errors = 0;
     warn_level = -1;
     infile = NULL;
-    null = "";
-    debug = 0;
-    in_directive = FALSE;
-    in_define = FALSE;
+    in_directive = in_define = in_getarg = in_include = FALSE;
     in_asm = 0L;
     macro_line = 0L;
     compat_mode = FALSE;
-    mkdep = 0;
-    no_output = 0;
+    debug = mkdep = no_output = exp_mac_ind = keep_comments = 0;
     ifstack[0].stat = WAS_COMPILING;
-    ifstack[0].ifline = 0L;
-    ifstack[0].elseline = 0L;
+    ifstack[0].ifline = ifstack[0].elseline = 0L;
     ifptr = ifstack;
     insert_sep = NO_SEP;
     has_pragma = FALSE;
@@ -375,7 +366,7 @@ int     main
     /* Open input file, "-" means stdin.    */
     if (in_file != NULL && ! str_eq( in_file, "-")) {
         if (freopen( in_file, "r", fp_in) == NULL) {
-            fprintf( fp_err, "Can't open input file \"%s\".\n", in_file);
+            mcpp_fprintf( ERR, "Can't open input file \"%s\".\n", in_file);
             return( IO_ERROR);
         }
         strcpy( work, in_file);     /* Remember input filename      */
@@ -385,27 +376,27 @@ int     main
     /* Open output file, "-" means stdout.  */
     if (out_file != NULL && ! str_eq( out_file, "-")) {
         if (freopen( out_file, "w", fp_out) == NULL) {
-            fprintf( fp_err, "Can't open output file \"%s\".\n", out_file);
+            mcpp_fprintf( ERR, "Can't open output file \"%s\".\n", out_file);
             return( IO_ERROR);
         }
     }
     if (qflag) {                            /* Redirect diagnostics */
         if (freopen( "mcpp.err", "a", fp_err) == NULL) {
-            fprintf( fp_out, "Can't open \"mcpp.err\"\n");
+            mcpp_fprintf( OUT, "Can't open \"mcpp.err\"\n");
             return( IO_ERROR);
         }
     }
     add_file( fp_in, work);         /* "open" main input file       */
     infile->dirp = inc_dirp;
     strcpy( cur_fullname, work);
-    if (mkdep && str_eq( infile->filename, "<stdin>") == FALSE)
+    if (mkdep && str_eq( infile->real_fname, "<stdin>") == FALSE)
         put_depend( work);          /* Putout target file name      */
     at_start();                     /* Do the pre-main commands     */
 
     mcpp_main();                    /* Process main file            */
 
     if (mkdep)
-        put_depend( NULLST);    /* Append '\n' to dependency line   */
+        put_depend( NULL);      /* Append '\n' to dependency line   */
     at_end();                       /* Do the final commands        */
 
 fatal_error_exit:
@@ -416,7 +407,7 @@ fatal_error_exit:
 #endif
 
     if (errors > 0 && no_source_line == FALSE) {
-        fprintf( fp_err, "%d error%s in preprocessor.\n",
+        mcpp_fprintf( ERR, "%d error%s in preprocessor.\n",
                 errors, (errors == 1) ? "" : "s");
         return  IO_ERROR;
     }
@@ -431,13 +422,13 @@ void    sharp( void)
     if (no_output || pflag || infile == NULL)
         goto  sharp_exit;
     if (keep_comments)
-        fputc( '\n', fp_out);           /* Ensure to be on line top */
+        mcpp_fputc( '\n', OUT);         /* Ensure to be on line top */
     if (std_line_prefix)
-        fprintf( fp_out, "#line %ld", line);
+        mcpp_fprintf( OUT, "#line %ld", line);
     else
-        fprintf( fp_out, "%s%ld", LINE_PREFIX, line);
+        mcpp_fprintf( OUT, "%s%ld", LINE_PREFIX, line);
     cur_file();
-    fputc( '\n', fp_out);
+    mcpp_fputc( '\n', OUT);
 sharp_exit:
     wrong_line = FALSE;
 }
@@ -681,7 +672,7 @@ static void mcpp_main( void)
                 put_asm();                  /* Put out as it is     */
             } else if (c == '\n') {         /* Blank line           */
                 if (keep_comments)
-                    fputc( '\n', fp_out);   /* May flush comments   */
+                    mcpp_fputc( '\n', OUT); /* May flush comments   */
                 else
                     newlines++;             /* Wait for a token     */
             } else {
@@ -704,7 +695,7 @@ static void mcpp_main( void)
                 sharp();                /* Output # line number */
             } else {                    /* If just a few, stuff */
                 while (newlines-- > 0)  /* them out ourselves   */
-                    fputc('\n', fp_out);
+                    mcpp_fputc('\n', OUT);
             }
         }
 
@@ -759,7 +750,7 @@ static void do_pragma_op( void)
     char *  cp1, * cp2;
     int     c;
 
-    file = unget_string( out_ptr, NULLST);
+    file = unget_string( out_ptr, NULL);
     while (c = get(), file == infile) {
         if (c == ' ') {
             *out_ptr++ = ' ';
@@ -770,7 +761,6 @@ static void do_pragma_op( void)
                 && defp->nargs == DEF_PRAGMA) {     /* _Pragma() operator   */
             if (prev) {
                 putout( output);    /* Putout the previous sequence */
-                sharp();
                 cp1 = stpcpy( output, "pragma ");   /* From top of buffer   */
             }
             *cp1++ = get();                                 /* '('  */
@@ -791,10 +781,9 @@ static void do_pragma_op( void)
                 return;
             }
             strcpy( workp, "\n");       /* Terminate with <newline> */
-            unget_string( work, NULLST);
+            unget_string( work, NULL);
             do_pragma();                /* Do the #pragma "line"    */
             infile->bptr += strlen( infile->bptr);      /* Clear sequence   */
-            sharp();
             cp1 = out_ptr = output;     /* From the top of buffer   */
             prev = FALSE;
         } else {                        /* Not pragma sequence      */
@@ -805,7 +794,6 @@ static void do_pragma_op( void)
     unget();
     if (prev)
         putout( output);
-    sharp();
 }
 
 static void put_seq(
@@ -820,7 +808,7 @@ static void put_seq(
     int     c;
 
     cerror( "Operand of _Pragma() is not a string literal"  /* _E_  */
-            , NULLST, 0L, NULLST);
+            , NULL, 0L, NULL);
     while (c = get(), file == infile)
         *seq++ = c;
     unget();
@@ -891,7 +879,7 @@ static void devide_line(
     char *  wp;
     int     c;
 
-    file = unget_string( out, NULLST);      /* To re-read the line  */
+    file = unget_string( out, NULL);        /* To re-read the line  */
     wp = out_ptr = out;
 
     while ((c = get()), file == infile) {
@@ -903,10 +891,11 @@ static void devide_line(
             continue;
         }
         scan_token( c, &wp, out_wend);          /* Read a token     */
-        if (NWORK-1 <= wp - out_ptr) {          /* Too long a token */
-            cfatal( "Too long token %s", out_ptr, 0L, NULLST);      /* _F_  */
+        if (NWORK-2 < wp - out_ptr) {           /* Too long a token */
+            cfatal( "Too long token %s", out_ptr, 0L, NULL);        /* _F_  */
         } else if (out_end <= wp) {             /* Too long line    */
             save = save_string( out_ptr);       /* Save the token   */
+            *out_ptr++ = '\n';                  /* Append newline   */
             *out_ptr = EOS;
             put_a_line( out);           /* Putout the former tokens */
             wp = out_ptr = stpcpy( out, save);      /* Restore the token    */
@@ -942,8 +931,8 @@ static void put_a_line(
         *++out_p = '\n';
         *++out_p = EOS;
     }
-    if (fputs( out, fp_out) == EOF)
-        cfatal( "File write error", NULLST, 0L, NULLST);    /* _F_  */
+    if (mcpp_fputs( out, OUT) == EOF)
+        cfatal( "File write error", NULL, 0L, NULL);        /* _F_  */
 }
 
 
@@ -982,7 +971,7 @@ static int  post_preproc(
     char *  str;
     char *  cp = out;
 
-    unget_string( out, NULLST);
+    unget_string( out, NULL);
     while ((c = get()) != '\n') {   /* Not to read over to next line    */
         if (c == ' ') {
             *cp++ = ' ';
@@ -1017,7 +1006,7 @@ static int  post_preproc(
 #if ! HAVE_DIGRAPHS
     if (mode == STD && di_count && (warn_level & 16))
         cwarn( "%.0s%ld digraph(s) converted"           /* _W16_    */
-                , NULLST, (long) di_count, NULLST);
+                , NULL, (long) di_count, NULL);
 #endif
     return  0;
 }

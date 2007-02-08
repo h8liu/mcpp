@@ -1,5 +1,5 @@
 # makefile to compile MCPP version 2.6 for FreeBSD / GCC / UCB make
-#       2006/11 kmatsui
+#       2007/02 kmatsui
 #
 # First, you must edit GCCDIR, BINDIR, INCDIR, gcc_maj_ver and gcc_min_ver.
 # To make compiler-independent-build of MCPP do:
@@ -76,7 +76,7 @@ MALLOC =
 .if		!empty(MALLOC)
 .if		$(MALLOC) == KMMALLOC
     MEMLIB = /usr/local/lib/libkmmalloc_debug.a	# -lkmmalloc_debug
-    MEM_MACRO = -D_MEM_DEBUG -DXMALLOC
+    MEM_MACRO = -D_MEM_DEBUG -DXMALLOC -I/usr/local/include
 .endif
     MEM_MACRO += -D$(MALLOC)
 .else
@@ -87,12 +87,16 @@ MALLOC =
 OBJS = main.o directive.o eval.o expand.o support.o system.o mbchar.o lib.o
 
 .if empty(COMPILER)
-.if $(MCPP_LIB) == 1
+.if ! empty(MCPP_LIB) && $(MCPP_LIB) == 1
 # compiler-independent-build and MCPP_LIB is specified:
 # use mcpp as a subroutine from testmain.c
 OBJS += testmain.o
 CFLAGS += -DMCPP_LIB
 NAME = testmain
+.if ! empty(OUT2MEM) && (OUT2MEM) == 1
+# output to memory buffer
+CFLAGS += -DOUT2MEM
+.endif
 .endif
 .endif
 

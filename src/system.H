@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1998, 2002-2006 Kiyoshi Matsui <kmatsui@t3.rim.or.jp>
+ * Copyright (c) 1998, 2002-2007 Kiyoshi Matsui <kmatsui@t3.rim.or.jp>
  * All rights reserved.
  *
  * Some parts of this code are derived from the public domain software
@@ -274,7 +274,7 @@ typedef long            expr_t;
 #define INCLUDE_NEST        0x100
 #endif
 #ifndef NINCLUDE
-#define NINCLUDE            0x40
+#define NINCLUDE            0x80
 #endif
 #ifndef RESCAN_LIMIT
 #define RESCAN_LIMIT        0x40

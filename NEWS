@@ -1,5 +1,22 @@
 This file summarizes new major features of each MCPP release.  (kmatsui)
 
+MCPP V.2.6.3-prerelease (2007/02)
+
+1. Revised sutle points of #include and '#pragma once' handling, such as
+    dereferencing symbolic linked directory and others.
+
+2. Relaxed syntax checking and token checking in lang_asm mode.
+    Implemented variadic macro of GCC3-specification for GCC-specific-
+    build.  Increased compatibility of GCC-specific-build to GCC.
+
+3. Implemented optional memory buffer output (other than file) in
+    subroutine-build.
+
+4. Abolished 'install-data' and 'uninstall-data' targets of configured
+    makefile.  On the other hand, made 'install' target install also
+    mcpp-manual.html.
+
+
 MCPP V.2.6.2 (2006/11)
 
 1. Fixed several bugs of the previous release.

@@ -34,7 +34,7 @@ stand-alone-build.
 
 To compile MCPP, the configure script can be used on UNIX-like systems
 and CygWIN, MinGW.  You can do configure and make in any directory.  In
-this document ${mcpp-dir} represents the path of 'mcpp-2.6.2' directory.
+this document ${mcpp-dir} represents the path of 'mcpp-2.6.3' directory.
 
 2.1. The compiler-independent-build
 
@@ -56,38 +56,40 @@ directory defaults to '/usr/local'.
     sudo make install
 
 or by first 'su', then 'configure; make; make install'.
-On FreeBSD, you'd do better to use 'gmake' instead of 'make'.
+On FreeBSD, you'd better to use 'gmake' instead of 'make'.
 To strip the executable, do:
 
     make install-strip
 
 instead of 'make install'.
-To install the documents and the validation suite, do:
-
-    make install-data
 
 To uninstall the executable, do:
 
     make uninstall
 
-The documents and the validation suite will get deleted if you do:
+If you specify 'DESTDIR=DIR' option with make (un)install, all the files
+will be installed under (or uninstalled from) the 'DIR' directory.  For
+example,
 
-    make uninstall-data
+    make DESTDIR=/tmp/mcpp install
 
-If you specify 'DESTDIR=DIR' option with make (un)install*, all the
-files will be installed under (or uninstalled from) the 'DIR' directory.
-For example,
+will install mcpp into '/tmp/mcpp/usr/local/bin/', (Non-existent
+directories will be generated.  If '--prefix=DIR' option was specified
+in configure, '/usr/local' part will be replaced by 'DIR').  This option
+is used to make a binary package.
 
-    make DESTDIR=/tmp install
+GCC 4.1 or later has the option '-fstack-protector' ('-fstack-protector-
+all').  You can enable it by adding 'CFLAGS+=-fstack-protector' option
+to configure or make command.  The same can be said on GCC-specific-
+build.
 
-will install mcpp into '/tmp/usr/local/bin', (non-existent directories
-will be generated), and
-
-    make DESTDIR=/tmp install-data
-
-will install the documents into '/tmp/usr/local/share/doc/mcpp/'.  (If
-'--prefix=DIR' option was specified in configure, '/usr/local' part will
-be replaced by 'DIR').  This option is used to make a binary package.
+Though the Makefile of MCPP had 'install-data' and 'uninstall-data'
+targets upto V.2.6.2, these targets were abolished at V.2.6.3, because
+copying of documents and Validation Suite to another directory is not
+necessary when one installs MCPP from the source.  However, 'make
+install' of compiler-independent-build installs the least documents as
+well as the executable.  This is for the convenience of making a binary
+package.
 
 2.2. The compiler-specific-build
 
@@ -96,11 +98,11 @@ install it into the compiler-specific directory.
 
     ${mcpp-dir}/configure --enable-replace-cpp; make; make install
 
-'make install', 'make install-strip', 'make install-data', 'make
-uninstall', 'make uninstall-data' are the same as compiler-independent-
-build.  '--prefix' option of configure is also the same, though this is
-irrelevant to the installation directory of the executable.  'DESTDIR'
-option of make has also no relevance to the executable's installation.
+'make install', 'make install-strip', 'make uninstall' are the same as
+compiler-independent-build.  '--prefix' option of configure is also the
+same, though this is irrelevant to the installation directory of the
+executable.  'DESTDIR' option of make has also no relevance to the
+executable's installation.
 
 For the compiler systems other than GCC, however, it may not be compiled
 or installed properly if some porting work has not been done beforehand
@@ -369,6 +371,6 @@ preprocessor comprehensively.  Validation Suite has 265 items and can be
 applied to any preprocessor as well as MCPP.  Refer to 3.1 and 3.2 of
 cpp-test.html.
 
-November, 2006
+February, 2007
 Kiyoshi Matsui <kmatsui@t3.rim.or.jp>
 

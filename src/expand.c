@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1998, 2002-2006 Kiyoshi Matsui <kmatsui@t3.rim.or.jp>
+ * Copyright (c) 1998, 2002-2007 Kiyoshi Matsui <kmatsui@t3.rim.or.jp>
  * All rights reserved.
  *
  * Some parts of this code are derived from the public domain software
@@ -42,6 +42,8 @@
 #endif
 
 #define ARG_ERROR   (-255)
+#define CERROR      1
+#define CWARN       2
 
 static char *   expand_std( DEFBUF * defp, char * out, char * out_end);
                 /* Expand a macro completely (for Standard modes)   */
@@ -58,6 +60,10 @@ static int      squeeze_ws( char ** out);
                 /* Squeeze white spaces to a space  */
 static void     skip_macro( void);
                 /* Skip the rest of macro call      */
+static void     diag_macro( int severity, const char * format
+        , const char * arg1, long arg2, const char * arg3, const DEFBUF * defp1
+        , const DEFBUF * defp2) ;
+                /* Supplement diagnostic information*/
 static void     dump_args( const char * why, int nargs, char ** arglist);
                 /* Dump arguments list              */
 
@@ -109,14 +115,14 @@ static DEFBUF * is_macro_call(
             || defp->nargs == DEF_PRAGMA) { /* _Pragma() pseudo-macro       */
         c = squeeze_ws( cp);                /* See the next char.   */
         if (c == CHAR_EOF) {                /* End of file          */
-            unget_string( "\n", NULLST);    /* Restore skipped '\n' */
+            unget_string( "\n", NULL);      /* Restore skipped '\n' */
         } else if (! standard || c != RT_END) {
                         /* Still in the file and rescan boundary ?  */
             unget();                        /* To see it again      */
         }
         if (c != '(') {     /* Only the name of function-like macro */
             if (! standard && warn_level & 8)
-                cwarn( only_name, defp->name, 0L, NULLST);
+                cwarn( only_name, defp->name, 0L, NULL);
             return  NULL;
         }
     }
@@ -161,8 +167,8 @@ static char *   catenate( const DEFBUF * defp, char ** arglist, char * out
                 /* Catenate tokens                  */
 static char *   stringize( const DEFBUF * defp, char * argp, char * out);
                 /* Stringize an argument            */
-static char *   substitute( char ** arglist, const char * in, char * out
-        , char * out_end);
+static char *   substitute( const DEFBUF * defp, int gvar_arg, char ** arglist
+        , const char * in, char * out, char * out_end);
                 /* Substitute parms with arguments  */
 static char *   rescan( const DEFBUF * outer, const char * in, char * out
         , char * out_end);
@@ -191,9 +197,9 @@ static char *   expand_std(
     char *  cp;
 
     macro_line = line;                      /* Line number for diag */
-    macro_name = save_string( identifier);
+    macro_name = defp->name;
     rescan_level = 0;
-    if (replace( defp, macrobuf, macrobuf + NMACWORK, (DEFBUF *) NULLST
+    if (replace( defp, macrobuf, macrobuf + NMACWORK, NULL
             , infile) == NULL) {            /* Illegal macro call   */
         skip_macro();
         macro_line = MACRO_ERROR;
@@ -201,7 +207,7 @@ static char *   expand_std(
     }
     len = (size_t) (out_end - out);
     if (strlen( macrobuf) > len) {
-        cerror( macbuf_overflow, defp->name, 0, macrobuf);
+        cerror( macbuf_overflow, macro_name, 0, macrobuf);
         memcpy( out, macrobuf, len);
         out_p = out + len;
         macro_line = MACRO_ERROR;
@@ -217,9 +223,10 @@ static char *   expand_std(
             if (c == IN_SRC)
                 continue;                   /* Skip IN_SRC          */
             else if (c == TOK_SEP) {
-                if (c1 == ' ' || in_include)
+                if (c1 == ' ' || in_include || lang_asm)
                     continue;
                     /* Skip separator just after ' ' and in #include line   */
+                    /* Also skip this in lang_asm mode              */
                 else
                     c = ' ';
             }
@@ -233,7 +240,6 @@ exp_end:
     *out_p = EOS;
     if (debug & EXPAND)
         dump_string( "expand_std exit", out);
-    free( macro_name);
     macro_name = NULL;
     exp_mac_ind = 0;        /* Clear the information for diagnostic */
     return  out_p;
@@ -262,7 +268,7 @@ static char *   replace(
         dump_a_def( "replace entry", defp, FALSE, FALSE, TRUE, fp_debug);
         dump_unget( "replace entry");
     }
-    nargs = (defp->nargs == DEF_PRAGMA) ? 1 : (defp->nargs & ~VA_ARGS);
+    nargs = (defp->nargs == DEF_PRAGMA) ? 1 : (defp->nargs & ~AVA_ARGS);
 
     if (nargs < DEF_NOARGS - 2) {           /* __FILE__, __LINE__   */
         defp = def_special( defp);
@@ -276,7 +282,7 @@ static char *   replace(
         }
         return  out;
     } else if (nargs >= 0) {                /* Function-like macro  */
-        squeeze_ws( (char **)NULL);         /* Skip to '('          */
+        squeeze_ws( NULL);                  /* Skip to '('          */
         arglist = (char **) xmalloc( (nargs + 1) * sizeof (char *));
         arglist[ 0] = xmalloc( (size_t) (NMACWORK + IDMAX * 2));
                             /* Note: arglist[ n] may be reallocated */
@@ -301,12 +307,13 @@ static char *   replace(
 
     catbuf = xmalloc( (size_t) (NMACWORK + IDMAX));
     if (debug & EXPAND) {
-        fprintf( fp_debug, "(%s)", defp->name);
+        mcpp_fprintf( DBG, "(%s)", defp->name);
         dump_string( "prescan entry", defp->repl);
     }
     if (prescan( defp, arglist, catbuf, catbuf + NMACWORK) == FALSE) {
                                     /* Process #, ## operators      */
-        cerror( macbuf_overflow, defp->name, 0L, catbuf);
+        diag_macro( CERROR, macbuf_overflow, defp->name, 0L, catbuf, defp
+                , NULL);
         if (nargs >= 0) {
             free( arglist[ 0]);
             free( arglist);
@@ -317,25 +324,27 @@ static char *   replace(
     catbuf = xrealloc( catbuf, strlen( catbuf) + 1);
                                             /* Use memory sparingly */
     if (debug & EXPAND) {
-        fprintf( fp_debug, "(%s)", defp->name);
+        mcpp_fprintf( DBG, "(%s)", defp->name);
         dump_string( "prescan exit", catbuf);
     }
 
     if (nargs > 0) {    /* Function-like macro with any argument    */
+        int     gvar_arg;
         expbuf = xmalloc( (size_t) (NMACWORK + IDMAX));
         if (debug & EXPAND) {
-            fprintf( fp_debug, "(%s)", defp->name);
+            mcpp_fprintf( DBG, "(%s)", defp->name);
             dump_string( "substitute entry", catbuf);
         }
-        out_p = substitute( arglist, catbuf, expbuf, expbuf + NMACWORK);
-                                            /* Expand each arguments*/
+        gvar_arg = (defp->nargs & GVA_ARGS) ? (defp->nargs & ~AVA_ARGS) : 0;
+        out_p = substitute( defp, gvar_arg, arglist, catbuf, expbuf
+                , expbuf + NMACWORK);       /* Expand each arguments*/
         free( arglist[ 0]);
         free( arglist);
         free( catbuf);
         expbuf = xrealloc( expbuf, strlen( expbuf) + 1);
                                             /* Use memory sparingly */
         if (debug & EXPAND) {
-            fprintf( fp_debug, "(%s)", defp->name);
+            mcpp_fprintf( DBG, "(%s)", defp->name);
             dump_string( "substitute exit", expbuf);
         }
     } else {                                /* Object-like macro or */
@@ -370,8 +379,9 @@ static DEFBUF * def_special(
     switch (defp->nargs) {
     case DEF_NOARGS - 3:                    /* __LINE__             */
         if ((line > line_limit || line <= 0) && (warn_level & 1))
-            cwarn( "Line number %.0s\"%ld\" is out of range"        /* _W1_ */
-                    , NULLST, line, NULLST);
+            diag_macro( CWARN
+                    , "Line number %.0s\"%ld\" is out of range"     /* _W1_ */
+                    , NULL, line, NULL, defp, NULL);
         sprintf( defp->repl, "%ld", line);          /* Re-define    */
         break;
     case DEF_NOARGS - 4:                    /* __FILE__             */
@@ -440,8 +450,14 @@ static int  prescan(
                                     /* Stringize without expansion  */
             break;
         case CAT:
-            if (*prev_token == DEF_MAGIC || *prev_token == IN_SRC)
-                *prev_token++ = ' ';    /* Remove DEF_MAGIC, IN_SRC */
+            if (*prev_token == DEF_MAGIC || *prev_token == IN_SRC) {
+                memmove( prev_token, prev_token + 1, strlen( prev_token + 1));
+                *--out = EOS;           /* Remove DEF_MAGIC, IN_SRC */
+            }
+#if COMPILER == GNUC
+            if (*prev_token == ',')
+                break;      /* ', ##' sequence (peculiar to GCC)    */
+#endif
             out = catenate( defp, arglist, out, out_end, &prev_token);
             break;
         case MAC_PARM:
@@ -507,14 +523,14 @@ static char *   catenate(
             *out = EOS;                     /* An empty argument    */
         } else {
             if (mode == POST_STD) {
-                file = unget_string( argp, NULLST);
+                file = unget_string( argp, NULL);
                 while (c = get(), file == infile) {
                     prev_token = out;   /* Remember the last token      */
                     scan_token( c, &out, out_end);
                 }           /* Copy actual argument without expansion   */
                 unget();
             } else {
-                unget_string( argp, NULLST);
+                unget_string( argp, NULL);
                 while ((c = get()) != RT_END) {
                     prev_prev_token = prev_token;
                     prev_token = out;   /* Remember the last token      */
@@ -549,7 +565,7 @@ static char *   catenate(
                 || (mode == STD && *argp == RT_END))
             *out = EOS;                     /* An empty argument    */
         else {
-            unget_string( argp, NULLST);
+            unget_string( argp, NULL);
             if ((c = get()) == DEF_MAGIC)   /* Remove DEF_MAGIC     */
                 c = get();                  /*  enabling to replace */
             else if (c == IN_SRC)           /* Remove IN_SRC        */
@@ -570,7 +586,7 @@ static char *   catenate(
 
     /* The generated sequence is a valid preprocessing-token ?      */
     if (*prev_token) {                      /* There is any token   */
-        unget_string( prev_token, NULLST);  /* Scan once more       */
+        unget_string( prev_token, NULL);    /* Scan once more       */
         c = get();  /* This line should be before the next line.    */
         infile->fp = (FILE *)-1;            /* To check token length*/
         if (debug & EXPAND)
@@ -580,9 +596,11 @@ static char *   catenate(
         if (*infile->bptr != EOS) {         /* More than a token    */
             if (lang_asm) {                 /* Assembler source     */
                 if (warn_level & 2)
-                    cwarn( invalid_token, prev_token, 0L, NULLST);
+                    diag_macro( CWARN, invalid_token, prev_token, 0L, NULL
+                            , defp, NULL);
             } else {
-                cerror( invalid_token, prev_token, 0L, NULLST);
+                diag_macro( CERROR, invalid_token, prev_token, 0L, NULL, defp
+                       , NULL);
             }
             infile->bptr += strlen( infile->bptr);
         }
@@ -590,7 +608,7 @@ static char *   catenate(
         unget();
     }
 
-    if (mode == STD) {
+    if (mode == STD && ! lang_asm) {
         *out++ = TOK_SEP;                   /* Prevent token merging*/
         *out = EOS;
     }
@@ -631,7 +649,7 @@ static char *   stringize(
 
     *out_p++ = '"';
 
-    file = unget_string( argp, NULLST);
+    file = unget_string( argp, NULL);
 
     while ((c = get()), ((mode == POST_STD && file == infile)
             || (mode == STD && c != RT_END))) {
@@ -695,18 +713,22 @@ static char *   stringize(
         get();                              /* Clear the "file"     */
         unget();
         if (invalid)
-            cerror( "Not a valid string literal %s"         /* _E_  */
-                    , out, 0L, NULLST);
+            diag_macro( CERROR
+                    , "Not a valid string literal %s"       /* _E_  */
+                    , out, 0L, NULL, defp, NULL);
     }
 #if NWORK-2 > SLEN90MIN
     else if ((warn_level & 4) && out_p - out > str_len_min)
-        cwarn( "String literal longer than %.0s%ld bytes %s"        /* _W4_ */
-                , NULLST , (long) str_len_min, out);
+        diag_macro( CWARN
+                , "String literal longer than %.0s%ld bytes %s"     /* _W4_ */
+                , NULL , (long) str_len_min, out, defp, NULL);
 #endif
     return  out_p;
 }
 
 static char *   substitute(
+    const DEFBUF *  defp,           /* The macro getting arguments  */
+    int         gvar_arg,   /* gvar_arg's argument is GCC3 variable argument*/
     char **     arglist,        /* Pointers to actual arguments     */
     const char *    in,                     /* Replacement text     */
     char *      out,                        /* Output buffer        */
@@ -717,6 +739,7 @@ static char *   substitute(
  * the formal parameters in the replacement list.
  */
 {
+    char *  out_start = out;
     int     c;
 
     *out = EOS;                             /* Ensure to termanate  */
@@ -724,12 +747,31 @@ static char *   substitute(
         if (c == MAC_PARM) {                /* Formal parameter     */
             c = *in++ & UCHARMAX;           /* Parameter number     */
             if (debug & EXPAND) {
-                fprintf( fp_debug, " (expanding arg[%d])", c);
-                dump_string( NULLST, arglist[ c - 1]);
+                mcpp_fprintf( DBG, " (expanding arg[%d])", c);
+                dump_string( NULL, arglist[ c - 1]);
             }
-            if ((out = rescan( (DEFBUF *)NULL, arglist[ c - 1], out, out_end))
-                    == NULL)                /* Replace completely   */
+#if COMPILER == GNUC
+            if (c == gvar_arg && *(arglist[ c - 1]) == RT_END) {
+                /* GCC3 variadic macro and its variable argument is absent  */
+                char *  tmp;
+                tmp = out - 1;
+                while (*tmp == ' ')
+                    tmp--;
+                if (*tmp == ',') {
+                    out = tmp;      /* Remove the immediately preceding ',' */
+                    if (warn_level & 1) {
+                        *out = EOS;
+                        diag_macro( CWARN,
+            "Removed ',' preceding the absent variable macro: %s"   /* _W1_ */
+                                , out_start, 0L, NULL, defp, NULL);
+                    }
+                }
+            } else
+#endif
+            if ((out = rescan( NULL, arglist[ c - 1], out, out_end))
+                    == NULL) {              /* Replace completely   */
                 return  NULL;               /* Error                */
+            }
         } else {
             *out++ = c;                     /* Copy the character   */
         }
@@ -761,11 +803,10 @@ static char *   rescan(
     char *  out_p = out;            /* Current output pointer       */
     FILEINFO *  file;       /* Input sequences stacked on a "file"  */
     DEFBUF *    inner;              /* Inner macro to replace       */
-    int     is_able;                /* Macro is not "blue-painted"  */
     int     c;                      /* First character of token     */
 
     if (debug & EXPAND) {
-        fprintf( fp_debug, "rescan_level--%d (%s) "
+        mcpp_fprintf( DBG, "rescan_level--%d (%s) "
                 , rescan_level + 1, outer ? outer->name : "<arg>");
         dump_string( "rescan entry", in);
     }
@@ -776,7 +817,7 @@ static char *   rescan(
         unget();                    /*      for diagnostic          */
         cur_cp = infile->bptr;      /* Remember current location    */
     }
-    file = unget_string( in, outer ? outer->name : NULLST);
+    file = unget_string( in, outer ? outer->name : NULL);
                                     /* Stack input on a "file"      */
 
     while ((c = get()), file == infile
@@ -787,14 +828,18 @@ static char *   rescan(
              * may read over to file->parent (provided the "file" is macro)
              * unless stopped by RT_END.
              */
+
         if (c == ' ' || c == TOK_SEP) {
             *out_p++ = c;
             continue;
         }
         if (scan_token( c, (tp = out_p, &out_p), out_end) == NAM
                 && c != DEF_MAGIC && (inner =
-                look_id((mode == STD && c == IN_SRC) ? tp+1 : tp)) != NULL) {
+                look_id( (mode == STD && c == IN_SRC) ? tp+1 : tp)) != NULL) {
                                             /* A macro name         */
+            int     is_able;        /* Macro is not "blue-painted"  */
+            char *  inp_save = infile->bptr;        /* Remember current bptr*/
+
             if (is_macro_call( inner, &out_p)
                     && ((mode == POST_STD && is_able_repl( inner))
                         || (mode == STD
@@ -804,16 +849,25 @@ static char *   rescan(
                 if ((out_p = replace( inner, tp, out_end, outer, file))
                         == NULL)            /* Error of macro call  */
                     break;
-            } else if ((is_able = is_able_repl( inner)) == NO
+            } else {
+                if (file != infile && infile->bptr != inp_save
+                        && *(infile->bptr - 1) == ' ') {
+                    /* Has read over spaces into the parent "file"  */
+                    infile->bptr--;         /* Pushback forcibly    */
+                    out_p--;
+                }
+                if ((is_able = is_able_repl( inner)) == NO
                     || (mode == STD && is_able == READ_OVER && c != IN_SRC)) {
-                if (mode == POST_STD || c != IN_SRC)
-                    memmove( tp + 1, tp, (size_t) (out_p++ - tp));
-                *tp = DEF_MAGIC;            /* Mark not to replace  */
-            }                               /* Else not a macro call*/
+                    if (mode == POST_STD || c != IN_SRC)
+                        memmove( tp + 1, tp, (size_t) (out_p++ - tp));
+                    *tp = DEF_MAGIC;        /* Mark not to replace  */
+                }                           /* Else not a macro call*/
+            }
         }
         if (out_end <= out_p) {
             *out_p = EOS;
-            cerror( macbuf_overflow, outer ? outer->name : in, 0L, out);
+            diag_macro( CERROR, macbuf_overflow, outer ? outer->name : in, 0L
+                    , out, outer, inner);
             out_p = NULL;
             break;
         }
@@ -831,9 +885,9 @@ static char *   rescan(
                                                 /* Macro is enabled */
                             && ((!compat_mode && (warn_level & 1))
                                 || (compat_mode && (warn_level & 8)))) {
-                        cwarn(
+                        diag_macro( CWARN,
 "Replacement text \"%s\" of macro %.0ld\"%s\" involved subsequent text" /* _W1_ */
-                            , in, 0L, outer->name);
+                            , in, 0L, outer->name, outer, inner);
                     }
                 }
             }                       /* Else remove RT_END           */
@@ -843,7 +897,7 @@ static char *   rescan(
     }
     enable_repl( outer, TRUE);      /* Enable macro for later text  */
     if (debug & EXPAND) {
-        fprintf( fp_debug, "rescan_level--%d (%s) "
+        mcpp_fprintf( DBG, "rescan_level--%d (%s) "
                 , rescan_level + 1, outer ? outer->name : "<arg>");
         dump_string( "rescan exit", out);
     }
@@ -861,9 +915,9 @@ disable_repl(
     if (defp == NULL)
         return  TRUE;
     if (rescan_level >= RESCAN_LIMIT) {
-        cerror(
+        diag_macro( CERROR,
             "Rescanning macro \"%s\" more than %ld times at \"%s\"" /* _E_  */
-                , macro_name, (long) RESCAN_LIMIT, defp->name);
+                , macro_name, (long) RESCAN_LIMIT, defp->name, defp, NULL);
         return  FALSE;
     }
     replacing[ rescan_level].def = defp;
@@ -942,7 +996,7 @@ static char *   expand_prestd(
 
     macro_line = line;                      /* Line number for diag.*/
     unget_string( identifier, identifier);  /* To re-read           */
-    macro_name = save_string( identifier);
+    macro_name = defp->name;
     rescan_level = 0;
     if (setjmp( jump) == 1) {
         skip_macro();
@@ -991,7 +1045,7 @@ static char *   expand_prestd(
 
         if (mac_end <= mp) {
             *mp = EOS;
-            cerror( macbuf_overflow, defp->name, 0L, macrobuf);
+            cerror( macbuf_overflow, macro_name, 0L, macrobuf);
             longjmp( jump, 1);
         }
         if (debug & GETC) {
@@ -1007,7 +1061,7 @@ exp_end:
     macro_line = 0;
     *mp = EOS;
     if (mp - macrobuf > out_end - out) {
-        cerror( macbuf_overflow, defp->name, 0L, macrobuf);
+        cerror( macbuf_overflow, macro_name, 0L, macrobuf);
         macro_line = MACRO_ERROR;
     }
 err_end:
@@ -1015,7 +1069,6 @@ err_end:
     if (debug & EXPAND) {
         dump_string( "expand_prestd exit", out);
     }
-    free( macro_name);
     macro_name = NULL;
     exp_mac_ind = 0;
     return  out_p;
@@ -1073,8 +1126,9 @@ static int  replace_pre(
         dump_unget( "replace_pre entry");
     }
     if (++rescan_level >= PRESTD_RESCAN_LIMIT) {
-        cerror( "Recursive macro definition of \"%s\""      /* _E_  */
-                , defp->name, 0L, NULLST);
+        diag_macro( CERROR
+                , "Recursive macro definition of \"%s\""    /* _E_  */
+                , defp->name, 0L, NULL, defp, NULL);
         longjmp( jump, 1);
     }
 
@@ -1091,7 +1145,7 @@ static int  replace_pre(
         /*
          * Nothing funny about this macro.
          */
-        c = squeeze_ws( (char **)NULL);     /* Look for and skip '('*/
+        c = squeeze_ws( NULL);              /* Look for and skip '('*/
         if (c != '(') {
             /*
              * If the programmer writes
@@ -1102,7 +1156,7 @@ static int  replace_pre(
              */
             unget();
             if (warn_level & 8)
-                cwarn( only_name, defp->name, 0L, NULLST);
+                diag_macro( CWARN, only_name, defp->name, 0L, NULL, defp, NULL);
             return  FALSE;
         } else {
             arglist_pre[ 0] = xmalloc( (size_t) (NMACWORK + IDMAX * 2));
@@ -1171,7 +1225,8 @@ static void substitute_pre(
 
 nospace:
     *out_p = EOS;
-    cerror( macbuf_overflow, defp->name, 0L, file->buffer);
+    diag_macro( CERROR, macbuf_overflow, defp->name, 0L, file->buffer, defp
+            , NULL);
     longjmp( jump, 1);
 }
 
@@ -1215,7 +1270,7 @@ static int  collect_args(
 
     if (debug & EXPAND)
         dump_unget( "collect_args entry");
-    args = (defp->nargs == DEF_PRAGMA) ? 1 : (defp->nargs & ~VA_ARGS);
+    args = (defp->nargs == DEF_PRAGMA) ? 1 : (defp->nargs & ~AVA_ARGS);
     if (args == 0)                      /* Need no argument         */
         valid_argp = argp;
     *argp = EOS;                        /* Make sure termination    */
@@ -1244,11 +1299,8 @@ static int  collect_args(
             if (! more_to_come)         /* Zero argument            */
                 break;                  /* Else fall through        */
         case ',':                       /* Empty argument           */
-            if (warn_level & 2) {
-                cwarn( empty_arg, sequence, 0L, NULLST);
-                if (! no_source_line)
-                    dump_a_def( "    macro", defp, FALSE, FALSE, TRUE, fp_err);
-            }
+            if (warn_level & 2)
+                diag_macro( CWARN, empty_arg, sequence, 0L, NULL, defp, NULL);
             if (standard && var_arg && nargs == args - 1) {
                 /* Variable arguments begin with an empty argument  */
                 c = get_an_arg( c, &argp, arg_end, &seq, 1);
@@ -1268,9 +1320,7 @@ static int  collect_args(
         case '\n':      /* Unterminated macro call in control line  */
             unget();                    /* Fall through             */
         case RT_END:                    /* Error of missing ')'     */
-            cerror( unterm_macro, sequence, 0L, NULLST);
-            if (! no_source_line)
-                dump_a_def( "    macro", defp, FALSE, FALSE, TRUE, fp_err);
+            diag_macro( CERROR, unterm_macro, sequence, 0L, NULL, defp, NULL);
                                         /* Fall through             */
         case CHAR_EOF:                  /* End of file in macro call*/
             goto  arg_ret;              /* Diagnosed by at_eof()    */
@@ -1291,34 +1341,27 @@ static int  collect_args(
         if (c == 0)                     /* End of file              */
             goto  arg_ret;              /* Diagnosed by at_eof()    */
         if (c == -1) {                  /* Untermanated macro call  */
-            cerror( unterm_macro, sequence, 0L, NULLST);
-            if (! no_source_line)
-                dump_a_def( "    macro", defp, FALSE, FALSE, TRUE, fp_err);
+            diag_macro( CERROR, unterm_macro, sequence, 0L, NULL, defp, NULL);
             goto  arg_ret;
         }
         more_to_come = (c == ',');
     }                                   /* Collected all arguments  */
 
     if (nargs == 0 && args == 1) {      /* Only and empty argument  */
-        if (warn_level & 2) {
-            cwarn( empty_arg, sequence, 0L, NULLST);
-            if (! no_source_line)
-                dump_a_def( "    macro", defp, FALSE, FALSE, TRUE, fp_err);
-        }
+        if (warn_level & 2)
+            diag_macro( CWARN, empty_arg, sequence, 0L, NULL, defp, NULL);
     } else if (nargs != args) {         /* Wrong number of arguments*/
         if (mode != OLD_PREP || (warn_level & 1)) {
-            if (((standard && var_arg && (nargs == args -1))
-                                        /* Empty variable arguments */
-                        || (mode == OLD_PREP))
-                    && (warn_level & 1)) {
-                cwarn( narg_error, nargs < args ? "Less" : "More"
-                        , (long) args, sequence);
+            if ((standard && var_arg && (nargs == args - 1))
+                                /* Absence of variable arguments    */
+                        || (mode == OLD_PREP)) {
+                if (warn_level & 1)
+                    diag_macro( CWARN, narg_error, nargs < args ? "Less"
+                            : "More", (long) args, sequence, defp, NULL);
             } else {
-                cerror( narg_error, nargs < args ? "Less" : "More"
-                        , (long) args, sequence);
+                diag_macro( CERROR, narg_error, nargs < args ? "Less" : "More"
+                        , (long) args, sequence, defp, NULL);
             }
-            if (! no_source_line)
-                dump_a_def( "    macro", defp, FALSE, FALSE, TRUE, fp_err);
         }
     }
     if (args < nargs) {
@@ -1491,6 +1534,30 @@ static void skip_macro( void)
     unget();
 }
 
+static void diag_macro(
+    int     severity,                       /* Error or warning     */ 
+    const char *    format,
+    const char *    arg1,
+    long            arg2, 
+    const char *    arg3,
+    const DEFBUF *  defp1,          /* Macro causing the problem 1  */
+    const DEFBUF *  defp2                                   /*   2  */
+)
+/*
+ * Supplement macro information for diagnostic.
+ */
+{
+
+    if (defp1 && defp1->name != macro_name)
+        expanding( defp1->name);   /* Inform of the problematic macro call */
+    if (defp2 && defp2->name != macro_name)
+        expanding( defp2->name);
+    if (severity == CERROR)
+        cerror( format, arg1, arg2, arg3);
+    else
+        cwarn( format, arg1, arg2, arg3);
+}
+
 static void dump_args(
     const char *    why,
     int     nargs,
@@ -1502,10 +1569,10 @@ static void dump_args(
 {
     int     i;
 
-    fprintf( fp_debug, "dump of %d actual arguments %s\n", nargs, why);
+    mcpp_fprintf( DBG, "dump of %d actual arguments %s\n", nargs, why);
     for (i = 0; i < nargs; i++) {
-        fprintf( fp_debug, "arg[%d]", i + 1);
-        dump_string( NULLST, arglist[ i]);
+        mcpp_fprintf( DBG, "arg[%d]", i + 1);
+        dump_string( NULL, arglist[ i]);
     }
 }
 

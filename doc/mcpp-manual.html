@@ -11,7 +11,7 @@
 <h2>== How to Use MCPP ==</h2>
 </div>
 <div align="right">
-<h4>for V.2.6.2 (2006/11)<br>
+<h4>for V.2.6.3 (2007/01)<br>
 Kiyoshi Matsui (kmatsui@t3.rim.or.jp)</h4>
 </div>
 <div align="center">
@@ -52,16 +52,16 @@ Kiyoshi Matsui (kmatsui@t3.rim.or.jp)</h4>
 <dd><a name="toc.3.5.6" href="#3.5.6">3.5.6. #pragma MCPP debug getc, #debug getc</a>
 <dd><a name="toc.3.5.7" href="#3.5.7">3.5.7. #pragma MCPP debug memory, #debug memory</a></dl>
 <dd><a name="toc.3.6" href="#3.6">3.6. #assert, #asm, #endasm</a>
-<dd><a name="toc.3.7" href="#3.7">3.7. New C99 Features</a>
+<dd><a name="toc.3.7" href="#3.7">3.7. New C99 Features (_Pragma() operator, Variadic Macro and others)</a>
 <dd><a name="toc.3.8" href="#3.8">3.8. Asm Statement in Borland C and Other Special Syntaxes</a>
 <dd><dl><dt><a name="toc.3.9" href="#3.9">3.9. Compatibility with GCC</a>
-<dd><a name="toc.3.9.1" href="#3.9.1">3.9.1. Preprocessing FreeBSD 2/Kernel</a>
+<dd><a name="toc.3.9.1" href="#3.9.1">3.9.1. Preprocessing FreeBSD 2/Kernel Sources</a>
 <dd><a name="toc.3.9.2" href="#3.9.2">3.9.2. Preprocessing FreeBSD 2/Libc</a>
 <dd><a name="toc.3.9.3" href="#3.9.3">3.9.3. Problems Concerning GCC 2/cpp</a>
 <dd><a name="toc.3.9.4" href="#3.9.4">3.9.4. Preprocessing Linux/glibc 2.1</a>
 <dd><dl><dt><a name="toc.3.9.5" href="#3.9.5">3.9.5. To Use <b>mcpp</b> with GCC 2</a>
 <dd><a name="toc.3.9.5.1" href="#3.9.5.1">3.9.5.1. To Sort <b>mcpp</b>'s Warnings</a></dl>
-<dd><a name="toc.3.9.6" href="#3.9.6">3.9.6. Preprocessing GCC 3.2</a>
+<dd><a name="toc.3.9.6" href="#3.9.6">3.9.6. Preprocessing GCC 3.2 Source</a>
 <dd><a name="toc.3.9.7" href="#3.9.7">3.9.7. To Use <b>mcpp</b> with GCC 3 or 4</a>
 <dd><a name="toc.3.9.8" href="#3.9.8">3.9.8. The Problems of Linux / stddef.h, limits.h and #include_next</a></dl>
 <dd><dl><dt><a name="toc.3.10" href="#3.10">3.10. Visual C++ System Header Problems</a>
@@ -119,10 +119,15 @@ Kiyoshi Matsui (kmatsui@t3.rim.or.jp)</h4>
 <br>
 
 <h1><a name="1" href="#toc.1">1. Overview</a></h1>
-<p><b>mcpp</b> is a C preprocessor developed by kmatsui (Kiyoshi Matsui) based on DECUS cpp written by Martin Minow, and then rewritten entirely.  <b>mcpp</b> means Matsui cpp.  This software is supplied as source codes, and to use <b>mcpp</b> in any compiler systems, a small amount of modifications to adapt to the compiler system are required before it can be compiled into an executable.</p>
+<p><b>mcpp</b> is a C preprocessor developed by kmatsui (Kiyoshi Matsui) based on DECUS cpp written by Martin Minow, and then rewritten entirely.  <b>mcpp</b> means Matsui cpp.  This software is supplied as source codes, and to use <b>mcpp</b> in any compiler systems, a small amount of modifications to adapt to the compiler system are required before it can be compiled into an executable. *1</p>
 <p>This document describes the specification for <b>mcpp</b> executables that has been already ported to certain compiler systems.  For those who want to know more about <b>mcpp</b> or want to port it to other compiler systems, refer to <b>mcpp</b> source and its document "mcpp-porting.html".</p>
-<p>All these sources and related documents are provided as free software.</p>
+<p>All these sources and related documents are provided as an open-source-software.</p>
 <p>Before going into detail, some of the <b>mcpp</b> features are introduced here.</p>
+<p>Note:</p>
+<p>*1 <b>mcpp</b> V.2.6.3 onward provides some binary packages too, at the following site.</p>
+<blockquote>
+<p><a href="http://mcpp.sourceforge.net/">http://mcpp.sourceforge.net/</a></p>
+</blockquote>
 <br>
 
 <h2><a name="1.1" href="#toc.1.1">1.1. High portability</a></h2>
@@ -159,11 +164,10 @@ Kiyoshi Matsui (kmatsui@t3.rim.or.jp)</h4>
 </blockquote>
 <p>The old version of <b>mcpp</b>, cpp V.2.2 and Validation Suite V.1.2 are located in the following Vector's web site.  They are in the directory called dos/prog/c, but they are not for MS-DOS exclusively.  Sources are for UNIX, WIN32, MS-DOS.</p>
 <blockquote>
-<p><a href="http://download.vector.co.jp/pack/dos/prog/c/cpp22src.lzh"> http://download.vector.co.jp/pack/dos/prog/c/cpp22src.lzh</a><br>
-<a href="http://download.vector.co.jp/pack/dos/prog/c/cpp22bin.lzh"> http://download.vector.co.jp/pack/dos/prog/c/cpp22bin.lzh</a><br>
-<a href="http://download.vector.co.jp/pack/dos/prog/c/cpp12tst.lzh"> http://download.vector.co.jp/pack/dos/prog/c/cpp12tst.lzh</a></p>
+<a href="http://www.vector.co.jp/soft/dos/prog/se081188.html">http://www.vector.co.jp/soft/dos/prog/se081188.html</a><br>
+<a href="http://www.vector.co.jp/soft/dos/prog/se081189.html">http://www.vector.co.jp/soft/dos/prog/se081189.html</a><br>
+<a href="http://www.vector.co.jp/soft/dos/prog/se081186.html">http://www.vector.co.jp/soft/dos/prog/se081186.html</a><br>
 </blockquote>
-<p>http://download.vector.co.jp/ and ftp://ftp.vector.co.jp/ seem to be the same.</p>
 <p>The text files in these archive files available at Vector use [CR]+[LF] as a &lt;newline&gt; and encode Kanji in shift-JIS for DOS/Windows.  On the other hand, those from V.2.3 through V.2.5 available at SourceForge use [LF] as a &lt;newline&gt; and encode Kanji in EUC-JP for UNIX.  From V.2.6 on two types of archive, .tar.gz file with [LF]/EUC-JP and .zip file with [CR]+[LF]/shift-JIS, are provided.</p>
 <br>
 
@@ -183,7 +187,7 @@ This manual uses the following typographical conventions:</p>
 <h1><a name="2" href="#toc.2">2. Invocation Options and Environment Settings</a></h1>
 
 <h2><a name="2.1" href="#toc.2.1">2.1. Two Kinds of Build and Five Behavioral Modes</a></h2>
-<p>There are two types of build (or compiling configuration) for <b>mcpp</b> executable. *1</p>
+<p>There are two types of build (or compiling configuration) for <b>mcpp</b> executable. *1, *2</p>
 <ol>
 <li><b>Compiler-independent-build</b>: the preprocessor which behaves on its own not depending on compiler system.  The invocation options of compiler-independent-build are the same across the compilers with which <b>mcpp</b> is compiled.  Although it can preprocess source files, it cannot behave as an integrated part of a compiler system.<br>
 <li><b>Compiler-specific-build</b>: the preprocessor to replace the resident preprocessor of certain compiler system, if possible.  Each compiler-specific-build has some different specifications for compatibility with the compiler system.  It has the options common with the compiler-independent-build, except a few options different from the commons to avoid conflict with the compiler system.<br>
@@ -209,7 +213,7 @@ The <i>KR</i> mode.<br>
 <li><samp>-@oldprep, -@old</samp><br>
 The <i>OLDPREP</i> mode.<br>
 </ul>
-<p>In this document, I group <i>OLDPREP</i> and <i>KR</i> into pre-Standard modes, and group <i>STD</i>, <i>COMPAT</i> and <i>POSTSTD</i> into Standard modes.  Since <i>COMPAT</i> mode is almost the same with <i>STD</i> mode, <i>STD</i> includes <i>COMPAT</i> unless otherwise mentioned. *2</p>
+<p>In this document, I group <i>OLDPREP</i> and <i>KR</i> into pre-Standard modes, and group <i>STD</i>, <i>COMPAT</i> and <i>POSTSTD</i> into Standard modes.  Since <i>COMPAT</i> mode is almost the same with <i>STD</i> mode, <i>STD</i> includes <i>COMPAT</i> unless otherwise mentioned. *3</p>
 <p>There are differences in the macro expansion methods between Standard and pre-Standard modes.  Roughly speaking, this difference is the difference between C90 and pre-C90.  The biggest difference is the expansion of the function-like macros (macros with arguments).  For the arguments with macros, while in Standard mode, <b>mcpp</b> substitutes the parameter within the replacement list of the original macro after completely expanding the arguments, in pre-Standard, <b>mcpp</b> substitutes the parameter without expanding, then expands the argument at rescan time.</p>
 <p>Also, in Standard mode, a macro is not expanded recursively in principle, even if the macro definition is recursive directly or indirectly.  If there is a recursive macro definition in pre-Standard mode, it causes infinite recursion and becomes an error at expansion time.</p>
 <p>Handling of \ at line end is also different by mode.  In Standard mode, after processing the trigraph, the sequence of &lt;backslash&gt;&lt;newline&gt; gets deleted before tokenization, but in pre-Standard mode, these only get deleted when they are within the string literals or in a #define line.</p>
@@ -240,7 +244,7 @@ The <i>OLDPREP</i> mode.<br>
 Expand recursive macro more than the Standard's specification.  On expanding recursive macro, set the range of non-re-replacing of the same name narrower than the Standard.<br>
 <br>
 Refer to 
-<a href="cpp-test.html#3.4.26"> cpp-test.html#3.4.26</a> about the specifications of recursive macro expansion.  See test-t/recurs.t for a sample of recursive macro. *3<br>
+<a href="cpp-test.html#3.4.26"> cpp-test.html#3.4.26</a> about the specifications of recursive macro expansion.  See test-t/recurs.t for a sample of recursive macro. *4<br>
 <br>
 <li><i>POSTSTD</i><br>
 This mode differs from <i>STD</i> mode in the following points:<br>
@@ -260,8 +264,9 @@ This mode differs from <i>STD</i> mode in the following points:<br>
 <p>For the above reasons, there are some different specifications in <b>mcpp</b> executables.  So, please read this manual carefully.  This chapter describes first the common options, next the behavioral-mode-dependent options, then the the options common to most compiler systems, finally the compiler-dependent options for each compiler-specific-build.</p>
 <p>Note:</p>
 <p>*1 There is another one named <b>subroutine-build</b> which is called as a subroutine from some other main program.  The behavioral specification of subroutine-build is, however, the same with either of compiler-specific-build or compiler-independent-build according to its compile time setting.  Hence, this manual does not mention subroutine-build particularly.</p>
-<p>*2 <b>mcpp</b> had two separate executables for Standard mode and pre-Standard mode; they were integrated into one at V.2.6.</p>
-<p>*3 This option is for compatibility with GCC, Visual C++ and other major implementations.  'compat' means "compatible mode".</p>
+<p>*2 The binary packages provided at the SourceForge site are of compiler-independent-builds.</p>
+<p>*3 <b>mcpp</b> had two separate executables for Standard mode and pre-Standard mode; they were integrated into one at V.2.6.</p>
+<p>*4 This option is for compatibility with GCC, Visual C++ and other major implementations.  'compat' means "compatible mode".</p>
 <br>
 
 <h2><a name="2.2" href="#toc.2.2">2.2. How to Specify Invocation Options</a></h2>
@@ -281,7 +286,7 @@ mcpp [-&lt;opts&gt; [-&lt;opts&gt;]] [in_file] [out_file] [-&lt;opts&gt; [-&lt;o
 <p>When invalid options are specified, a usage statement is displayed.  To check valid options, enter a command, such as "mcpp -?".  In addition to the usage message, there are several error messages, but they are self-explanatory.  I will omit their explanations.</p>
 <br>
 
-<h2><a name="2.3" href="#toc.2.3">2.3. General Options</a></h2>
+<h2><a name="2.3" href="#toc.2.3">2.3. Common Options</a></h2>
 <p>This section covers common options across <b>mcpp</b> modes or compiler systems.</p>
 <ul>
 <li><samp>-C</samp><br>
@@ -381,7 +386,7 @@ The preprocessing result of the #included files is not output, but macros are de
 </ol>
 <br>
 
-<h2><a name="2.4" href="#toc.2.4">2.4. Options by <b>mcpp</b> Mode</a></h2>
+<h2><a name="2.4" href="#toc.2.4">2.4. Options by <b>mcpp</b> Behavioral Modes</a></h2>
 <p><b>mcpp</b> has several behavioral modes.  For their specifications refer to sec 
 <a href="#2.1"> 2.1</a>.</p>
 <p>This manual shows a list of various <b>mcpp</b> behaviors by mode, which may not readable.  Please be patient.  In this manual, all the uppercased names that do not begin with "__" and displayed in italics, such as <i>DIGRAPHS_INIT</i>, <i>TRUE</i>, <i>FALSE</i>, etc, are macros defined in system.H.  These macros are only used for compiling <b>mcpp</b> itself and a <b>mcpp</b> executable generated does not predefine these macros.  You must understand this point clearly.</p>
@@ -430,7 +435,7 @@ Reverse initial settings for the trigraphs processing.  With <i>TRIGRAPHS_INIT</
 <p>*4 This is for compatibility with GCC.</p>
 <br>
 
-<h2><a name="2.5" href="#toc.2.5">2.5. General Options Except for Some Compiler Systems</a></h2>
+<h2><a name="2.5" href="#toc.2.5">2.5. Common Options Except for Some Compiler Systems</a></h2>
 <p>Since GCC has so many options that GCC-specific-build of <b>mcpp</b> has some different options from the other builds in order to avoid conflicts with GCC.  Note that the options in compiler-independent-build are all the same even if compiled by GCC.  The options common to the builds other than GCC-specific are as follows.</p>
 <ul>
 <li><samp>-a</samp><br>
@@ -776,7 +781,7 @@ vcexpress &lt;Project File&gt; /useenv
 <p>*1  Actual processing is a little more complex.  When <b>mcpp</b> encounters a '#pragma MCPP preprocessed', <b>mcpp</b> outputs lines it has read just as they are, except for #line lines, which compiler-specific-build of <b>mcpp</b> converts and outputs into a format that the compiler-proper can accept.  <b>mcpp</b> disregards predefined standard macro because its #define line is enclosed with comment marks.</p>
 <p>*2  Therefore, information on where a macro definition is found is not lost during pre-preprocessing.</p>
 
-<h3><a name="3.1.1" href="#toc.3.1.1">3.1.1. Pre-Preprocessing Header File</a></h3>
+<h3><a name="3.1.1" href="#toc.3.1.1">3.1.1. Pre-preprocessing of Header File</a></h3>
 <p>With above directives, you can "pre-preprocess" header files.  Pre-preprocessing considerably saves the entire preprocessing time.  I think the explanation so far has already given you an understanding of how to pre-preprocess header files, but to deepen your understanding, let me explain it by taking an example of <b>mcpp</b>'s own source code.</p>
 <p><b>mcpp</b> source consists of eight *.c files, of which seven files include "system.H" and "internal.H".  No other headers are included.  The source looks like this:</p>
 <pre>
@@ -1030,7 +1035,7 @@ asm (
 <p>However, this is not suitable for a longer assembly code, in which case, you had better write the assembly code as a separate file like a library function, and assemble and link the program.  This seems to be inconvenient, but it is necessary to separate the assembler portion completely to write a portable C program.  It is recommended that you should write assembly code in a separate file rather than using #asm.</p>
 <br>
 
-<h2><a name="3.7" href="#toc.3.7">3.7. New C99 Features</a></h2>
+<h2><a name="3.7" href="#toc.3.7">3.7. New C99 Features (_Pragma() operator, Variadic Macro and others)</a></h2>
 <p>These features are available in Standard mode.  The -V199901L option with <tt>__STDC_VERSION__</tt> set to 199901L enables the following C99's features.  The same thing can be said with C++ for the -V199901L option with <tt>__cplusplus</tt> set to 199901L or more.  Although C++ Standard does not provides for the features other than 1 or 7, <b>mcpp</b> in Standard mode provides them for better compatibility with C99.  Standard mode also allows variable argument macros even in the C90 and C++ modes. *1</p>
 <ol>
 <li>Treats the text from // to the end of a line as a comment.<br>
@@ -1059,7 +1064,7 @@ debug( "X = %d\n", x);
 <pre>
 fprintf(stderr, "X = %d\n", x);
 </pre>
-<p>"..." in the parameter list corresponds to one or more parameters.  In the above example, "..." corresponds to __VA_ARGS__ in the replacement list.  During a macro invocation, several arguments that correspond to the "...", including ",", are concatenated to be treated as one argument.</p>
+<p><samp>...</samp> in the parameter list corresponds to one or more parameters.  In the above example, <samp>...</samp> corresponds to <samp>__VA_ARGS__</samp> in the replacement list.  During a macro invocation, several arguments that correspond to the <samp>...</samp>, including ",", are concatenated to be treated as one argument.</p>
 <p>_Pragma( "foo bar") has the same effect as specifying #pragma foo bar.  The argument of the _Pragma() operator must be one string literal or wide string literal.  For a wide string, the prefix (L) is deleted and treated as same as a string literal.  For a string literal, " enclosing that string literal is deleted, and \" and \\ in that literal is replaced with " and \, respectively, before it is treated as a #pragma argument.</p>
 <p>#pragma must be written somewhere in one logical line and its argument is not macro-expanded at least for C90.  On the other hand, the _Pragma() operator can be written anywhere in source code (even in a replacement list), which gives the same effect with #pragma written in a logical line.  The _Pragma() operator generated during macro expansion is also valid.  This flexibility provides the pragma directive with a wide range of portability and allows a header file to absorb the difference in #pragma among compiler systems. (For this sample, see pragmas.h and pragmas.t of "Validation Suite".) *2</p>
 <p>C99 stipulates a #if expression is of maximum integer type.  As "long long" and "unsigned long long" are required types, the type of an #if expression is "long long / unsigned long long" or larger.  C90 and C++98 stipulate the type is long / unsigned long.  <b>mcpp</b>, however, evaluates it by long long / unsigned long long even in C90 and C++98, and issues a warning when the value is out of range of long / unsigned long. *1</p>
@@ -1175,7 +1180,7 @@ asm(
         printf(fmt, ## a);          \
         }
 </pre>
-<p>This is a GCC-specific enhanced specification and cannot be applied to other compiler systems.  The above "## a" can be simply written as "a".  With ## and in the absence of an argument corresponding to "a..." in a macro invocation, the preceding comma is deleted.  C99 also provides for variable argument macros, but their notation differs from that of GCC.  The above example is written as follows in C99:</p>
+<p>This is a GCC-specific enhanced specification and cannot be applied to other compiler systems.  The above "## a" can be simply written as "a".  With ## and in the absence of an argument corresponding to "<samp>a...</samp>" in a macro invocation, the preceding comma is deleted.  C99 also provides for variable argument macros, but their notation differs from that of GCC.  The above example is written as follows in C99:</p>
 <pre>
 #define MCD_TRACE( ...)             \
 {                                   \
@@ -1192,7 +1197,7 @@ asm(
        printf( __VA_ARGS__);   \
        }
 </pre>
-<p>The most annoying difference is that in C99 requires one or more arguments on a macro invocation corresponding to "..." while GNUC/cpp requires 0 or more arguments corresponding to "a...".  To handle this, when there is no argument corresponding to "...", <b>mcpp</b> issues a warning, instead of making it an error.  Therefore, you can change the above code as follows:</p>
+<p>The most annoying difference is that in C99 requires one or more arguments on a macro invocation corresponding to "<samp>...</samp>" while GNUC/cpp requires 0 or more arguments corresponding to "<samp>a...</samp>".  To handle this, when there is no argument corresponding to "<samp>...</samp>", <b>mcpp</b> issues a warning, instead of making it an error.  Therefore, you can change the above code as follows:</p>
 <pre>
 #define MCD_TRACE(fmt, ...)         \
 {                                   \
@@ -1297,7 +1302,7 @@ asm(
 <p>Note:</p>
 <p>*1 In FreeBSD 2.0-R, these kernel sources are contained not in *.S but in *.s file.  The Makefile is so defined as to call 'cpp', instead of 'cc', to process them.  Then the 'cc' calls 'as'.  When the 'cpp' is called, '/usr/bin/cpp' is invoked.  '/usr/bin/cpp' is a shell-script that calls '/usr/libexec/cpp -traditional'.  This method was more convenient in that it provides a way to change preprocessors to be used by modifying the script.</p>
 
-<h3><a name="3.9.2" href="#toc.3.9.2">3.9.2. Preprocess of FreeBSD 2/libc Source</a></h3>
+<h3><a name="3.9.2" href="#toc.3.9.2">3.9.2. Preprocessing FreeBSD 2/libc Source</a></h3>
 <p>I recompiled all the source files in <samp>/usr/src/lib/libc</samp> of FreeBSD 2.2.2R.  There was no problem, probably because most of them comes from 4.4BSD-Lite without much modification.  It is quite rare and surprising that a huge amount of source files in excellent quality is gathered together.</p>
 <p>Only at one place, I found the following coding in gen/getgrent.c.  Of course, ";" at the end of line is surplus.</p>
 <pre>
@@ -1312,7 +1317,7 @@ asm(
 <p>Note:</p>
 <p>*1 I wrote 3.9.3 subsection in 1998.  After that, gcc's man page or info deleted this expression, however, the specification remains almost the same.</p>
 
-<h3><a name="3.9.4" href="#toc.3.9.4">3.9.4. Preprocessing Linux/glibc 2.1 Source</a></h3>
+<h3><a name="3.9.4" href="#toc.3.9.4">3.9.4. Preprocessing Linux/glibc 2.1</a></h3>
 <p>I recompiled glibc (GNU LIBC) 2.1.3 sources.  Different from those of FreeBSD libc, I found many problems.  Some sources are written based on GCC/cpp's undocumented specifications, in which case it took me a lot of time to identify them.</p>
 
 <h4>3.9.4.1. Multi-Line String Literal</h4>
@@ -1493,7 +1498,7 @@ ln -sf cpp_gnuc cpp
 <p>*1 If you use 'configure' and 'make' to compile GCC-specific-build of <b>mcpp</b>, the 'make install' command will set the script appropriately.  The only thing left for you here is to add '-Q -lang-asm' options to the script.</p>
 
 <h4><a name="3.9.5.1" href="#toc.3.9.5.1">3.9.5.1. To Sort <b>mcpp</b>'s Warnings</a></h4>
-<p>Another problem of using <b>mcpp</b> is that it issues a huge amount of warning messages.  You can redirect them to a file using the -Q option, but when you uses with the -W3 option to preprocess a large amount of source code, such as glibc, total of several hundred MB of mcpp.err' are created, so it is impossible for you to look through the whole files.</p>
+<p>Another problem of using <b>mcpp</b> is that it issues a huge amount of warning messages.  You can redirect them to a file using the -Q option, but when you preprocess a large amount of source code, such as glibc, total of several hundred MB or more of 'mcpp.err' are created, so it is impossible for you to look through the whole files.</p>
 <p>Taking a close look at mcpp.err, you will find same warnings being issued repeatedly.  This is because the same *.h files are #included by many source programs.  To make the files more readable, perform the following procedure:</p>
 <ol>
 <li>To find error messages, enter the following command:<br>
@@ -1503,11 +1508,11 @@ grep error `find . -name mcpp.err`
 </pre>
 <li>To sort warning messages, enter the following command:<br>
 <pre>
-grep warning `find . -name mcpp.err` | sort -k3 -u | less
+grep warning `find . -name mcpp.err` | sort -k3 -u > mcpp-warnings-sorted
 </pre>
 <li>To find all the source lines causing a warning, enter the following command:<br>
 <pre>
-grep warning `find . -name mcpp.err` | sort -k3 | uniq | less
+grep warning `find . -name mcpp.err` | sort -k3 | uniq > mcpp-warnings-all
 </pre>
 <li>To find a particular type of warnings, enter the following command, for example:<br>
 <pre>
@@ -1558,12 +1563,12 @@ When you use "make", you must temporarily change the above shell-script.<br>
 <p>GCC 3.2 sources does not have #warnings.</p>
 
 <h4>3.9.6.3. Variable Argument Macros</h4>
-<p>GCC 3.2 sources have some variable argument macros, but most of them are found in testsuite and they are nothing but test samples.  Although GCC 3.2 still supports variable argument macros in GCC 2 notation, the ones using __VA_ARGS__ (in C99 notation) are more frequently found in GCC 3.2 sources.</p>
+<p>GCC 3.2 sources have some variable argument macros, but most of them are found in testsuite and they are nothing but test samples.  Although GCC 3.2 still supports variable argument macros in GCC 2 notation, the ones using <samp>__VA_ARGS__</samp> (in C99 notation) are more frequently found in GCC 3.2 sources.</p>
 <p>In GCC 3, variable argument macros in a mixed notation of GCC 2 and C99 are found:</p>
 <pre>
 #define eprintf( fmt, ...)   fprintf( stderr, fmt, ##__VA_ARGS__)
 </pre>
-<p>According to the GCC 3 specification, in the absence of an argument corresponding to "...", the comma immediately before "..." is deleted.  So, this is expanded as follows:</p>
+<p>According to the GCC 3 specification, in the absence of an argument corresponding to "<samp>...</samp>", the comma immediately before "<samp>...</samp>" is deleted.  So, this is expanded as follows:</p>
 <pre>
 eprintf( "success!\n")  ==&gt;  fprintf( stderr, "success!\n")
 </pre>
@@ -2444,7 +2449,7 @@ The second argument of a #line, if any, must be a string literal.  An identifier
 #else, #endif, #asm, or #endasm line has a junk text, or such text follows a valid argument of #ifdef, #ifndef, #include, #line or #undef line.<br>
 </ul>
 
-<h3><a name="5.4.5" href="#toc.5.4.5">5.4.5. Syntax Related Errors in #if Expressions</a></h3>
+<h3><a name="5.4.5" href="#toc.5.4.5">5.4.5. Syntax Errors in #if Expressions</a></h3>
 <p>This section covers syntax-related errors in #if, #elif and #assert directives.  If a #if (#elif) line has these errors, <b>mcpp</b> evaluates it to false, skips the #if (#elif) group, and continues processing.</p>
 <p>For a skipped #if (#ifdef, #ifndef, #elif or #else) group, <b>mcpp</b> checks validity of C preprocessing tokens and balance of these directives, but not other grammatical errors.</p>
 <p>A #if line has a sub-expression whose evaluation is skipped.  For example, in case of #if a || b, if "a" is evaluated to true, "b" is not evaluated at all.  However, the following 14 types of syntax errors or translation limit errors are checked, even if they are located in a sub-expression whose evaluation is skipped.</p>
@@ -2535,7 +2540,7 @@ A type combination, like #if sizeof (long float), is invalid.<br>
 </ul>
 
 <h3><a name="5.4.7" href="#toc.5.4.7">5.4.7. #define Related Errors</a></h3>
-<p>This section covers #define related errors.  A macro will not be defined if an error occurs at #define.  The # and ## operator related errors occurs in Standard mode.  __VA_ARGS__ related errors also occur in Standard mode.  Although variable argument macro is a C99 specification, <b>mcpp</b> allows these macros to be used in C90 and C++ modes for compatibility with GCC and Visual C++2005. (A warning is issued.)</p>
+<p>This section covers #define related errors.  A macro will not be defined if an error occurs at #define.  The # and ## operator related errors occurs in Standard mode.  <samp>__VA_ARGS__</samp> related errors also occur in Standard mode.  Although variable argument macro is a C99 specification, <b>mcpp</b> allows these macros to be used in C90 and C++ modes for compatibility with GCC and Visual C++2005. (A warning is issued.)</p>
 <ul>
 <li><samp>"defined" shouldn't be defined</samp><br>
 A macro named "defined" cannot be defined.  Standard mode checks this.<br>
@@ -2544,7 +2549,7 @@ A macro named "defined" cannot be defined.  Standard mode checks this.<br>
 The <tt>__STDC__</tt> macro cannot be #defined.  The same can be said with <tt>__STDC_VERSION__</tt>, <tt>__FILE__</tt>, <tt>__LINE__</tt>, <tt>__DATE__</tt> and <tt>__TIME__</tt> (<tt>__STDC_HOSTED__</tt> in C99 mode, and <tt>__cplusplus</tt> when <b>mcpp</b> is invoked with -+ option).  Standard mode checks these macros.<br>
 <br>
 <li><samp>"__VA_ARGS__" shouldn't be defined</samp><br>
-C99 allows a variable argument macro with the __VA_ARGS__ parameter in the replacement list, but this identifier cannot be defined as a macro.<br>
+C99 allows a variable argument macro with the <samp>__VA_ARGS__</samp> parameter in the replacement list, but this identifier cannot be defined as a macro.<br>
 <br>
 <li><samp>More than <i>NMACPARS</i> parameters</samp><br>
 The number of parameters of a macro definition has exceeded <i>NMACPARS</i>.<br>
@@ -2553,7 +2558,7 @@ The number of parameters of a macro definition has exceeded <i>NMACPARS</i>.<br>
 A macro definition has an empty parameter.<br>
 <br>
 <li><samp>Illegal parameter "123"</samp><br>
-A token other than an identifier is used in a parameter of a macro definition.  In Standard mode, even an identifier __VA_ARGS__ cannot be used.<br>
+A token other than an identifier is used in a parameter of a macro definition.  In Standard mode, even an identifier <samp>__VA_ARGS__</samp> cannot be used.<br>
 <br>
 <li><samp>Duplicate parameter name "a"</samp><br>
 A macro definition has a duplicate parameter name "a".<br>
@@ -2574,10 +2579,10 @@ The replacement list of a macro definition has a token sequence of "## ##".  Som
 A function-like macro definition has a # operator whose operand id is not a parameter name.<br>
 <br>
 <li><samp>"..." isn't the last parameter</samp><br>
-"..." must be the last parameter of a macro definition.  In pre-Standard mode, "..." causes an illegal parameter error.<br>
+"<samp>...</samp>" must be the last parameter of a macro definition.  In pre-Standard mode, "<samp>...</samp>" causes an illegal parameter error.<br>
 <br>
 <li><samp>"__VA_ARGS__" without corresponding "..."</samp><br>
-"__VA_ARGS__", an identifier in a replacement list, can be used only when it has a corresponding "..." parameter.<br>
+"<samp>__VA_ARGS__</samp>", an identifier in a replacement list, can be used only when it has a corresponding "<samp>...</samp>" parameter.<br>
 </ul>
 
 <h3><a name="5.4.8" href="#toc.5.4.8">5.4.8. #undef Related Errors</a></h3>

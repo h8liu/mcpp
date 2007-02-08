@@ -1,5 +1,5 @@
 # makefile to compile MCPP version 2.6 for LCC-Win32 / LCC make
-#       2006/11 kmatsui
+#       2007/02 kmatsui
 # You must first edit BINDIR according to your system.
 # To compile MCPP do:
 #		make
@@ -35,6 +35,8 @@ OBJS = main.obj directive.obj eval.obj expand.obj support.obj system.obj  \
     mbchar.obj lib.obj testmain.obj
 #CFLAGS = -A -DMCPP_LIB
 #NAME = testmain.exe
+# To output to memory buffer, uncomment the next line
+#CFLAGS = -A -DMCPP_LIB -DOUT2MEM
 
 $(NAME) : $(OBJS)
 	lcclnk $(LINKFLAGS) *.obj $(MEMLIB)

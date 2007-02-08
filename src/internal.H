@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1998, 2002-2006 Kiyoshi Matsui <kmatsui@t3.rim.or.jp>
+ * Copyright (c) 1998, 2002-2007 Kiyoshi Matsui <kmatsui@t3.rim.or.jp>
  * All rights reserved.
  *
  * Some parts of this code are derived from the public domain software
@@ -38,13 +38,16 @@
     #error "system.H" must be included prior to "internal.H"
 #endif
 
+#include "mcpp_lib.h"   /* External interface when used as library  */
+
 #define EOS             '\0'        /* End of string                */
 #define CHAR_EOF        0           /* Returned by get() on eof     */
-#define NULLST          ((char *) NULL)     /* Pointer to nowhere   */
 
 #define VA_ARGS         (UCHARMAX + 1)      /* Signal of variable arguments */
-#define DEF_PRAGMA      (-1 - VA_ARGS)      /* _Pragma() pseudo-macro       */
-#define DEF_NOARGS      (-2 - VA_ARGS)      /* #define foo vs #define foo() */
+#define GVA_ARGS        (VA_ARGS * 2)       /* GCC3-specific variable args  */
+#define AVA_ARGS        (VA_ARGS | GVA_ARGS)/* Any variable arguments       */
+#define DEF_PRAGMA      (-1 - AVA_ARGS)     /* _Pragma() pseudo-macro       */
+#define DEF_NOARGS      (-2 - AVA_ARGS)     /* #define foo vs #define foo() */
 
 /*
  * The following may need to change if the host system doesn't use ASCII.
@@ -207,8 +210,15 @@ typedef struct fileinfo {
         struct fileinfo *   parent; /* Link to includer             */
         struct ifinfo *     initif; /* Initial ifstack (return there on EOF)*/
         const char **   dirp;       /* Include directory the file resides   */
-        const char *    filename;   /* File/macro name              */
+        const char *    real_fname; /* Real file name               */
+        char *          filename;   /* File/macro name (maybe changed)      */
         char *          buffer;     /* Buffer of current input line */
+#if MCPP_LIB
+        /* Save output functions during push/pop of #includes   */
+        int (* last_fputc)  ( int c, OUTDEST od);
+        int (* last_fputs)  ( const char * s, OUTDEST od);
+        int (* last_fprintf)( OUTDEST od, const char * format, ...);
+#endif
 } FILEINFO;
 
 /*
@@ -228,6 +238,12 @@ typedef struct ifinfo {
 #define TRUE_SEEN       4           /* TRUE when #if TRUE processed */
 
 #define compiling       ifstack[0].stat
+
+#define FP2DEST(fp) \
+    (fp == fp_out) ? OUT : \
+    ((fp == fp_err) ? ERR : \
+    ((fp == fp_debug) ? DBG : \
+    (-1)))
 
 /* VAL_SIGN structure stores information about evaluated number.    */
 typedef struct val_sign {
@@ -375,7 +391,7 @@ extern VAL_SIGN *   eval_num( const char * nump);
                 /* Evaluate preprocessing number*/
 
 /* expand.c */
-extern char *   (*expand)( DEFBUF * defp, char * out, char * out_end);
+extern char *   (* expand)( DEFBUF * defp, char * out, char * out_end);
                 /* Expand a macro completely    */
 extern void     expand_init( void);
                 /* Initialize expand() function */
@@ -383,7 +399,7 @@ extern DEFBUF * is_macro( char ** cp);
                 /* The sequence is a macro call?*/
 
 /* mbchar.c     */
-extern size_t   (*mb_read)( int c1, char ** in_pp, char ** out_pp);
+extern size_t   (* mb_read)( int c1, char ** in_pp, char ** out_pp);
                 /* Read mbchar sequence         */
 extern const char *     set_encoding( char * name, char * env, int pragma);
                 /* Multi-byte char encoding     */
@@ -405,6 +421,8 @@ extern char *   scan_quote( int delim, char * out, char * out_end, int diag);
                 /* Scan a quoted literal        */
 extern int      id_operator( const char * name);
                 /* Check identifier-like ops    */
+extern void     expanding( const char * name);
+                /* Save macro name expanding    */
 extern int      get( void);
                 /* Get the next char from input */
 extern int      cnv_trigraph( char * in);
@@ -436,6 +454,10 @@ extern void     dump_string( const char * why, const char * text);
                 /* Dump text readably           */
 extern void     dump_unget( const char * why);
                 /* Dump all ungotten junk       */
+/* Support for alternate output mechanisms (e.g. memory buffers) */
+extern int      (* mcpp_fputc)( int c, OUTDEST od),
+                (* mcpp_fputs)( const char * s, OUTDEST od),
+                (* mcpp_fprintf)( OUTDEST od, const char *format, ...);
 
 /* system.c */
 extern void     do_options( int argc, char ** argv, char ** in_pp

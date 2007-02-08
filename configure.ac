@@ -1,10 +1,10 @@
-dnl configure.ac for MCPP   2003/11, 2006/11  kmatsui
+dnl configure.ac for MCPP   2003/11, 2007/02  kmatsui
 dnl Process this file with autoconf to produce a configure script.
 
 dnl WARNING: This script does not assume cross-compiling.
 dnl To cross-compile you must edit here and there of this file.
 
-AC_INIT( mcpp, 2.6.2, kmatsui@t3.rim.or.jp)
+AC_INIT( mcpp, 2.6.3-prerelease, kmatsui@t3.rim.or.jp)
 AC_CONFIG_SRCDIR( src/main.c)
 AM_CONFIG_HEADER( src/config.h)
 AC_CONFIG_AUX_DIR( config)

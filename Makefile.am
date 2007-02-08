@@ -3,12 +3,14 @@
 AUTOMAKE_OPTIONS = foreign
 
 SUBDIRS = src
+
 if REPLACE_CPP
 SUBDIRS += tests .
 man_page = mcpp-gcc
 else
 man_page = mcpp
 endif
+man1_MANS = $(man_page).1
 
 EXTRA_DIST = $(top_srcdir)/LICENSE $(top_srcdir)/INSTALL*   \
   $(top_srcdir)/ChangeLog.old $(top_srcdir)/NEWS    \
@@ -21,19 +23,19 @@ EXTRA_DIST = $(top_srcdir)/LICENSE $(top_srcdir)/INSTALL*   \
   $(top_srcdir)/test-c $(top_srcdir)/test-l $(top_srcdir)/tool  \
   $(top_srcdir)/doc $(top_srcdir)/doc-jp
 
-install-data:
-	$(top_srcdir)/config/install-sh -d "$(DESTDIR)$(prefix)/share/doc/mcpp"
-	cp -Rpf $(top_srcdir)/cpp-test \
-            $(top_srcdir)/test-t $(top_srcdir)/test-c $(top_srcdir)/test-l  \
-            $(top_srcdir)/tool $(top_srcdir)/doc $(top_srcdir)/doc-jp   \
-            $(DESTDIR)$(prefix)/share/doc/mcpp
+if ! REPLACE_CPP
 
-uninstall-data:
-	rm -r -f $(DESTDIR)$(prefix)/share/doc/mcpp/cpp-test
-	rm -r -f $(DESTDIR)$(prefix)/share/doc/mcpp/test-t
-	rm -r -f $(DESTDIR)$(prefix)/share/doc/mcpp/test-c
-	rm -r -f $(DESTDIR)$(prefix)/share/doc/mcpp/test-l
-	rm -r -f $(DESTDIR)$(prefix)/share/doc/mcpp/tool
-	rm -r -f $(DESTDIR)$(prefix)/share/doc/mcpp/doc
-	rm -r -f $(DESTDIR)$(prefix)/share/doc/mcpp/doc-jp
+install-exec-hook:
+	$(top_srcdir)/config/install-sh -d "$(DESTDIR)$(prefix)/share/doc/mcpp/doc"
+	$(top_srcdir)/config/install-sh -d "$(DESTDIR)$(prefix)/share/doc/mcpp/doc-jp"
+	cp -pf $(top_srcdir)/LICENSE $(top_srcdir)/README $(top_srcdir)/NEWS \
+            $(DESTDIR)$(prefix)/share/doc/mcpp
+	cp -pf $(top_srcdir)/doc/mcpp-manual.html   \
+            $(DESTDIR)$(prefix)/share/doc/mcpp/doc
+	cp -pf $(top_srcdir)/doc-jp/mcpp-manual.html   \
+            $(DESTDIR)$(prefix)/share/doc/mcpp/doc-jp
+uninstall-hook:
+	rm -rf $(DESTDIR)$(prefix)/share/doc/mcpp
+
+endif
 
