@@ -324,6 +324,7 @@ ifdo:
             break;
         }
         do_pragma();
+        newlines = -1;              /* Do not putout excessive '\n' */
         break;
 
     default:                /* Non-Standard or unknown directives   */

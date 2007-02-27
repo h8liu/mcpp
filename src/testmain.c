@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
+#define MCPP_LIB    1
 #include "mcpp_lib.h"
 
 extern int  mcpp_lib_main(int argc, char **argv);
@@ -53,11 +55,14 @@ int main(int argc, char *argv[])
         mcpp_use_mem_buffers( 1);           /* enable memory output */
         retval = mcpp_lib_main(j + 1, tmp_argv);    /* call MCPP    */
         result = mcpp_get_mem_buffer( OUT); /* get the output       */
-        fputs( result, stdout);
+        if (result)
+            fputs( result, stdout);
         result = mcpp_get_mem_buffer( ERR); /* get the diagnostics  */
-        fputs( result, stderr);
+        if (result)
+            fputs( result, stderr);
         result = mcpp_get_mem_buffer( DBG); /* get the debug output */
-        fputs( result, stdout);             /* appended to output   */
+        if (result)
+            fputs( result, stdout);         /* appended to output   */
 #else               /* Normal output to file    */
         retval = mcpp_lib_main(j + 1, tmp_argv);
 #endif

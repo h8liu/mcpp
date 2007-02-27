@@ -719,7 +719,7 @@ plus:
             }
             if (str_eq( optarg, "D") || str_eq( optarg, "MD")) {
                 cp = argv[ optind];
-                if (*cp != '-')                 /* -MD (-MMD) file  */
+                if (cp && *cp != '-')           /* -MD (-MMD) file  */
                     mkdep_md = argv[ optind++];
             }
             mkdep |= MD_MKDEP;

@@ -11,7 +11,7 @@
 <h2>== How to Port MCPP ==</h2>
 </div>
 <div align="right">
-<h4>for V.2.6.3 (2007/01)<br>
+<h4>for V.2.6.3 (2007/02)<br>
 Kiyoshi Matsui (kmatsui@t3.rim.or.jp)</h4>
 </div>
 <div align="center">
@@ -161,6 +161,7 @@ In March 2004, V.2.4.1 was released.  In this version, recursive macro expansion
 <li>In July 2006, V.2.6 was released.  In this version, <i>STANDARD</i> and <i>PRE_STANDARD</i> modes are integrated into one executable, all the behavioral modes are made to be specified by the execution options.  The specifications of compiler-independent-build became entirely independent from compiler systems.  While the portings to new versions of some compiler systems are added, the settings for pre-C90 compiler systems and settings for MS-DOS compiler systems are removed.  The sources were rewritten in many parts.  I think that so much rewriting as this version will not happen hereafter, except adding codes and refining details.<br>
 In August 2006, V.2.6.1 was released.  In this version, porting to MinGW was added, some bugs were fixed and some relatively small improvements were done.<br>
 In November 2006, V.2.6.2 was released.  In this version, most of the text file documents were converted to html, some bugs were fixed, and subroutine-build of <b>mcpp</b> was implemented by contribution from Juergen Mueller.<br>
+In February 2007, V.2.6.3 was released.  In this version, compatibility of GCC-specific-build to GCC was increased, and output to memory buffer was implemented in subroutine-build by contribution from Greg Kress.  In addition, binary packages for some systems were begun to be provided.<br>
 </ol>
 <p>Note:</p>
 <p>*1 The outline of the "Exploratory Software Project" can be seen at the following site (the documents are only in Japanese).</p>
@@ -175,7 +176,7 @@ In November 2006, V.2.6.2 was released.  In this version, most of the text file 
 <blockquote>
 <p><a href="http://mcpp.sourceforge.net/">http://mcpp.sourceforge.net/</a></p>
 </blockquote>
-<p>The older version of <b>mcpp</b>, cpp V.2.2 and Validation Suite V.1.2 are located in the following Vector's web site.  They are in the directory called dos/prog/c, but they are not for MS-DOS exclusively.  Sources are for UNIX, WIN32, MS-DOS.</p>
+<p>The older version of <b>mcpp</b>, cpp V.2.2 and Validation Suite V.1.2 are located in the following Vector's web site.  They are in the directory called dos/prog/c, but they are not for MS-DOS exclusively.  Sources are for UNIX, WIN32, MS-DOS. The documents are Japanese only.</p>
 <blockquote>
 <a href="http://www.vector.co.jp/soft/dos/prog/se081188.html">http://www.vector.co.jp/soft/dos/prog/se081188.html</a><br>
 <a href="http://www.vector.co.jp/soft/dos/prog/se081189.html">http://www.vector.co.jp/soft/dos/prog/se081189.html</a><br>
@@ -185,7 +186,7 @@ In November 2006, V.2.6.2 was released.  In this version, most of the text file 
 <br>
 
 <h1><a name="3" href="#toc.3">3. How to port <b>mcpp</b> to each compiler system: Overview</a></h1>
-<p>The source of <b>mcpp</b> consists of four header files and eight *.c files.  The parts which are dependent on OS or compiler system are included in the four source files <samp>configed.H, noconfig.H, system.H</samp> and <samp>system.c</samp>.  Either of <samp>configed.H</samp> or <samp>noconfig.H</samp> is used depending the compiling method, they are never used simultaneously.  There are also a few library function sources in <samp>lib.c</samp>.  When <b>mcpp</b> is compiled by any compiler system, these source files need to be modified to match that compiler system.</p>
+<p>The source of <b>mcpp</b> consists of five header files and eight *.c files.  The parts which are dependent on OS or compiler system are included in the four source files <samp>configed.H, noconfig.H, system.H</samp> and <samp>system.c</samp>.  Either of <samp>configed.H</samp> or <samp>noconfig.H</samp> is used depending the compiling method, they are never used simultaneously.  There are also a few library function sources in <samp>lib.c</samp>.  When <b>mcpp</b> is compiled by any compiler system, these source files need to be modified to match that compiler system.</p>
 <p>There are several types of MCPP executable corresponding to its building methods.
 The building methods of MCPP have following two axis:</p>
 
@@ -222,9 +223,8 @@ into the compiler-system-specific directory.
 <p>The C/C++ compiler systems I could use are the following, and <b>mcpp</b> has been ported to all of these.  Therefore, it has been verified that this source code can be compiled, and that generated preprocessors run correctly on each compiler system.  In any case the CPU used is the x86 type.</p>
 <blockquote>
 <table>
-  <tr><th>FreeBSD 5.3        </th><td>GCC V.3.4.2</td></tr>
-  <tr><th>Vine Linux 3.2     </th><td>GCC V.2.95.3, V.3.2, V.3.3.2, V.3.4.3</td></tr>
-  <tr><th>openSUSE Linux 10.0</th><td>GCC V.4.0.2</td></tr>
+  <tr><th>FreeBSD 6.2        </th><td>GCC V.3.4.6</td></tr>
+  <tr><th>Vine Linux 4.0-x86 </th><td>GCC V.2.95.3, V.3.2, V.3.3.6, V.3.4.3, V.4.1.1</td></tr>
   <tr><th>CygWIN 1.3.10      </th><td>GCC V.2.95.3</td></tr>
   <tr><th>CygWIN 1.5.18      </th><td>GCC V.3.4.4</td></tr>
   <tr><th>MinGW (MSYS 1.0.11)</th><td>GCC V.3.4.5</td></tr>
@@ -234,7 +234,7 @@ into the compiler-system-specific directory.
 </table>
 </blockquote>
 <p>Settings are quite easy for creating <b>mcpp</b> executables by these compiler systems.  One only needs to change some macro definitions in <samp>noconfig.H</samp>.</p>
-<p>*.dif files in noconfig directory are difference files for modifying <samp>noconfig.H</samp>, which is by default for FreeBSD 5.3 / GCC 3.4, to use with each compiler system.</p>
+<p>*.dif files in noconfig directory are difference files for modifying <samp>noconfig.H</samp>, which is by default for FreeBSD 6.* / GCC 3.4, to use with each compiler system.</p>
 <p>For Visual C++ 2005, as an example, in the src directory, doing the following command modifies these files.</p>
 <pre>
 patch -c &lt; ..\noconfig\vc2005.dif
@@ -279,7 +279,7 @@ nmake COMPILER=MSC install
 <p>The default setting of multi-byte character encodings is set to EUC-JP on UNIX, shift-JIS on Windows.  If required, modify the macro called <i>MBCHAR</i> to change the encoding.  (The change of multi-byte character encoding can be done also by the environment variables, execution options and #pragma.)</p>
 <p>On certain compiler systems, because they do not support encodings such as shift-JIS or Big5, the tokenization gets errors when there is the same value byte of 0x5c as '\\' within multi-byte characters.  For these systems, <b>mcpp</b> needs special setting to compensate for an inability of the compiler.  Please refer to sec 
 <a href="#4.1.1.5">4.1.1.5</a> for this setting.</p>
-<p>With regard to the attached makefiles, you must need to rewrite BINDIR, which is the setting of the directory where the executables of the compiler system are located.</p>
+<p>With regard to the attached makefiles, you must need to rewrite BINDIR, which is the directory where the executables of the compiler system are located.</p>
 <p>In GCC V.3, V.4, the preprocessor is absorbed into the compiler (ccl, cclplus).  So, to use <b>mcpp</b>, you must replace the call of gcc, g++ with shell-script and set to execute first <b>mcpp</b>, then cc1 or cc1plus.  The attached makefiles set this automatically by doing:</p>
 <pre>
 make COMPILER=GNUC
@@ -289,7 +289,7 @@ make COMPILER=GNUC install
 <a href="mcpp-manual.html#3.9.7">mcpp-manual.html#3.9.7</a>.</p>
 
 <h3><a name="3.1.2" href="#toc.3.1.2">3.1.2. FreeBSD / GCC V.2.*, V.3.*, V.4.*</a></h3>
-<p>The source is to be compiled by GCC (GNU C) V.3.4 on FreeBSD 5.3 and to make <b>mcpp</b> of compiler-independent-build.  In order to make the compiler-specific-build for FreeBSD 5.3 / GCC V.3.4.*, first change the line:</p>
+<p>The source is to be compiled by GCC (GNU C) V.3.4 on FreeBSD 6.* and to make <b>mcpp</b> of compiler-independent-build.  In order to make the compiler-specific-build for FreeBSD 6.* / GCC V.3.4.*, first change the line:</p>
 <pre>
 #define COMPILER    INDEPENDENT
 </pre>
@@ -306,11 +306,11 @@ You can also overwrite <i>COMPILER</i> by <samp>'make COMPILER=GNUC'</samp> comm
 #define COMPILER_CPLUS_VAL  "3"
 </pre>
 <p>For the first, write major version number of GCC, and for the second, write minor version number.  The third is value of the macro <tt>__GNUG__</tt>, which is the same with the first.</p>
-<p>If the version of FreeBSD is not 5.*, then change the following values.</p>
+<p>If the version of FreeBSD is not 6.*, then change the following values.</p>
 <pre>
-#define SYSTEM_EXT_VAL  "5"     /* V.4.*: 4, V.5.*: 5   */
+#define SYSTEM_EXT_VAL      "6"     /* V.5.*: 5, V.6.*:6    */
 </pre>
-<p>Furthermore, in case of include directories are different from the default ones of FreeBSD 5.3, you need to change the following definition.</p>
+<p>Furthermore, in case of include directories are different from the default ones of FreeBSD 6.2, you need to change the following definition.</p>
 <pre>
 #define CPLUS_INCLUDE_DIR1  "/usr/include/c++/3.4"
 #define CPLUS_INCLUDE_DIR2  "/usr/include/c++/3.4/backward"
@@ -347,7 +347,7 @@ For GCC 2.* modify the value of <i>STDC_VERSION</i>.</p>
 echo '' | gcc -xc -E -v -
 echo '' | g++ -xc++ -E -v -
 </pre>
-<p>The difference files in 'noconfig' directory named <samp>linux_gcc2953.dif, linux_gcc32.dif, linux_gcc332.dif and linux_gcc343.dif</samp> are for VineLinux 3.* / GCC V.2.95.3, V.3.2, V.3.3.2 and V.3.4.3, respectively.  <samp>linux_gcc402.dif</samp> is for openSUSE Linux / GCC V.4.0.2.  For the compiler-specific-build, change <i>COMPILER</i> too.  The include directories may vary between distributions of Linux.  Also, if another version is installed in addition to the system standard version of GCC, it should create another include directory for the specific version.  Specify the particular directory using the above macros.</p>
+<p>The difference files in 'noconfig' directory named <samp>linux_gcc2953.dif, linux_gcc32.dif, linux_gcc336.dif, linux_gcc343.dif and linux_gcc411.dif</samp> are for VineLinux 4.0 / GCC V.2.95.3, V.3.2, V.3.3.6, V.3.4.3 and V.4.1.1, respectively.  For the compiler-specific-build, change <i>COMPILER</i> too.  The include directories may vary between distributions of Linux.  Also, if another version is installed in addition to the system standard version of GCC, it should create another include directory for the specific version.  Specify the particular directory using the above macros.</p>
 <p>The specification of getopt() of glibc is different from the standard ones such as POSIX, please use the one in <samp>lib.c</samp> instead.  I assume glibc is used by default for <samp>noconfig.H</samp> in Linux.</p>
 
 <h3><a name="3.1.4" href="#toc.3.1.4">3.1.4. CygWIN / GCC V.2.*, 3.*</a></h3>
@@ -437,7 +437,8 @@ make clean
 <li><samp>lib.c</samp> depends on <samp>configed.H (noconfig.H</samp>)<br>
 <li><samp>system.H</samp> depends on <samp>configed.H</samp> (<samp>noconfig.H</samp>)<br>
 </ol>
-<p><samp>system.H</samp> needs to be included before <samp>internal.H</samp>.</p>
+<p><samp>system.H</samp> needs to be included before <samp>internal.H</samp>.<br>
+<samp>internal.H</samp> further includes <samp>mcpp_lib.h</samp>.</p>
 <p>The stack size should be added, to the size which system uses, the following size. (<i>NMACWORK</i>, <i>NEXP</i>, <i>RESCAN_LIMIT</i> are macros defined in <samp>system.H</samp>.)</p>
 <blockquote><samp><i>NMACWORK</i> + (<i>NEXP</i> * 30) + (sizeof (int) * 100) + (sizeof (char *) * 12 * <i>RESCAN_LIMIT</i>)</samp></blockquote>
 <p>In systems like Windows, the shell (command processor) does not expand wild cards, and it is safe to be compiled not to expand in <b>mcpp</b> either. (Unless the -o option is specified, the second argument will be taken as the output file.)</p>
@@ -452,7 +453,7 @@ make NAME=mcpp
 </pre>
 <p>(The same thing needs to be done in BC make requires make -DNAME=mcpp.  For UCB make, -D can be either added or not.  For GNU make, -D should not be added.)</p>
 <p>Using the attached makefiles, 'make install' does not do any detailed work.  Except for freebsd.mak, linux.mak and cygwin.mak, please do rest of the work manually.  Please copy the resident preprocessor into the other name beforehand, so as to prevent being deleted by 'make install'.</p>
-<p>When you recompile <b>mcpp</b> using the one path compiler such as Visual C or Borland C, you should supply the output file of <b>mcpp</b> as the source file to the compiler. (For instance, output the preprocessed result of source file <samp>main.c</samp> as <samp>main.i</samp>, and compile that with cl or bcc32.)</p>
+<p>When you recompile <b>mcpp</b> using the one-pass compiler such as Visual C or Borland C, you should supply the output file of <b>mcpp</b> as the source file to the compiler. (For instance, output the preprocessed result of source file <samp>main.c</samp> as <samp>main.i</samp>, and compile that with cl or bcc32.)</p>
 <p>When recompiling using <b>mcpp</b>, if the "pre-preprocess" functionality for the header file is used, the preprocess time will be reduced dramatically.  When you use the attached makefile, for UCB make, GNU make or MS nmake, you run</p>
 <pre>
 make PREPROCESSED=1
@@ -551,10 +552,15 @@ However, since memory is scarce on MS-DOS, you may get an "out of memory" error 
 
 <h2><a name="3.12" href="#toc.3.12">3.12. Making subroutine-build of <b>mcpp</b></a></h2>
 <p><b>mcpp</b> can be compiled as a subroutine to be called from some other main program.  Like a stand-alone preprocessor, this subroutine accepts execution options from the caller, preprocesses the specified input file, writes its result into the output file, then returns to the caller.  It can be called repeatedly on several input files, if required.  It does not, however, pass on the output token by token to its caller.</p>
+<p>The subroutine-build also can write output into on-memory buffer.<p>
 <p><b>mcpp</b> is compiled as a subroutine when a macro <i>MCPP_LIB</i> is defined to non-0.  The entry to this subroutine is mcpp_lib_main() which is a rename of main() in stand-alone-build as:</p>
 <pre>    int mcpp_lib_main( int argc, char ** argv);</pre>
 <p>In actual compiling, do as follows.</p>
 <p>In order to make subroutine-build, use noconfig.H and the makefiles in noconfig directory.  Each of the makefiles has a setting to use a sample source testmain.c as a main program.  This setting is enabled with 'make MCPP_LIB=1' command.  Write your makefile referring to it.</p>
+<p>testmain.c also has a sample to write output to memory buffer.
+To do this, include the header file <samp>mcpp_lib.h</samp> and use the functions declared in it.
+'make MCPP_LIB=1 OUT2MEM=1' will enable this.
+Note that the macro <samp>OUT2MEM</samp> is only for testmain.c, not for <b>mcpp</b>.
 <p>You cannot use configure script for subroutine-build, because how to make cannot be determined without main program.</p>
 <p>If you use GCC, do not define the macro <i>COMPILER</i> to <i>GNUC</i>, leave it defined as <i>INDEPENDENT</i>, because GCC-specific setting generates an executable to be installed into GCC libexec directory and to be called from gcc command, which is not the desired one.</p>
 <p>On the other hand, if you use Visual C, Borland C or LCC-Win32, you can define <i>COMPILER</i> to either of <i>INDEPENDENT</i> or one of <i>MSC, BORLANDC, LCC</i>, because these compilers have no independent preprocessor and they never call <b>mcpp</b> even if it is compiled with compiler-specific settings.  Each compiler-specific setting defines the compiler-specific predefined macros, compiler-specific options, and some peculiar language specifications.  You can choose either of compiler-specific or compiler-independent setting for your convenience.</p>
@@ -628,13 +634,13 @@ The format of the above Standard C source code is set as default.  Write an alte
 #123 "fname"
 </pre>
 If the above is the format, define as <samp>"# "</samp>.  If it is a peculiar format, which is not any of the above, define the format to match.  (In some cases, these may need to be added to sharp() or other functions in <samp>main.c</samp>)<br>
-When <b>mcpp</b> is used in the front end of a one path compiler, such as Visual C or Borland C, the output of <b>mcpp</b> has to be the Standard C source code to be able to pass the output to the built-in preprocessor.  Hence, the transfer of the line number has to be the first format.<br>
+When <b>mcpp</b> is used in the front end of a one-pass compiler, such as Visual C or Borland C, the output of <b>mcpp</b> has to be the Standard C source code to be able to pass the output to the built-in preprocessor.  Hence, the transfer of the line number has to be the first format.<br>
 <br>
 <li><samp><i>EMFILE</i></samp><br>
 If <i>EMFILE</i> is not the macro for the value of errno, which means "too many open files (for the process)" in &lt;errno.h&gt;, define <i>EMFILE</i> into the macro name (Of course, you can add to &lt;errno.h&gt; itself).<br>
 <br>
 <li><samp><i>ONE_PASS</i></samp><br>
-If the target compiler is the so-called one-path-compiler in which the preprocessor is not separated, then set this to <i>TRUE</i>, otherwise set this to <i>FALSE</i>.  If this is set to <i>TRUE</i>, all the predefined macros of the compiler system will be output enclosed within comment marks by #pragma MCPP put_defines (#put_defines).  This is to prevent duplicate definitions, as it will be preprocessed again if the output of <b>mcpp</b> is passed onto the compiler.<br>
+If the target compiler is the so-called one-pass-compiler in which the preprocessor is not separated, then set this to <i>TRUE</i>, otherwise set this to <i>FALSE</i>.  If this is set to <i>TRUE</i>, all the predefined macros of the compiler system will be output enclosed within comment marks by #pragma MCPP put_defines (#put_defines).  This is to prevent duplicate definitions, as it will be preprocessed again if the output of <b>mcpp</b> is passed onto the compiler.<br>
 Though GCC 3 or 4 integrate preprocessor into its compiler, this macro should be set to <i>FALSE</i> as an independent preprocessor can also be used.<br>
 <br>
 <li><samp><i>FNAME_FOLD</i></samp><br>

@@ -11,7 +11,7 @@
 <h3>== Validation Suite for Standard C Conformance of Preprocessing ==</h3>
 </div>
 <div align="right">
-<h4>for V.1.5.2 (2006/11)<br>
+<h4>for V.1.5.3 (2007/02)<br>
 Kiyoshi Matsui (kmatsui@t3.rim.or.jp)</h4>
 </div>
 <div align="center">
@@ -144,7 +144,7 @@ Kiyoshi Matsui (kmatsui@t3.rim.or.jp)</h4>
 <p>V.1.3 supports the official C99 release and is an update to V.1.2.  In addition, behavioral test samples were rewritten so that they can be used by the GCC / testsuite.</p>
 <p>V.1.3, while it was under development, was adopted as the year 2002's "Exploratory Software Project" at the Information-technology Promotion Agency, Japan (IPA) by Yutaka Niibe Project Manager.  From July, 2002 to February, 2003, the development continued under the grants-in-aid from IPA and Niibe PM's advice.  The English version of the document was created under my supervision with the translation work outsourced to Highwell, Inc.  In 2003/02, <b>mcpp</b> V.2.3 and Validation Suite V.1.3 were released on m17n.org.</p>
 <p>In addition, <b>mcpp</b> and Validation Suite were adopted as the year 2003's "Exploratory Software Project" by Hiroshi Ichiji Project Manager.  This allowed an update to V.2.4 and V.1.4. *1</p>
-<p><b>mcpp</b> and Validation Suite have been kept on updating after the project.  V.2.5 and V.1.5 were released in March, 2005.  Validation Suite V.1.5 changed allocation of points and some other matters.  In July 2006, <b>mcpp</b> V.2.6 and Validation Suite V.1.5.1 are released.  Validation Suite V.1.5.1 updated the test result of the preprocessors.  In November, 2006, <b>mcpp</b> V.2.6.2 and Validation Suite V.1.5.2 were released.</p>
+<p><b>mcpp</b> and Validation Suite have been kept on updating after the project.  V.2.5 and V.1.5 were released in March, 2005.  Validation Suite V.1.5 changed allocation of points and some other matters.  In July 2006, <b>mcpp</b> V.2.6 and Validation Suite V.1.5.1 are released.  Validation Suite V.1.5.1 updated the test result of the preprocessors.  In November, 2006, <b>mcpp</b> V.2.6.2 and Validation Suite V.1.5.2 were released.  In February, 2007 <b>mcpp</b> V.2.6.3 and Validation Suite V.1.5.3 were released.  V.1.5.2 and V.1.5.3 of Validation Suite have no substantial change other than small updates of this document.</p>
 <p>Note:</p>
 <p>*1 The overview of the Exploratory Software Project can be found below (in Japanese only).</p>
 <blockquote>
@@ -158,7 +158,7 @@ Kiyoshi Matsui (kmatsui@t3.rim.or.jp)</h4>
 <blockquote>
 <p><a href="http://mcpp.sourceforge.net/">http://mcpp.sourceforge.net/</a></p>
 </blockquote>
-<p><b>mcpp</b> V.2.2 and Validation Suite V.1.2 are located in the following Vector's web site.  They are in the directory called dos/prog/c, but they are not for MS-DOS exclusively.  Sources are for UNIX, WIN32, MS-DOS.</p>
+<p><b>mcpp</b> V.2.2 and Validation Suite V.1.2 are located in the following Vector's web site.  They are in the directory called dos/prog/c, but they are not for MS-DOS exclusively.  Sources are for UNIX, WIN32, MS-DOS.  The documents are Japanese only.</p>
 <blockquote>
 <a href="http://www.vector.co.jp/soft/dos/prog/se081188.html">http://www.vector.co.jp/soft/dos/prog/se081188.html</a><br>
 <a href="http://www.vector.co.jp/soft/dos/prog/se081189.html">http://www.vector.co.jp/soft/dos/prog/se081189.html</a><br>
@@ -1000,15 +1000,15 @@ runtest --tool gcc --srcdir /usr/local/gcc-3.4.3-src/gcc/testsuite cpp-test.exp
 <p>On the other hand, my Validation Suite was originally written by myself only in order to debug my preprocessor and rewritten so that the entire preprocessing specifications are tested.  Many samples are organized systematically on the whole.</p>
 <p>It will have considerable meaning to add these systematic testcases to GCC / testsuite.</p>
 <p>Also, my testsuite edition of Validation Suite is written so that it can test three preprocessors, GCC 2.9x / cpp, GCC 3.x, 4.x / cc1 (cc1plus), and <b>mcpp</b>.  In other words, the use of the regular expression facility in DejaGnu and Tcl can absorb the implementation differences in preprocessing output spacing and diagnostic messages. *1</p>
-<p>Below are the results of applying the testsuite edition of the Validation Suite to these three preprocessors (tested in October, 2006).</p>
-<p>Below is the case where the preprocessor is replaced by <b>mcpp</b> V.2.6.2 in GCC 3.3.2.</p>
+<p>Below are the results of applying the testsuite edition of the Validation Suite to these three preprocessors (tested <b>mcpp</b> in February, 2007, others in October, 2006).</p>
+<p>Below is the case where the preprocessor is replaced by <b>mcpp</b> V.2.6.3 in GCC 4.1.1.</p>
 <pre style="color:navy">
             === gcc Summary ===
 
 # of expected passes            264
 # of unexpected failures        1
 # of expected failures          4
-/usr/bin/gcc version 3.3.2
+/usr/local/bin/gcc version 4.1.1
 </pre>
 <p>There is one failure due to a lack of the universal-character-name &lt;=&gt; multi-byte character conversion implementation in C++98.</p>
 <p>Here is the GCC 3.2 / cc1 case.</p>
@@ -2989,7 +2989,7 @@ q.4.* are regarding documents.</p>
 <p>Scoring: 4.</p>
 
 <h4>q.2.7. Other options</h4>
-<p>There are other helpful options in preprocessing.  Having too many options makes things complicated, however, there are some that are convenient.  The option not to output the line number information (-P in most cases) is relatively common and it seems to be used for the purposes other than C language.  There are some which output without deleting comments.  Depending on command processors of OS, there are cases where implementations need to implement redirection of diagnostic messages.  In addition, so-called one pass compilers in which preprocessing is not an independent program should have an option to specify the output after preprocessing.</p>
+<p>There are other helpful options in preprocessing.  Having too many options makes things complicated, however, there are some that are convenient.  The option not to output the line number information (-P in most cases) is relatively common and it seems to be used for the purposes other than C language.  There are some which output without deleting comments.  Depending on command processors of OS, there are cases where implementations need to implement redirection of diagnostic messages.  In addition, so-called one-pass compilers in which preprocessing is not an independent program should have an option to specify the output after preprocessing.</p>
 <p>The option to identify C90 (C95), C99, and C++ is obviously necessary.  Furthermore, the option to achieve the compatibility between C99 and C++ (making C++ preprocessing closer to C99's) is helpful.</p>
 <p>There is an option to output source file dependency relations in order to generate a Makefile.</p>
 <p>Scoring: 10.</p>
@@ -3479,7 +3479,7 @@ Number: OS          / Compiler System       / Execution program (version)
     C95:    cpp
 </pre>
 <blockquote>
-DECUS cpp original version by Martin Minow (June 1985.)  It was ported to some systems such as various DEC systems, UNIX, and MS-DOS at that time, but what I used in this test was modified by kmatsui and compiled on Linux / GCC.  Macros were rewritten so that translation limits clear as many specifications as possible.
+DECUS cpp original version by Martin Minow (June 1985.)  It was ported to some systems such as various DEC systems, UNIX, and MS-DOS at that time, but what used in this test was modified by kmatsui and compiled on Linux / GCC.  Macros were rewritten so that translation limits clear as many specifications as possible.
 </blockquote>
 <pre>
 2   :   FreeBSD 2.2.7   / GCC V.2.7.2.1     / cpp (V.2.0)
@@ -3592,9 +3592,7 @@ Open-source-software by Hartmut Kaiser (January, 2004.)  Compiler-independent pr
     C99:    gcc -E -std=c99 -$ -Wall
     C++:    g++ -E -std=c++98 -$ -Wall
 </pre>
-<blockquote>
-Compiled by kmatsui with GCC V.3.3.2.
-</blockquote>
+
 <pre>
 12 :   WIN32        / Visual C++ 2005       / cl
     C95:    cl -Za -E -Wall -Tc
@@ -3622,15 +3620,15 @@ LCC-Win32 2006-03 (March, 2006.)
     C99:    gcc -E -std=c99 -$ -Wall
     C++:    g++ -E -std=c++98 -$ -Wall
 
-15 :    FreeBSD, Linux, CygWIN   / GCC 2.95-4.0
-    WIN32  / Visual C 2003-2005, BCC, LCC-Win32 / mcpp (V.2.6.2)
+15 :    FreeBSD, Linux, CygWIN   / GCC 2.95-4.1
+    WIN32  / Visual C 2003-2005, BCC, LCC-Win32 / mcpp (V.2.6.3)
     C95:    mcpp -23 (-S1 -V199409L) -W31
             gcc -ansi -Wp,-2,-W31
     C99:    mcpp -23 (-S1) -V199901L -W31
     C++:    mcpp -23+ -V199711L -W31
 </pre>
 <blockquote>
-<b>mcpp</b> V.2.6.2 (November, 2006.)
+<b>mcpp</b> V.2.6.3 (February, 2007.)
 </blockquote>
 <br>
 
@@ -3642,7 +3640,7 @@ LCC-Win32 2006-03 (March, 2006.)
                 U   P   5   2   3   p   0   0   e   P   3   0   0   4   P
                 S   2   5   9   2   1   0   3   1   2   4   0   6   1   2
                 C   0   C   5       3   3   0   0   4   3   5   0   1   6
-                P       P   3               8   0               3       2
+                P       P   3               8   0               3       3
                 P       P                                                
 
         max     1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
@@ -3969,7 +3967,7 @@ gtotal  960   483 857 646 769 840 760 712 661 649 926 846 738 665 848 928
                 U   P   5   2   3   p   0   0   e   P   3   0   0   4   P
                 S   2   5   9   2   1   0   3   1   2   4   0   6   1   2
                 C   0   C   5       3   3   0   0   4   3   5   0   1   6
-                P       P   3               8   0               3       2    
+                P       P   3               8   0               3       3    
                 P       P                                                
 
         max     1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
@@ -3987,7 +3985,7 @@ gtotal  960   483 857 646 769 840 760 712 661 649 926 846 738 665 848 928
 <blockquote>
 <p>The C90 conformance level is relatively high and troublesome shift-JIS is respectably supported. Documents are well provided. Although e_* usually issues diagnostic messages, most of them are hasty and the quality is not good.</p>
 <p>"Quality other than Standards" is poor and there are no special extension features. Not many diagnostic messages are issued for undefined parts and the program runs away sometimes. Supporting Standards only seems to be the best it could do.</p>
-<p>Different from Turbo C, the speed is no longer fast. Merits in one path compiler seem to have disappeared and only demerits seem to have remained. I wonder how long Borland continue this style.</p>
+<p>Different from Turbo C, the speed is no longer fast. Merits in one-pass compiler seem to have disappeared and only demerits seem to have remained. I wonder how long Borland continue this style.</p>
 </blockquote>
 
 <p>4 : Linux, CygWIN / GCC V.2.95.3 / cpp0</p>
@@ -4042,7 +4040,7 @@ gtotal  960   483 857 646 769 840 760 712 661 649 926 846 738 665 848 928
 
 <p>2 : FreeBSD, DJGPP, WIN32, MS-DOS, OS-9/09 / / <b>mcpp</b> (V.2.0)<br>
 10 : FreeBSD, Linux, CygWIN, WIN32, MS-DOS / / <b>mcpp</b> (V.2.4)<br>
-15 : FreeBSD, Linux, CygWIN, WIN32 / / <b>mcpp</b> (V.2.6.2)</p>
+15 : FreeBSD, Linux, CygWIN, WIN32 / / <b>mcpp</b> (V.2.6.3)</p>
 <blockquote>
 <p>Since I created and tested this myself, the conformance level is the best, of course. It should be the world's most accurate preprocessor. The plentifulness and accuracy of diagnostic messages and the detailed documentation is also the best. Useful options and #pragma directives are provided. The C99 specification is fully supported in V.2.3 and later.</p>
 <p>The portability of source is also the best. Only problem is there are not many ports, so I would appreciate your contribution.</p>

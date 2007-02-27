@@ -1,6 +1,6 @@
 ChangeLog of MCPP and its accompanying Validation Suite
 
-2007/02/08  kmatsui
+2007/02/27  kmatsui
         * V.2.6.3-prerelease
         * Fixed a bug of some #line directive handling which wrongly
         affected #include path.  Added a new member for real file name

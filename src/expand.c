@@ -762,7 +762,7 @@ static char *   substitute(
                     if (warn_level & 1) {
                         *out = EOS;
                         diag_macro( CWARN,
-            "Removed ',' preceding the absent variable macro: %s"   /* _W1_ */
+        "Removed ',' preceding the absent variable argument: %s"    /* _W1_ */
                                 , out_start, 0L, NULL, defp, NULL);
                     }
                 }
