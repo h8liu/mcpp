@@ -11,7 +11,7 @@
 <h2>== How to Port MCPP ==</h2>
 </div>
 <div align="right">
-<h4>for V.2.6.3 (2007/02)<br>
+<h4>for V.2.6.3 (2007/03)<br>
 Kiyoshi Matsui (kmatsui@t3.rim.or.jp)</h4>
 </div>
 <div align="center">
@@ -45,8 +45,10 @@ Kiyoshi Matsui (kmatsui@t3.rim.or.jp)</h4>
 <dd><a name="toc.3.9" href="#3.9">3.9. Host compiler system and target compiler system</a>
 <dd><a name="toc.3.10" href="#3.10">3.10. Compiler systems on MS-DOS and DJGPP</a>
 <dd><a name="toc.3.11" href="#3.11">3.11. Making compiler-independent-build of <b>mcpp</b></a>
-<dd><a name="toc.3.12" href="#3.12">3.12. Making subroutine-build of <b>mcpp</b></a>
-<br><br>
+<dd><dl><dt><a name="toc.3.12" href="#3.12">3.12. Making subroutine-build of <b>mcpp</b></a>
+<dd><a name="toc.3.12.1" href="#3.12.1">3.12.1. Using configure</a>
+<dd><a name="toc.3.12.2" href="#3.12.2">3.12.2. Using noconfig/*.mak</a></dl>
+<br>
 <dt><a name="toc.4" href="#4">4. How to port <b>mcpp</b> to each compiler system: Details</a>
 <dd><dl><dt><a name="toc.4.1" href="#4.1">4.1. Setting of noconfig.H, configed.H, system.H</a>
 <dd><dl><dt><a name="toc.4.1.1" href="#4.1.1">4.1.1. PART 1: Setting of Target system: for Compiler-specific-build</a>
@@ -161,7 +163,7 @@ In March 2004, V.2.4.1 was released.  In this version, recursive macro expansion
 <li>In July 2006, V.2.6 was released.  In this version, <i>STANDARD</i> and <i>PRE_STANDARD</i> modes are integrated into one executable, all the behavioral modes are made to be specified by the execution options.  The specifications of compiler-independent-build became entirely independent from compiler systems.  While the portings to new versions of some compiler systems are added, the settings for pre-C90 compiler systems and settings for MS-DOS compiler systems are removed.  The sources were rewritten in many parts.  I think that so much rewriting as this version will not happen hereafter, except adding codes and refining details.<br>
 In August 2006, V.2.6.1 was released.  In this version, porting to MinGW was added, some bugs were fixed and some relatively small improvements were done.<br>
 In November 2006, V.2.6.2 was released.  In this version, most of the text file documents were converted to html, some bugs were fixed, and subroutine-build of <b>mcpp</b> was implemented by contribution from Juergen Mueller.<br>
-In February 2007, V.2.6.3 was released.  In this version, compatibility of GCC-specific-build to GCC was increased, and output to memory buffer was implemented in subroutine-build by contribution from Greg Kress.  In addition, binary packages for some systems were begun to be provided.<br>
+In March 2007, V.2.6.3 was released.  In this version, compatibility of GCC-specific-build to GCC was increased, and output to memory buffer was implemented in subroutine-build by contribution from Greg Kress.  In addition, binary packages for some systems were begun to be provided.<br>
 </ol>
 <p>Note:</p>
 <p>*1 The outline of the "Exploratory Software Project" can be seen at the following site (the documents are only in Japanese).</p>
@@ -224,7 +226,7 @@ into the compiler-system-specific directory.
 <blockquote>
 <table>
   <tr><th>FreeBSD 6.2        </th><td>GCC V.3.4.6</td></tr>
-  <tr><th>Vine Linux 4.0-x86 </th><td>GCC V.2.95.3, V.3.2, V.3.3.6, V.3.4.3, V.4.1.1</td></tr>
+  <tr><th>Vine Linux 4.1     </th><td>GCC V.2.95.3, V.3.2, V.3.3.6, V.3.4.3, V.4.1.1</td></tr>
   <tr><th>CygWIN 1.3.10      </th><td>GCC V.2.95.3</td></tr>
   <tr><th>CygWIN 1.5.18      </th><td>GCC V.3.4.4</td></tr>
   <tr><th>MinGW (MSYS 1.0.11)</th><td>GCC V.3.4.5</td></tr>
@@ -553,17 +555,67 @@ However, since memory is scarce on MS-DOS, you may get an "out of memory" error 
 <h2><a name="3.12" href="#toc.3.12">3.12. Making subroutine-build of <b>mcpp</b></a></h2>
 <p><b>mcpp</b> can be compiled as a subroutine to be called from some other main program.  Like a stand-alone preprocessor, this subroutine accepts execution options from the caller, preprocesses the specified input file, writes its result into the output file, then returns to the caller.  It can be called repeatedly on several input files, if required.  It does not, however, pass on the output token by token to its caller.</p>
 <p>The subroutine-build also can write output into on-memory buffer.<p>
-<p><b>mcpp</b> is compiled as a subroutine when a macro <i>MCPP_LIB</i> is defined to non-0.  The entry to this subroutine is mcpp_lib_main() which is a rename of main() in stand-alone-build as:</p>
+<p><b>mcpp</b> is compiled as a subroutine when a macro <i>MCPP_LIB</i> is defined to non-0.  The entry to this subroutine is mcpp_lib_main() which is a rename of main() in stand-alone-build, and is declared as:</p>
 <pre>    int mcpp_lib_main( int argc, char ** argv);</pre>
-<p>In actual compiling, do as follows.</p>
-<p>In order to make subroutine-build, use noconfig.H and the makefiles in noconfig directory.  Each of the makefiles has a setting to use a sample source testmain.c as a main program.  This setting is enabled with 'make MCPP_LIB=1' command.  Write your makefile referring to it.</p>
-<p>testmain.c also has a sample to write output to memory buffer.
-To do this, include the header file <samp>mcpp_lib.h</samp> and use the functions declared in it.
-'make MCPP_LIB=1 OUT2MEM=1' will enable this.
-Note that the macro <samp>OUT2MEM</samp> is only for testmain.c, not for <b>mcpp</b>.
-<p>You cannot use configure script for subroutine-build, because how to make cannot be determined without main program.</p>
 <p>If you use GCC, do not define the macro <i>COMPILER</i> to <i>GNUC</i>, leave it defined as <i>INDEPENDENT</i>, because GCC-specific setting generates an executable to be installed into GCC libexec directory and to be called from gcc command, which is not the desired one.</p>
 <p>On the other hand, if you use Visual C, Borland C or LCC-Win32, you can define <i>COMPILER</i> to either of <i>INDEPENDENT</i> or one of <i>MSC, BORLANDC, LCC</i>, because these compilers have no independent preprocessor and they never call <b>mcpp</b> even if it is compiled with compiler-specific settings.  Each compiler-specific setting defines the compiler-specific predefined macros, compiler-specific options, and some peculiar language specifications.  You can choose either of compiler-specific or compiler-independent setting for your convenience.</p>
+<p>There are two ways of compiling subroutine (library) build: using configure script and using noconfig/*.mak makefiles.</p>
+
+<h3><a name="3.12.1" href="#toc.3.12.1">3.12.1. Using configure</a></h3>
+<p>You can use 'configure' script, if you compile with GCC.</p>
+<pre>
+./configure --enable-mcpplib
+make
+sudo make install
+</pre>
+<p>On Linux and FreeBSD, these commands will generate libmcpp.a and libmcpp.so.$(SHLIB_VER) of compiler-independent-build, and will install them into /usr/local/lib by default.
+Then libmcpp.so and libmcpp.so.0 will be created as links to libmcpp.so.$(SHLIB_VER).
+The *.a is a static library, and the *.so is a shared library.
+The file named libmcpp.la will also be created, which is for the tool 'libtool'.
+$(SHLIB_VER) is 0.0.0 on <b>mcpp</b> V.2.6.3.</p>
+<p>On CygWIN and MinGW, DLL named *.dll will be generated instead of *.so.
+On CygWIN, libmcpp.a, libmcpp.dll.a, libmcpp.la will be generated and installed into /usr/local/lib, and cygmcpp-0.dll will be generated and installed into /usr/local/bin.
+On MinGW, those are the same with CygWIN, except cygmcpp-0.dll changes to libmcpp-0.dll.
+To use the DLL, link your main program against libmcpp.dll.a, which is an 'import library' for the DLL.</p>
+<p>In order to test the generated libraries, compile testmain.c and link it against one of the libraries.
+See 3.12.2.</p>
+
+<h3><a name="3.12.2" href="#toc.3.12.2">3.12.2. Using noconfig/*.mak</a></h3>
+
+<p>If you use <samp>'noconfig.H'</samp> and the makefiles in <samp>'noconfig'</samp> directory, (after applying an apropriate patch to noconfig.H according to the compiler and its version, and adjusting the directory settings in the makefile), do:</p>
+<pre>
+make MCPP_LIB=1 mcpplib
+make MCPP_LIB=1 mcpplib_install
+</pre>
+<p>While the above commands makes a compiler-independent-build, you can also make a compiler-specific-build by adding an option <samp>'COMPILER=MSC'</samp> or the like, unless the compiler is GCC.<br>
+For Visual C, use <samp>'nmake'</samp> instead of <samp>'make'</samp>.<br>
+Since the 'make' command attached to LCC-Win32 cannot handle 'if' directive, you must edit the makefile whenever you do different 'make's.</p>
+<p>On Linux, FreeBSD, CygWIN and MinGW, the result is the same with that of the configure above, except libmcpp.la is not created.<br>
+On Windows, the name of the libraries are different from those on Linux as shown in the table below.</p>
+<blockquote>
+<table>
+  <tr><th></th><th>Linux, FreeBSD / GCC</th><th>CygWIN / GCC</th><th>MinGW / GCC</th><th>Visual C, Borland C, LCC-Win32</th></tr>
+  <tr><th>static library</th><td>libmcpp.a</td><td>libmcpp.a</td><td>libmcpp.a</td><td>mcpp.lib</td></tr>
+  <tr><th>shared library or DLL</th><td>libmcpp.so.$(SHLIB_VER)</td><td>cygmcpp-$(DLL_VER).dll<td>libmcpp-$(DLL_VER).dll</td><td>mcpp$(DLL_VER).dll</td></tr>
+  <tr><th>import library of DLL</th><td></td><td>libmcpp-$(DLL_VER).dll.a</td><td>libmcpp-$(DLL_VER).dll.a</td><td>mcpp$(DLL_VER).lib</td></tr>
+</table>
+</blockquote>
+<p>$(SHLIB_VER), $(DLL_VER) is 0.0.0, 0 respectively on <b>mcpp</b> V.2.6.3.</p>
+<p>On Windows, so-called 'import library' is generated too, which is to use the DLL.
+In order to use the DLL, you must link your main program against this import library.
+The static library and the import library are installed into the $(LIBDIR) specified in the makefile, and the DLL itself is installed into the $(BINDIR).
+Note that any DLL must be located at some of the execution directories specified by the environment variable PATH on Windows.</p>
+<p>After installing the libraries, you can test them by compiling testmain.c as a main program and linking it against one of the libraries as follows.</p>
+<pre>
+make MCPP_LIB=1 testmain
+make MCPP_LIB=1 testmain_install
+</pre>
+<p>On Windows, an option <samp>'DLL_IMPORT=1'</samp> specifies to link against DLL.</p>
+<p>testmain.c also has a sample to pass output via memory buffer.
+To enable the memory buffer, include the header file <samp>'mcpp_lib.h'</samp> in your main program, and use the functions declared in it.
+The option <samp>'OUT2MEM=1'</samp> will enable this in testmain.c.
+Note that the macro <samp>OUT2MEM</samp> is only for testmain.c, not for <b>mcpp</b>.
+<p>When you use the library-build of <b>mcpp</b>, write your makefile referring to noconfig/*.mak, and write your main program referring to testmain.c.</p>
 <br>
 
 <h1><a name="4" href="#toc.4">4. How to port <b>mcpp</b> to each compiler system: Details</a></h1>
@@ -731,7 +783,7 @@ The value of <tt>FILENAME_MAX</tt> in &lt;stdio.h&gt; of the host system.<br>
 
 <h4><a name="4.1.3.1" href="#toc.4.1.3.1">4.1.3.1. Several behavioral modes of new and old</a></h4>
 <p>In <samp>system.H</samp>, there are macro definitions to specify the behavioral specification of <b>mcpp</b>.</p>
-<p>There is a variable named 'mode' in <b>mcpp</b> source, and the value of mode determines the frame of <b>mcpp</b> behavior, such as macro expansion method, available preprocessing directives and predefined macros.  There are following 4 modes (4 values of variable 'mode') in <b>mcpp</b>.  The mode of <b>mcpp</b> is specified by the run-time options.  Therefore, in compiling <b>mcpp</b>, nothing is required to be set concerning these 4 macros.  Nevertheless, you must understand the difference of these behavioral modes in order to set the other macros correctly.<br>
+<p>There is a variable named 'mcpp_mode' in <b>mcpp</b> source, and the value of this variable determines the frame of <b>mcpp</b> behavior, such as macro expansion method, available preprocessing directives and predefined macros.  There are following 4 modes (4 values of variable 'mcpp_mode') in <b>mcpp</b>.  The mode of <b>mcpp</b> is specified by the run-time options.  Therefore, in compiling <b>mcpp</b>, nothing is required to be set concerning these 4 macros.  Nevertheless, you must understand the difference of these behavioral modes in order to set the other macros correctly.<br>
 There is another mode called <i>COMPAT</i> which is a variation of <i>STD</i>.</p>
 <ul>
 <li><samp><i>OLD_PREP</i></samp><br>

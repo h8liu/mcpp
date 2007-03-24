@@ -80,9 +80,9 @@ static const char * const   only_name
         = "Macro \"%s\" needs arguments";                   /* _W8_ */
 
 void     expand_init( void)
-/* Set expand() function    */
+/* Set expand_macro() function  */
 {
-    expand = standard ? expand_std : expand_prestd;
+    expand_macro = standard ? expand_std : expand_prestd;
 }
 
 DEFBUF *    is_macro(
@@ -118,7 +118,7 @@ static DEFBUF * is_macro_call(
             unget_string( "\n", NULL);      /* Restore skipped '\n' */
         } else if (! standard || c != RT_END) {
                         /* Still in the file and rescan boundary ?  */
-            unget();                        /* To see it again      */
+            unget_ch();                     /* To see it again      */
         }
         if (c != '(') {     /* Only the name of function-like macro */
             if (! standard && warn_level & 8)
@@ -130,8 +130,8 @@ static DEFBUF * is_macro_call(
 }
 
 /*
- * expand()     expands a macro call completely, and writes out the result to
- *      the specified output buffer and returns the advanced pointer.
+ * expand_macro()   expands a macro call completely, and writes out the result
+ *      to the specified output buffer and returns the advanced pointer.
  */
 
 
@@ -196,7 +196,7 @@ static char *   expand_std(
     int     c, c1;
     char *  cp;
 
-    macro_line = line;                      /* Line number for diag */
+    macro_line = src_line;                      /* Line number for diag */
     macro_name = defp->name;
     rescan_level = 0;
     if (replace( defp, macrobuf, macrobuf + NMACWORK, NULL
@@ -219,7 +219,7 @@ static char *   expand_std(
     while ((c = *cp++) != EOS) {
         if (c == DEF_MAGIC)
             continue;                       /* Skip DEF_MAGIC       */
-        if (mode == STD) {
+        if (mcpp_mode == STD) {
             if (c == IN_SRC)
                 continue;                   /* Skip IN_SRC          */
             else if (c == TOK_SEP) {
@@ -238,7 +238,7 @@ static char *   expand_std(
     macro_line = 0;
 exp_end:
     *out_p = EOS;
-    if (debug & EXPAND)
+    if (mcpp_debug & EXPAND)
         dump_string( "expand_std exit", out);
     macro_name = NULL;
     exp_mac_ind = 0;        /* Clear the information for diagnostic */
@@ -264,7 +264,7 @@ static char *   replace(
     char *  expbuf;                 /* Buffer for  substitute()     */
     char *  out_p;                          /* Output pointer       */
 
-    if (debug & EXPAND) {
+    if (mcpp_debug & EXPAND) {
         dump_a_def( "replace entry", defp, FALSE, FALSE, TRUE, fp_debug);
         dump_unget( "replace entry");
     }
@@ -272,7 +272,7 @@ static char *   replace(
 
     if (nargs < DEF_NOARGS - 2) {           /* __FILE__, __LINE__   */
         defp = def_special( defp);
-        if (mode == STD) {
+        if (mcpp_mode == STD) {
             *out++ = TOK_SEP;       /* Wrap repl-text with token    */
             out = stpcpy( out, defp->repl); /*   separators to pre- */
             *out++ = TOK_SEP;               /*   vent token merging.*/
@@ -292,11 +292,11 @@ static char *   replace(
             free( arglist);
             return  NULL;
         }
-        if (mode == STD && outer && rt_file != infile) {
+        if (mcpp_mode == STD && outer && rt_file != infile) {
                                  /* Has read over replacement-text  */
             if (compat_mode) {
                 enable_repl( outer, FALSE); /* Enable re-expansion  */
-                if (debug & EXPAND)
+                if (mcpp_debug & EXPAND)
                     dump_string( "enabled re-expansion"
                             , outer ? outer->name : "<arg>");
             } else {
@@ -306,7 +306,7 @@ static char *   replace(
     }
 
     catbuf = xmalloc( (size_t) (NMACWORK + IDMAX));
-    if (debug & EXPAND) {
+    if (mcpp_debug & EXPAND) {
         mcpp_fprintf( DBG, "(%s)", defp->name);
         dump_string( "prescan entry", defp->repl);
     }
@@ -323,7 +323,7 @@ static char *   replace(
     }
     catbuf = xrealloc( catbuf, strlen( catbuf) + 1);
                                             /* Use memory sparingly */
-    if (debug & EXPAND) {
+    if (mcpp_debug & EXPAND) {
         mcpp_fprintf( DBG, "(%s)", defp->name);
         dump_string( "prescan exit", catbuf);
     }
@@ -331,7 +331,7 @@ static char *   replace(
     if (nargs > 0) {    /* Function-like macro with any argument    */
         int     gvar_arg;
         expbuf = xmalloc( (size_t) (NMACWORK + IDMAX));
-        if (debug & EXPAND) {
+        if (mcpp_debug & EXPAND) {
             mcpp_fprintf( DBG, "(%s)", defp->name);
             dump_string( "substitute entry", catbuf);
         }
@@ -343,7 +343,7 @@ static char *   replace(
         free( catbuf);
         expbuf = xrealloc( expbuf, strlen( expbuf) + 1);
                                             /* Use memory sparingly */
-        if (debug & EXPAND) {
+        if (mcpp_debug & EXPAND) {
             mcpp_fprintf( DBG, "(%s)", defp->name);
             dump_string( "substitute exit", expbuf);
         }
@@ -378,22 +378,22 @@ static DEFBUF * def_special(
 
     switch (defp->nargs) {
     case DEF_NOARGS - 3:                    /* __LINE__             */
-        if ((line > line_limit || line <= 0) && (warn_level & 1))
+        if ((src_line > line_limit || src_line <= 0) && (warn_level & 1))
             diag_macro( CWARN
                     , "Line number %.0s\"%ld\" is out of range"     /* _W1_ */
-                    , NULL, line, NULL, defp, NULL);
-        sprintf( defp->repl, "%ld", line);          /* Re-define    */
+                    , NULL, src_line, NULL, defp, NULL);
+        sprintf( defp->repl, "%ld", src_line);      /* Re-define    */
         break;
     case DEF_NOARGS - 4:                    /* __FILE__             */
         for (file = infile; file != NULL; file = file->parent) {
             if (file->fp != NULL) {
-                sprintf( work, "\"%s%s\"", *(file->dirp), file->filename);
-                if (str_eq( work, defp->repl))
+                sprintf( work_buf, "\"%s%s\"", *(file->dirp), file->filename);
+                if (str_eq( work_buf, defp->repl))
                     break;                          /* No change    */
                 defp->nargs = DEF_NOARGS;   /* Enable to redefine   */
                 prevp = look_prev( defp->name, &cmp);
-                defp = install( "__FILE__", DEF_NOARGS - 4, "", work, prevp
-                        , cmp);             /* Re-define            */
+                defp = install_macro( "__FILE__", DEF_NOARGS - 4, "", work_buf
+                        , prevp, cmp);      /* Re-define            */
                 break;     
             }
         }
@@ -428,23 +428,23 @@ static int  prescan(
      * where <QUO> is ST_QUO, possibly with following space.
      */
 
-    if (mode == POST_STD) {
+    if (mcpp_mode == POST_STD) {
         file = unget_string( defp->repl, defp->name);
     } else {
         *out++ = TOK_SEP;                   /* Wrap replacement     */
-        workp = work;                       /*  text with token     */
+        workp = work_buf;                   /*  text with token     */
         workp = stpcpy( workp, defp->repl); /*   separators to      */
         *workp++ = TOK_SEP;                 /*    prevent unintended*/
         *workp = EOS;                       /*     token merging.   */
-        file = unget_string( work, defp->name);
+        file = unget_string( work_buf, defp->name);
     }
 
-    while (c = get(), file == infile) {     /* To the end of repl   */
+    while (c = get_ch(), file == infile) {  /* To the end of repl   */
 
         switch (c) {
         case ST_QUOTE:
             skip_ws();                      /* Skip space, MAC_PARM */
-            c = get() - 1;                  /* Parameter number     */
+            c = get_ch() - 1;               /* Parameter number     */
             prev_token = out;               /* Remember the token   */
             out = stringize( defp, arglist[ c], out);
                                     /* Stringize without expansion  */
@@ -463,7 +463,7 @@ static int  prescan(
         case MAC_PARM:
             prev_token = out;
             *out++ = MAC_PARM;
-            *out++ = get();                 /* Parameter number     */
+            *out++ = get_ch();              /* Parameter number     */
             break;
         case TOK_SEP:
         /* Fall through */
@@ -482,7 +482,7 @@ static int  prescan(
     }
 
     *out = EOS;         /* Ensure terminatation in case of no token */
-    unget();
+    unget_ch();
     return  TRUE;
 }
 
@@ -518,20 +518,20 @@ static char *   catenate(
         c = (*(prev_token + 1) & UCHARMAX) - 1;     /* Parm number  */
         argp = arglist[ c];                 /* Actual argument      */
         out = prev_token;                   /* To overwrite         */
-        if ((mode == POST_STD && *argp == EOS)
-                || (mode == STD && *argp == RT_END)) {
+        if ((mcpp_mode == POST_STD && *argp == EOS)
+                || (mcpp_mode == STD && *argp == RT_END)) {
             *out = EOS;                     /* An empty argument    */
         } else {
-            if (mode == POST_STD) {
+            if (mcpp_mode == POST_STD) {
                 file = unget_string( argp, NULL);
-                while (c = get(), file == infile) {
+                while (c = get_ch(), file == infile) {
                     prev_token = out;   /* Remember the last token      */
                     scan_token( c, &out, out_end);
                 }           /* Copy actual argument without expansion   */
-                unget();
+                unget_ch();
             } else {
                 unget_string( argp, NULL);
-                while ((c = get()) != RT_END) {
+                while ((c = get_ch()) != RT_END) {
                     prev_prev_token = prev_token;
                     prev_token = out;   /* Remember the last token      */
                     scan_token( c, &out, out_end);
@@ -542,7 +542,7 @@ static char *   catenate(
                 }
             }
             if (*prev_token == DEF_MAGIC 
-                    || (mode == STD && *prev_token == IN_SRC)) {
+                    || (mcpp_mode == STD && *prev_token == IN_SRC)) {
                 memmove( prev_token, prev_token + 1
                         , (size_t) (out-- - prev_token));
             /* Remove DEF_MAGIC enabling the name to replace later  */
@@ -555,21 +555,21 @@ static char *   catenate(
     switch (c) {
     case ST_QUOTE:          /* First stringize and then catenate    */
         skip_ws();                  /* Skip MAC_PARM, ST_QUOTE      */
-        c = get() - 1;
+        c = get_ch() - 1;
         out = stringize( defp, arglist[ c], out);
         break;
     case MAC_PARM:
-        c = get() - 1;                      /* Parameter number     */
+        c = get_ch() - 1;                   /* Parameter number     */
         argp = arglist[ c];                 /* Actual argument      */
-        if ((mode == POST_STD && *argp == EOS)
-                || (mode == STD && *argp == RT_END))
+        if ((mcpp_mode == POST_STD && *argp == EOS)
+                || (mcpp_mode == STD && *argp == RT_END))
             *out = EOS;                     /* An empty argument    */
         else {
             unget_string( argp, NULL);
-            if ((c = get()) == DEF_MAGIC)   /* Remove DEF_MAGIC     */
-                c = get();                  /*  enabling to replace */
+            if ((c = get_ch()) == DEF_MAGIC)    /* Remove DEF_MAGIC */
+                c = get_ch();               /*  enabling to replace */
             else if (c == IN_SRC)           /* Remove IN_SRC        */
-                c = get();
+                c = get_ch();
             scan_token( c, &out, out_end);  /* The first token      */
             if (*infile->bptr)              /* There are more tokens*/
                 in_arg = TRUE;
@@ -577,7 +577,7 @@ static char *   catenate(
         break;
     case DEF_MAGIC:
     case IN_SRC:
-        c = get();                      /* Skip DEF_MAGIC, IN_SRC   */
+        c = get_ch();                   /* Skip DEF_MAGIC, IN_SRC   */
         /* Fall through */
     default:
         scan_token( c, &out, out_end);      /* Copy the token       */
@@ -587,11 +587,11 @@ static char *   catenate(
     /* The generated sequence is a valid preprocessing-token ?      */
     if (*prev_token) {                      /* There is any token   */
         unget_string( prev_token, NULL);    /* Scan once more       */
-        c = get();  /* This line should be before the next line.    */
+        c = get_ch();  /* This line should be before the next line. */
         infile->fp = (FILE *)-1;            /* To check token length*/
-        if (debug & EXPAND)
+        if (mcpp_debug & EXPAND)
             dump_string( "checking generated token", infile->buffer);
-        scan_token( c, (workp = work, &workp), work_end);
+        scan_token( c, (workp = work_buf, &workp), work_end);
         infile->fp = NULL;
         if (*infile->bptr != EOS) {         /* More than a token    */
             if (lang_asm) {                 /* Assembler source     */
@@ -604,24 +604,24 @@ static char *   catenate(
             }
             infile->bptr += strlen( infile->bptr);
         }
-        get();                              /* To the parent "file" */
-        unget();
+        get_ch();                           /* To the parent "file" */
+        unget_ch();
     }
 
-    if (mode == STD && ! lang_asm) {
+    if (mcpp_mode == STD && ! lang_asm) {
         *out++ = TOK_SEP;                   /* Prevent token merging*/
         *out = EOS;
     }
     if (in_arg) {
-        if (mode == POST_STD) {
+        if (mcpp_mode == POST_STD) {
             file = infile;
-            while (c = get(), file == infile) {
+            while (c = get_ch(), file == infile) {
                 prev_token = out;       /* Remember the last token  */
                 scan_token( c, &out, out_end);
             }           /* Copy rest of argument without expansion  */
-            unget();
+            unget_ch();
         } else {
-            while ((c = get()) != RT_END) {
+            while ((c = get_ch()) != RT_END) {
                 prev_token = out;       /* Remember the last token  */
                 scan_token( c, &out, out_end);
             }           /* Copy rest of argument without expansion  */
@@ -651,26 +651,26 @@ static char *   stringize(
 
     file = unget_string( argp, NULL);
 
-    while ((c = get()), ((mode == POST_STD && file == infile)
-            || (mode == STD && c != RT_END))) {
+    while ((c = get_ch()), ((mcpp_mode == POST_STD && file == infile)
+            || (mcpp_mode == STD && c != RT_END))) {
         if (c == ' ') {
             *out_p++ = ' ';
             continue;
         }
-        if (mode == STD && (c == TOK_SEP || c == IN_SRC))
+        if (mcpp_mode == STD && (c == TOK_SEP || c == IN_SRC))
             continue;   /* Skip inserted separator and in-src magic */
         if (c == '\\')
             stray_bsl = TRUE;               /* May cause a trouble  */
-        token_type = scan_token( c, (workp = work, &workp), work_end);
+        token_type = scan_token( c, (workp = work_buf, &workp), work_end);
 
         switch (token_type) {
         case WSTR:
         case WCHR:
         case STR:
         case CHR:
-            workp = work;
+            workp = work_buf;
             while ((c = *workp++ & UCHARMAX) != EOS) {
-                if (type[ c] & mbstart) {   /* Multi-byte character */
+                if (char_type[ c] & mbstart) {      /* Multi-byte character */
                     mb_read( c, &workp, (*out_p++ = c, &out_p));
                                             /* Copy as it is        */
                     continue;
@@ -679,7 +679,7 @@ static char *   stringize(
                     *out_p++ = '\\';        /* Insert '\\'          */
                 } else if (c == '\\') {
 #if OK_UCN
-                    if (mode == POST_STD || ! stdc3
+                    if (mcpp_mode == POST_STD || ! stdc3
                             || (*workp != 'u' && *workp != 'U'))
                                             /* Not UCN              */
 #endif
@@ -690,28 +690,28 @@ static char *   stringize(
             *out_p = EOS;
             break;
         default:
-            out_p = stpcpy( out_p, work);
+            out_p = stpcpy( out_p, work_buf);
             break;
         }
     }
 
-    if (mode == POST_STD)
-        unget();
+    if (mcpp_mode == POST_STD)
+        unget_ch();
     *out_p++ = '"';
     *out_p = EOS;
 
     if (stray_bsl) {
         int     invalid = FALSE;
         unget_string( out, defp->name);
-        if (debug & EXPAND)
+        if (mcpp_debug & EXPAND)
             dump_string( "checking generated token", infile->buffer);
-        scan_quote( get(), work, work_end, TRUE);
+        scan_quote( get_ch(), work_buf, work_end, TRUE);
             /* Unterminated or too long string will be diagnosed    */
         if (*infile->bptr != EOS)           /* More than a token    */
             invalid = TRUE; /* Diagnose after clearing the "file"   */
         infile->bptr += strlen( infile->bptr);
-        get();                              /* Clear the "file"     */
-        unget();
+        get_ch();                           /* Clear the "file"     */
+        unget_ch();
         if (invalid)
             diag_macro( CERROR
                     , "Not a valid string literal %s"       /* _E_  */
@@ -746,7 +746,7 @@ static char *   substitute(
     while ((c = *in++) != EOS) {
         if (c == MAC_PARM) {                /* Formal parameter     */
             c = *in++ & UCHARMAX;           /* Parameter number     */
-            if (debug & EXPAND) {
+            if (mcpp_debug & EXPAND) {
                 mcpp_fprintf( DBG, " (expanding arg[%d])", c);
                 dump_string( NULL, arglist[ c - 1]);
             }
@@ -805,22 +805,22 @@ static char *   rescan(
     DEFBUF *    inner;              /* Inner macro to replace       */
     int     c;                      /* First character of token     */
 
-    if (debug & EXPAND) {
+    if (mcpp_debug & EXPAND) {
         mcpp_fprintf( DBG, "rescan_level--%d (%s) "
                 , rescan_level + 1, outer ? outer->name : "<arg>");
         dump_string( "rescan entry", in);
     }
     if (! disable_repl( outer)) /* Don't re-replace replacing macro */
         return  NULL;               /* Too deeply nested macro call */
-    if (mode == STD) {
-        get();                      /* Clear empty "file"s          */
-        unget();                    /*      for diagnostic          */
+    if (mcpp_mode == STD) {
+        get_ch();                   /* Clear empty "file"s          */
+        unget_ch();                 /*      for diagnostic          */
         cur_cp = infile->bptr;      /* Remember current location    */
     }
     file = unget_string( in, outer ? outer->name : NULL);
                                     /* Stack input on a "file"      */
 
-    while ((c = get()), file == infile
+    while ((c = get_ch()), file == infile
         /* Rescanning is limited to the "file"  */
             && c != RT_END) {
             /*
@@ -835,14 +835,14 @@ static char *   rescan(
         }
         if (scan_token( c, (tp = out_p, &out_p), out_end) == NAM
                 && c != DEF_MAGIC && (inner =
-                look_id( (mode == STD && c == IN_SRC) ? tp+1 : tp)) != NULL) {
-                                            /* A macro name         */
+                look_id( (mcpp_mode == STD && c == IN_SRC) ? tp+1 : tp))
+                        != NULL) {          /* A macro name         */
             int     is_able;        /* Macro is not "blue-painted"  */
             char *  inp_save = infile->bptr;        /* Remember current bptr*/
 
             if (is_macro_call( inner, &out_p)
-                    && ((mode == POST_STD && is_able_repl( inner))
-                        || (mode == STD
+                    && ((mcpp_mode == POST_STD && is_able_repl( inner))
+                        || (mcpp_mode == STD
                             && (((is_able = is_able_repl( inner)) == YES)
                                 || (is_able == READ_OVER && c == IN_SRC))))) {
                                             /* Really a macro call  */
@@ -857,8 +857,9 @@ static char *   rescan(
                     out_p--;
                 }
                 if ((is_able = is_able_repl( inner)) == NO
-                    || (mode == STD && is_able == READ_OVER && c != IN_SRC)) {
-                    if (mode == POST_STD || c != IN_SRC)
+                        || (mcpp_mode == STD && is_able == READ_OVER
+                                && c != IN_SRC)) {
+                    if (mcpp_mode == POST_STD || c != IN_SRC)
                         memmove( tp + 1, tp, (size_t) (out_p++ - tp));
                     *tp = DEF_MAGIC;        /* Mark not to replace  */
                 }                           /* Else not a macro call*/
@@ -875,9 +876,9 @@ static char *   rescan(
 
     if (out_p) {
         *out_p = EOS;
-        if (mode == STD) {
+        if (mcpp_mode == STD) {
             if  (c != RT_END) {
-                unget();
+                unget_ch();
                 if (outer != NULL) {    /* outer isn't a macro in argument  */
                     if (infile && infile->bptr != cur_cp
                                     /* Have overrun replacement list*/
@@ -892,11 +893,11 @@ static char *   rescan(
                 }
             }                       /* Else remove RT_END           */
         } else {
-            unget();
+            unget_ch();
         }
     }
     enable_repl( outer, TRUE);      /* Enable macro for later text  */
-    if (debug & EXPAND) {
+    if (mcpp_debug & EXPAND) {
         mcpp_fprintf( DBG, "rescan_level--%d (%s) "
                 , rescan_level + 1, outer ? outer->name : "<arg>");
         dump_string( "rescan exit", out);
@@ -994,7 +995,7 @@ static char *   expand_prestd(
     int     token_type;                     /* Type of token        */
     int     c;
 
-    macro_line = line;                      /* Line number for diag.*/
+    macro_line = src_line;                  /* Line number for diag.*/
     unget_string( identifier, identifier);  /* To re-read           */
     macro_name = defp->name;
     rescan_level = 0;
@@ -1006,11 +1007,11 @@ static char *   expand_prestd(
         goto  err_end;
     }
 
-    while ((c = get()) != CHAR_EOF && infile->fp == NULL) {
+    while ((c = get_ch()) != CHAR_EOF && infile->fp == NULL) {
                             /* While the input stream is a macro    */
         while (c == ' ') {                  /* Output the spaces    */
             *mp++ = c;
-            c = get();
+            c = get_ch();
             if (infile == NULL || infile->fp != NULL)
                 goto  exp_end;
         }
@@ -1029,7 +1030,7 @@ static char *   expand_prestd(
         case SEP:                           /* Special character    */
             switch( *mp) {
             case COM_SEP:
-                if (mode == OLD_PREP)
+                if (mcpp_mode == OLD_PREP)
                     break;  /* Zero-length comment is removed now   */
                 /* Else fall through    */
             default:                        /* Who knows ?          */
@@ -1048,14 +1049,14 @@ static char *   expand_prestd(
             cerror( macbuf_overflow, macro_name, 0L, macrobuf);
             longjmp( jump, 1);
         }
-        if (debug & GETC) {
+        if (mcpp_debug & GETC) {
             *mp = EOS;
             dump_string( "macrobuf", macrobuf);
         }
     }
 
 exp_end:
-    unget();
+    unget_ch();
     while (macrobuf < mp && *(mp - 1) == ' ')
         mp--;                           /* Remove trailing blank    */
     macro_line = 0;
@@ -1066,7 +1067,7 @@ exp_end:
     }
 err_end:
     out_p = stpcpy( out, macrobuf);
-    if (debug & EXPAND) {
+    if (mcpp_debug & EXPAND) {
         dump_string( "expand_prestd exit", out);
     }
     macro_name = NULL;
@@ -1094,9 +1095,9 @@ static int  rescan_pre(
         if (replace_pre( defp) == FALSE)
             break;                  /* Macro name with no argument  */
         file = infile;
-        c = get();
+        c = get_ch();
         if (file != infile) {       /* Replaced to 0 token          */
-            unget();
+            unget_ch();
             token_type = NO_TOKEN;
             break;
         }
@@ -1114,14 +1115,14 @@ static int  replace_pre(
  * to parse actual arguments, checking for the correct number.  It then
  * creates a "file" containing single line containing the replacement text
  * with the actual arguments inserted appropriately.  This is "pushed back"
- * onto the input stream.  (When get() routine runs off the end of the macro
+ * onto the input stream.  (When get_ch() routine runs off the end of the macro
  * line, it will dismiss the macro itself.)
  */
 {
     int         nargs;                      /* Number of arguments  */
     int         c;
 
-    if (debug & EXPAND) {
+    if (mcpp_debug & EXPAND) {
         dump_a_def( "replace_pre entry", defp, FALSE, FALSE, TRUE, fp_debug);
         dump_unget( "replace_pre entry");
     }
@@ -1154,7 +1155,7 @@ static int  replace_pre(
              *      foo [no ()]
              * just write foo to output.
              */
-            unget();
+            unget_ch();
             if (warn_level & 8)
                 diag_macro( CWARN, only_name, defp->name, 0L, NULL, defp, NULL);
             return  FALSE;
@@ -1175,7 +1176,7 @@ static int  replace_pre(
     else
         unget_string( defp->repl, defp->name);
 
-    if (debug & EXPAND)
+    if (mcpp_debug & EXPAND)
         dump_unget( "replace_pre exit");
     if (defp->nargs >= 0)
         free( arglist_pre[ 0]);
@@ -1219,7 +1220,7 @@ static void substitute_pre(
     *out_p = EOS;
     file->buffer = xrealloc( file->buffer, strlen( file->buffer) + 1);
     file->bptr = file->buffer;              /* Truncate buffer      */
-    if (debug & EXPAND)
+    if (mcpp_debug & EXPAND)
         dump_string( "substitute_pre macroline", file->buffer);
     return;
 
@@ -1268,7 +1269,7 @@ static int  collect_args(
     int     ret = ARG_ERROR;                    /* Return value     */
     int     c;
 
-    if (debug & EXPAND)
+    if (mcpp_debug & EXPAND)
         dump_unget( "collect_args entry");
     args = (defp->nargs == DEF_PRAGMA) ? 1 : (defp->nargs & ~AVA_ARGS);
     if (args == 0)                      /* Need no argument         */
@@ -1284,7 +1285,7 @@ static int  collect_args(
      * diagnostic's convenience.
      * in_getarg is used only in STD mode.
      */
-    if (mode == STD)
+    if (mcpp_mode == STD)
         in_getarg = TRUE;
 
     while (1) {
@@ -1305,7 +1306,7 @@ static int  collect_args(
                 /* Variable arguments begin with an empty argument  */
                 c = get_an_arg( c, &argp, arg_end, &seq, 1);
             } else {
-                if (mode == STD)
+                if (mcpp_mode == STD)
                     *argp++ = RT_END;
                 *argp++ = EOS;
             }
@@ -1318,7 +1319,7 @@ static int  collect_args(
                 break;
             }
         case '\n':      /* Unterminated macro call in control line  */
-            unget();                    /* Fall through             */
+            unget_ch();                 /* Fall through             */
         case RT_END:                    /* Error of missing ')'     */
             diag_macro( CERROR, unterm_macro, sequence, 0L, NULL, defp, NULL);
                                         /* Fall through             */
@@ -1351,10 +1352,10 @@ static int  collect_args(
         if (warn_level & 2)
             diag_macro( CWARN, empty_arg, sequence, 0L, NULL, defp, NULL);
     } else if (nargs != args) {         /* Wrong number of arguments*/
-        if (mode != OLD_PREP || (warn_level & 1)) {
+        if (mcpp_mode != OLD_PREP || (warn_level & 1)) {
             if ((standard && var_arg && (nargs == args - 1))
                                 /* Absence of variable arguments    */
-                        || (mode == OLD_PREP)) {
+                        || (mcpp_mode == OLD_PREP)) {
                 if (warn_level & 1)
                     diag_macro( CWARN, narg_error, nargs < args ? "Less"
                             : "More", (long) args, sequence, defp, NULL);
@@ -1368,7 +1369,7 @@ static int  collect_args(
         argp = valid_argp;              /* Truncate excess arguments*/
     } else {
         for (c = nargs; c < args; c++) {
-            if (mode == STD)
+            if (mcpp_mode == STD)
                 *argp++ = RT_END;       /* For rescan()             */
             *argp++ = EOS;              /* Missing arguments        */
         }
@@ -1383,13 +1384,13 @@ static int  collect_args(
 
     ret = nargs;
 arg_ret:
-    if (debug & EXPAND) {
+    if (mcpp_debug & EXPAND) {
         if (nargs > 0)
             dump_args( "collect_args exit"
                     , nargs < args ? nargs : args, arglist);
         dump_unget( "collect_args exit");
     }
-    if (mode == STD)
+    if (mcpp_mode == STD)
         in_getarg = FALSE;
 
     return  ret;
@@ -1417,7 +1418,7 @@ static int  get_an_arg(
         if (c == '\n'                       /* In control line      */
                 || c == RT_END) {       /* Boundary of rescan (in STD mode) */
             if (c == '\n')
-                unget();
+                unget_ch();
             break;
         }
         token_type = scan_token( c, (prevp = argp, &argp), arg_end);
@@ -1437,7 +1438,7 @@ static int  get_an_arg(
         case CHAR_EOF:                      /* Unexpected EOF       */
             return  0;
         default :                           /* Any token            */
-            if (mode == STD && ! compat_mode && token_type == NAM
+            if (mcpp_mode == STD && ! compat_mode && token_type == NAM
                     && c != IN_SRC && c != DEF_MAGIC && infile->fp) {
                 memmove( prevp + 1, prevp, (size_t) (argp++ - prevp));
                 *prevp = IN_SRC;
@@ -1457,7 +1458,7 @@ static int  get_an_arg(
     argp--;                                 /* Remove the punctuator*/
     while (*argpp < argp && *(argp - 1) == ' ')
         --argp;                     /* Remove trailing blanks       */
-    if (mode == STD)
+    if (mcpp_mode == STD)
         *argp++ = RT_END;                   /* For rescan()         */
     *argp++ = EOS;                          /* Terminate an argument*/
     *argpp = argp;
@@ -1469,7 +1470,7 @@ static int  squeeze_ws(
 )
 /*
  * Squeeze white spaces to one space.
- * White spaces are ' ' ('\t', '\r', '\v', '\f' converted to ' ' by get()),
+ * White spaces are ' ' ('\t', '\r', '\v', '\f' converted to ' ' by get_ch()),
  * and '\n' unless in_directive is set.
  * COM_SEP is skipped.  TOK_SEPs are squeezed to one TOK_SEP.
  * If white spaces are found and 'out' is not NULL, write a space to *out and
@@ -1483,10 +1484,11 @@ static int  squeeze_ws(
     int     tsep = 0;
     FILE *  fp = infile->fp;
 
-    while ((type[ c = get()] & SPA) && (! standard 
-            || (mode == POST_STD && file == infile)
-            || (mode == STD && ((macro_line != 0 && macro_line != MACRO_ERROR)
-                || file == infile)))) {
+    while ((char_type[ c = get_ch()] & SPA) && (! standard 
+            || (mcpp_mode == POST_STD && file == infile)
+            || (mcpp_mode == STD
+                && ((macro_line != 0 && macro_line != MACRO_ERROR)
+                    || file == infile)))) {
         if (c == '\n') {
             if (in_directive)           /* If scanning control line */
                 break;                  /*   do not skip newline.   */
@@ -1494,7 +1496,7 @@ static int  squeeze_ws(
                 wrong_line = TRUE;
         }
         if (c == TOK_SEP) {
-            if (mode == STD)
+            if (mcpp_mode == STD)
                 tsep++;
             continue;           /* Skip COM_SEP in OLD_PREP mode    */
         }
@@ -1507,12 +1509,12 @@ static int  squeeze_ws(
         if (tsep)
             *(*out)++ = TOK_SEP;
     }
-    if (mode == POST_STD && file != infile) {
-        unget();                /* Arguments cannot cross "file"s   */
+    if (mcpp_mode == POST_STD && file != infile) {
+        unget_ch();             /* Arguments cannot cross "file"s   */
         c = fp ? CHAR_EOF : RT_END; /* EOF is diagnosed by at_eof() */
-    } else if (mode == STD && macro_line == MACRO_ERROR && file != infile) {
-                                /* EOF  */
-        unget();                /*   diagnosed by at_eof() or only  */
+    } else if (mcpp_mode == STD && macro_line == MACRO_ERROR
+            && file != infile) {            /* EOF                  */
+        unget_ch();             /*   diagnosed by at_eof() or only  */
         c = CHAR_EOF;           /*   name of a function-like macro. */
     }                       /* at_eof() resets macro_line on error  */
     return  c;                  /* Return the next character        */
@@ -1529,9 +1531,9 @@ static void skip_macro( void)
         return;
     while (infile->fp == NULL) {            /* Stacked stuff        */
         infile->bptr += strlen( infile->bptr);
-        get();                              /* To the parent "file" */
+        get_ch();                           /* To the parent "file" */
     }
-    unget();
+    unget_ch();
 }
 
 static void diag_macro(

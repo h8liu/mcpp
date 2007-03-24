@@ -270,7 +270,7 @@ void    init_eval( void)
 }
 #endif
 
-expr_t  eval( void)
+expr_t  eval_if( void)
 /*
  * Evaluate a #if expression.  Straight-forward operator precedence.
  * This is called from directive() on encountering an #if statement.
@@ -297,7 +297,7 @@ expr_t  eval( void)
     skip = skip_cur = opp->skip = 0;        /* Not skipping now     */
 
     while (1) {
-        if (debug & EXPRESSION)
+        if (mcpp_debug & EXPRESSION)
             mcpp_fprintf( DBG
                     , "In eval loop skip = %d, binop = %d, line is: %s\n"
                     , opp->skip, binop, infile->bptr);
@@ -316,21 +316,21 @@ expr_t  eval( void)
         case OP_FAIL:
             return  0L;                     /* Token error          */
         }
-        if (debug & EXPRESSION)
+        if (mcpp_debug & EXPRESSION)
             mcpp_fprintf( DBG
                     , "op = %s, opdope = %04o, binop = %d, skip = %d\n"
                     , opname[ op], opdope[ op], binop, opp->skip);
         if (op == VAL) {                    /* Value?               */
             if (binop != 0) {               /* Binop is needed      */
                 cerror( "Misplaced constant \"%s\""         /* _E_  */
-                        , work, 0L, NULL);
+                        , work_buf, 0L, NULL);
                 return  0L;
             } else if (& value[ NEXP * 2] <= valp) {
                 cerror( "More than %.0s%ld constants stacked at %s" /* _E_  */
-                        , NULL, (long) (NEXP * 2 - 1), work);
+                        , NULL, (long) (NEXP * 2 - 1), work_buf);
                 return  0L;
             } else {
-                if (debug & EXPRESSION) {
+                if (mcpp_debug & EXPRESSION) {
                     dump_val( "pushing ", &ev);
                     mcpp_fprintf( DBG, " onto value stack[%d]\n"
                             , (int)(valp - value));
@@ -354,7 +354,7 @@ expr_t  eval( void)
         binop = (prec & 2) >> 1;            /* Binop should follow? */
 
         while (1) {
-            if (debug & EXPRESSION)
+            if (mcpp_debug & EXPRESSION)
                 mcpp_fprintf( DBG
                         , "op %s, prec %d, stacked op %s, prec %d, skip %d\n"
                 , opname[ op], prec, opname[ opp->op], opp->prec, opp->skip);
@@ -406,7 +406,7 @@ expr_t  eval( void)
                 } else {                    /* Other operators leave*/
                     opp->skip = op1;        /*  skipping unchanged. */
                 }
-                if (debug & EXPRESSION) {
+                if (mcpp_debug & EXPRESSION) {
                     mcpp_fprintf( DBG, "stacking %s, ", opname[ op]);
                     if (&value[0] < valp)
                         dump_val( "valp[-1].val == ", valp - 1);
@@ -453,7 +453,7 @@ expr_t  eval( void)
                 /* Evaluate op1.            Fall through            */
             default:                        /* Others:              */
                 opp--;                      /* Unstack the operator */
-                if (debug & EXPRESSION) {
+                if (mcpp_debug & EXPRESSION) {
                     mcpp_fprintf( DBG, "Stack before evaluation of %s\n"
                             , opname[ op1]);
                     dump_stack( opstack, opp, value, valp);
@@ -467,7 +467,7 @@ expr_t  eval( void)
                     return  0L;     /* Out of range or divide by 0  */
                 valp++;
                 skip = 0;
-                if (debug & EXPRESSION) {
+                if (mcpp_debug & EXPRESSION) {
                     mcpp_fprintf( DBG, "Stack after evaluation\n");
                     dump_stack( opstack, opp, value, valp);
                 }
@@ -484,7 +484,7 @@ expr_t  eval( void)
 
 static int  eval_lex( void)
 /*
- * Return next operator or value to evaluate.  Called from eval().  It calls
+ * Return next operator or value to evaluate.  Called from eval_if().  It calls
  * a special-purpose routines for character constants and numeric values:
  *      eval_char()     called to evaluate 'x'
  *      eval_num()      called to evaluate numbers
@@ -502,7 +502,7 @@ static int  eval_lex( void)
     ev.val = 0L;            /* Default value (on error or 0 value)  */
     c = skip_ws();
     if (c == '\n') {
-        unget();
+        unget_ch();
         return  OP_EOE;                     /* End of expression    */
     }
     token_type = get_unexpandable( c, warn);
@@ -517,7 +517,7 @@ static int  eval_lex( void)
             c1 = c = skip_ws();
             if (c == '(')                   /* Allow defined (name) */
                 c = skip_ws();
-            if (scan_token( c, (workp = work, &workp), work_end) == NAM) {
+            if (scan_token( c, (workp = work_buf, &workp), work_end) == NAM) {
                 if (warn)
                     ev.val = (look_id( identifier) != NULL);
                 if (c1 != '(' || skip_ws() == ')')  /* Balanced ?   */
@@ -526,17 +526,17 @@ static int  eval_lex( void)
             cerror( "Bad defined syntax: %s"                /* _E_  */
                     , infile->fp ? "" : infile->buffer, 0L, NULL);
             break;
-        } else if (cplus) {
+        } else if (cplus_val) {
             if (str_eq( identifier, "true")) {
                 ev.val = 1L;
                 return  VAL;
             } else if (str_eq( identifier, "false")) {
                 ev.val = 0L;
                 return  VAL;
-            } else if (mode != POST_STD
+            } else if (mcpp_mode != POST_STD
                     && (openum = id_operator( identifier)) != 0) {
                 /* Identifier-like operator in C++98    */
-                strcpy( work, identifier);
+                strcpy( work_buf, identifier);
                 return  chk_ops();
             }
         } else if (! standard && str_eq( identifier, "sizeof")) {
@@ -555,28 +555,29 @@ static int  eval_lex( void)
         return  VAL;
     case CHR:                               /* Character constant   */
     case WCHR:                              /* Wide char constant   */
-        if (mode == POST_STD) {
+        if (mcpp_mode == POST_STD) {
             cerror( "Can't use a character constant %s"     /* _E_  */
-                    , work, 0L, NULL);
+                    , work_buf, 0L, NULL);
             break;
         }
-        valp = eval_char( work);            /* 'valp' points 'ev'   */
+        valp = eval_char( work_buf);        /* 'valp' points 'ev'   */
         if (valp->sign == VAL_ERROR)
             break;
-        if (debug & EXPRESSION) {
+        if (mcpp_debug & EXPRESSION) {
             dump_val( "eval_char returns ", &ev);
             mcpp_fputc( '\n', DBG);
         }
         return  VAL;                        /* Return a value       */
     case STR:                               /* String literal       */
     case WSTR:                              /* Wide string literal  */
-        cerror( "Can't use a string literal %s", work, 0L, NULL);   /* _E_  */
+        cerror(
+    "Can't use a string literal %s", work_buf, 0L, NULL);   /* _E_  */
         break;
     case NUM:                               /* Numbers are harder   */
-        valp = eval_num( work);             /* 'valp' points 'ev'   */
+        valp = eval_num( work_buf);         /* 'valp' points 'ev'   */
         if (valp->sign == VAL_ERROR)
             break;
-        if (debug & EXPRESSION) {
+        if (mcpp_debug & EXPRESSION) {
             dump_val( "eval_num returns ", &ev);
             mcpp_fputc( '\n', DBG);
         }
@@ -604,7 +605,7 @@ static int  chk_ops( void)
     case OP_STR:    case OP_CAT:    case OP_ELL:
     case OP_1:      case OP_2:      case OP_3:
         cerror( "Can't use the operator \"%s\""             /* _E_  */
-                , work, 0L, NULL);
+                , work_buf, 0L, NULL);
         return  OP_FAIL;
     default:
         return  openum;
@@ -715,7 +716,7 @@ static int  do_sizeof( void)
         goto  no_good;
     }
 
-    if (debug & EXPRESSION) {
+    if (mcpp_debug & EXPRESSION) {
         if (sizp)
             mcpp_fprintf( DBG,
             "sizp->bits:0x%x sizp->size:0x%x sizp->psize:0x%x ev.val:0x%lx\n"
@@ -725,7 +726,7 @@ static int  do_sizeof( void)
     return  VAL;
 
 no_good:
-    unget();
+    unget_ch();
     cerror( "sizeof: Syntax error", NULL, 0L, NULL);        /* _E_  */
     return  OP_FAIL;
 }
@@ -749,17 +750,17 @@ static int  look_type(
         if (token_type == NAM) {
 #if HAVE_LONG_LONG
             if (str_eq( identifier, "long")) {
-                strcpy( work, "long long");
+                strcpy( work_buf, "long long");
                 goto  basic;
             }
 #endif
             if (str_eq( identifier, "double")) {
-                strcpy( work, "long double");
+                strcpy( work_buf, "long double");
                 goto  basic;
             }
         }
-        unget_string( work, NULL);          /* Not long long        */
-        strcpy( work, "long");              /*   nor long double    */
+        unget_string( work_buf, NULL);      /* Not long long        */
+        strcpy( work_buf, "long");          /*   nor long double    */
     }
 
     /*
@@ -767,28 +768,28 @@ static int  look_type(
      */
 basic:
     for (tp = basic_types; tp->token_name != NULL; tp++) {
-        if (str_eq( work, tp->token_name))
+        if (str_eq( work_buf, tp->token_name))
             break;
     }
 
     if (tp->token_name == NULL) {
         if (! skip) {
-            cerror( unknown_type, work, 0L, NULL);
+            cerror( unknown_type, work_buf, 0L, NULL);
             return  0;
         } else if (warn_level & 8) {
-            cwarn( unknown_type, work, 0L, non_eval);
+            cwarn( unknown_type, work_buf, 0L, non_eval);
         }
     }
     if ((typecode & tp->excluded) != 0) {
         if (! skip) {
-            cerror( illeg_comb, work, 0L, NULL);
+            cerror( illeg_comb, work_buf, 0L, NULL);
             return  0;
         } else if (warn_level & 8) {
-            cwarn( illeg_comb, work, 0L, non_eval);
+            cwarn( illeg_comb, work_buf, 0L, non_eval);
         }
     }
 
-    if (debug & EXPRESSION) {
+    if (mcpp_debug & EXPRESSION) {
         if (tp->token_name)
             mcpp_fprintf( DBG,
             "sizeof -- typecode:0x%x tp->token_name:\"%s\" tp->type:0x%x\n"
@@ -834,7 +835,7 @@ VAL_SIGN *  eval_num(
 
     ev.sign = SIGNED;                       /* Default signedness   */
     ev.val = 0L;                            /* Default value        */
-    if ((type[ c = *cp++ & UCHARMAX] & DIG) == 0)   /* Dot          */
+    if ((char_type[ c = *cp++ & UCHARMAX] & DIG) == 0)   /* Dot          */
         goto  num_err;
     if (c != '0') {                         /* Decimal              */
         base = 10;
@@ -991,11 +992,11 @@ static VAL_SIGN *   eval_char(
         mbits = CHARBIT * 4;
     else
         mbits = CHARBIT * 2;
-    if (mode == STD && wide) {          /* Wide character constant  */
+    if (mcpp_mode == STD && wide) {          /* Wide character constant  */
         cp++;                           /* Skip 'L'                 */
         bits = mbits;
     }
-    if (type[ *cp & UCHARMAX] & mbstart) {
+    if (char_type[ *cp & UCHARMAX] & mbstart) {
         cl = mb_eval( &cp);
         bits = mbits;
     } else if ((cl = eval_one( &cp, wide, mbits, (ucn8 = FALSE, &ucn8)))
@@ -1007,7 +1008,7 @@ static VAL_SIGN *   eval_char(
     value = cl;
 
     for (i = 0; *cp != '\'' && *cp != EOS; i++) {
-        if (type[ *cp & UCHARMAX] & mbstart) {
+        if (char_type[ *cp & UCHARMAX] & mbstart) {
             cl = mb_eval( &cp);
             if (cl == 0)
                 /* Shift-out sequence of multi-byte or wide character   */
@@ -1035,7 +1036,7 @@ static VAL_SIGN *   eval_char(
                 erange = TRUE;
         }
 #if HAVE_LONG_LONG
-        if ((mode == STD && (! stdc3 && value > ULONGMAX))
+        if ((mcpp_mode == STD && (! stdc3 && value > ULONGMAX))
                 || (! standard && value > LONGMAX))
             erange_long = TRUE;
 #endif
@@ -1063,7 +1064,7 @@ static VAL_SIGN *   eval_char(
         return  & ev;
 
     if ((! skip && (warn_level & 4)) || (skip && (warn_level & 8))) {
-        if (mode == STD && wide)
+        if (mcpp_mode == STD && wide)
             cwarn(
 "Multi-character wide character constant %s%.0ld%s isn't portable"  /* _W4_ _W8_    */
                     , token, 0L, skip ? non_eval : NULL);
@@ -1162,7 +1163,7 @@ static expr_t   eval_one(
 
     wchar_max = (UCHARMAX << CHARBIT) | UCHARMAX;
     if (mbits == CHARBIT * 4) {
-        if (mode == STD)
+        if (mcpp_mode == STD)
             wchar_max = (wchar_max << CHARBIT * 2) | wchar_max;
         else
             wchar_max = LONGMAX;
@@ -1290,7 +1291,7 @@ static VAL_SIGN *   eval_eval(
     }
     v1 = (--valp)->val;
     sign1 = valp->sign;
-    if (debug & EXPRESSION) {
+    if (mcpp_debug & EXPRESSION) {
         mcpp_fprintf( DBG, "%s op %s", (is_binary( op)) ? "binary" : "unary"
                 , opname[ op]);
         dump_val( ", v1 = ", valp);

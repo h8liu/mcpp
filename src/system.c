@@ -280,7 +280,8 @@ void    init_system( void)
     start_inc = NULL;
     search_rule = SEARCH_INIT;
     mb_changed = dDflag = nflag = FALSE;
-    mkdep_fp = mkdep_target = mkdep_mf = mkdep_md = mkdep_mq = mkdep_mt = NULL;
+    mkdep_fp = NULL;
+    mkdep_target = mkdep_mf = mkdep_md = mkdep_mq = mkdep_mt = NULL;
 #if COMPILER == GNUC
     sys_dirp = incdir;
     gcc_work_dir = put_info_done = no_exceptions = FALSE;
@@ -326,7 +327,7 @@ void    do_options(
     VAL_SIGN    *valp;
     int         sflag;                      /* -S option or similar */
     int         ansi, trad;                 /* -ansi, -traditional  */
-    int         old_mode;                   /* backup of 'mode'     */
+    int         old_mode;                   /* backup of 'mcpp_mode'*/
 #if COMPILER == GNUC
 #define NSYSDIR   8
     /* System include directory specified by -isystem   */
@@ -383,11 +384,11 @@ opt_search: ;
 #if COMPILER == GNUC
 plus:
 #endif
-            if (cplus || sflag) {
+            if (cplus_val || sflag) {
                 mcpp_fputs( "warning: -+ option is ignored\n", ERR);
                 break;
             }
-            cplus = CPLUS;
+            cplus_val = CPLUS;
             break;
         case '2':                   /* Revert digraphs recognition  */
             dig_flag = ! dig_flag;
@@ -397,23 +398,23 @@ plus:
             break;
 
         case '@':                   /* Special preprocessing mode   */
-            old_mode = mode;
+            old_mode = mcpp_mode;
             if (str_eq( optarg, "post") || str_eq( optarg, "poststd"))
-                mode = POST_STD;        /* 'post-Standard' mode     */
+                mcpp_mode = POST_STD;   /* 'post-Standard' mode     */
             else if (str_eq( optarg, "old") || str_eq( optarg, "oldprep"))
-                mode = OLD_PREP;        /* 'old-Preprocessor' mode  */
+                mcpp_mode = OLD_PREP;   /* 'old-Preprocessor' mode  */
             else if (str_eq( optarg, "kr"))
-                mode = KR;              /* 'K&R 1st' mode (default) */
+                mcpp_mode = KR;         /* 'K&R 1st' mode           */
             else if (str_eq( optarg, "std"))
-                mode = STD;             /* 'Standard' mode (default)*/
+                mcpp_mode = STD;        /* 'Standard' mode (default)*/
             else if (str_eq( optarg, "compat")) {
                 compat_mode = TRUE;     /* 'compatible' mode        */
-                mode = STD;
+                mcpp_mode = STD;
             }
             else 
                 usage( opt);
-            standard = (mode == STD || mode == POST_STD);
-            if (old_mode != STD && old_mode != mode)
+            standard = (mcpp_mode == STD || mcpp_mode == POST_STD);
+            if (old_mode != STD && old_mode != mcpp_mode)
                 mcpp_fprintf( ERR, "Mode is redefined to: %s\n", optarg);
             break;
 
@@ -803,7 +804,7 @@ plus:
                 if (warn_level == -1)
                     warn_level = 0;
                 warn_level |= (1 | 2 | 4);
-                if (! sflag && ! cplus) {
+                if (! sflag && ! cplus_val) {
                     stdc_val = 1;
                     sflag = TRUE;
                 }
@@ -834,7 +835,7 @@ plus:
 #endif
 
         case 'S':
-            if (cplus || sflag) {       /* C++ or the second time   */
+            if (cplus_val || sflag) {   /* C++ or the second time   */
                 mcpp_fprintf( ERR, warning, opt, optarg);
                 break;
             }
@@ -871,7 +872,7 @@ plus:
                         || str_eq( cp, "iso9899:199x")) {
                     std_val = 199901L;
                 } else if (str_eq( cp, "c++98")) {  /* std=c++98    */
-                    cplus = std_val = 199711L;
+                    cplus_val = std_val = 199711L;
                 } else if (memcmp( cp, "iso9899:", 8) == 0
                         && strlen( cp) >= 14) { /* std=iso9899:199409, etc. */
                     optarg = cp + 8;
@@ -880,7 +881,7 @@ plus:
                     cp += 8;
                     if (cp && *cp == ':' && strlen( cp) >= 7) {
                                     /* std=iso14882:199711, etc.    */
-                        cplus = CPLUS;
+                        cplus_val = CPLUS;
                         optarg = cp + 1;
                         goto Version;
                     } else {
@@ -889,7 +890,7 @@ plus:
                 } else {
                     usage( opt);
                 }
-                if (! cplus && memcmp( cp, "gnu", 3) != 0)
+                if (! cplus_val && memcmp( cp, "gnu", 3) != 0)
                     look_and_install( "__STRICT_ANSI__", DEF_NOARGS, "", "1");
                 stdc_val = 1;
                 sflag = TRUE;
@@ -903,7 +904,7 @@ plus:
                     || str_eq( optarg, "raditional-cpp")) {
                                 /* -traditional, -traditional-cpp   */
                 trad = TRUE;
-                mode = OLD_PREP;
+                mcpp_mode = OLD_PREP;
             } else if (str_eq( optarg, "rigraphs")) {
                 trig_flag = TRUE;                   /* -trigraphs   */
             } else {
@@ -920,7 +921,7 @@ plus:
             if (i == 'c') {
                 break;                      /* Ignore this option   */
             } else if (i == 'p') {
-                cplus = CPLUS;
+                cplus_val = CPLUS;
                 break;
             } else {
                 usage( opt);
@@ -1126,7 +1127,7 @@ static void version( void)
 #endif
 
 #ifdef  VERSION_MSG
-        "MCPP V.2.6.3-prerelease (2007/02) "
+        "MCPP V.2.6.3-prerelease (2007/03) "
 #else
         "MCPP V.", VERSION, " (", DATE, ") "
 #endif
@@ -1437,9 +1438,9 @@ static void def_a_macro(
     int         i;
 
     /* Convert trigraphs for the environment which need trigraphs   */
-    if (mode == STD && trig_flag)
+    if (mcpp_mode == STD && trig_flag)
         cnv_trigraph( def);
-    if (mode == POST_STD && dig_flag)
+    if (mcpp_mode == POST_STD && dig_flag)
         cnv_digraph( def);  /* Convert prior to installing macro    */
     definition = xmalloc( strlen( def) + 4);
     strcpy( definition, def);
@@ -1451,7 +1452,7 @@ static void def_a_macro(
     }
     strcat( definition, cp);
     cp = definition;
-    while ((type[ *cp & UCHARMAX] & SPA) == 0)
+    while ((char_type[ *cp & UCHARMAX] & SPA) == 0)
         cp++;
     i = *cp;
     *cp = EOS;
@@ -1485,12 +1486,12 @@ static void     chk_opts(
 )
 /*
  * Check consistency between the specified options.
- * Set default value of some variables for each 'mode'.
+ * Set default value of some variables for each 'mcpp_mode'.
  */
 {
     int     incompat = FALSE;
 
-    switch (mode) {
+    switch (mcpp_mode) {
     case STD    :
     case POST_STD   :
         if (trad)
@@ -1500,7 +1501,7 @@ static void     chk_opts(
         break;
     case KR :
     case OLD_PREP   :
-        if (sflag || cplus || ansi || std_val != -1L)
+        if (sflag || cplus_val || ansi || std_val != -1L)
             incompat = TRUE;
         if (dig_flag) {
             if (dig_flag != DIGRAPHS_INIT)
@@ -1510,9 +1511,9 @@ static void     chk_opts(
         }
         break;
     }
-    if (mode == POST_STD && (lang_asm || compat_mode))
+    if (mcpp_mode == POST_STD && (lang_asm || compat_mode))
         incompat = TRUE;
-    if (mode != STD && trig_flag) {
+    if (mcpp_mode != STD && trig_flag) {
         if (trig_flag != TRIGRAPHS_INIT)
             incompat = TRUE;
         else
@@ -1523,14 +1524,14 @@ static void     chk_opts(
         usage( '?');
     }
 
-    standard = (mode == STD || mode == POST_STD);
+    standard = (mcpp_mode == STD || mcpp_mode == POST_STD);
     /* Modify magic characters in character type table. */
     if (! standard)
-        type[ DEF_MAGIC] = 0;
-    if (mode != STD)
-        type[ IN_SRC] = 0;
-    if (mode == POST_STD || mode == KR)
-        type[ TOK_SEP] = 0;         /* TOK_SEP equals to COM_SEP    */
+        char_type[ DEF_MAGIC] = 0;
+    if (mcpp_mode != STD)
+        char_type[ IN_SRC] = 0;
+    if (mcpp_mode == POST_STD || mcpp_mode == KR)
+        char_type[ TOK_SEP] = 0;    /* TOK_SEP equals to COM_SEP    */
 
     expand_init();
                 /* Set function pointer to macro expansion routine  */
@@ -1548,12 +1549,12 @@ static void init_predefines(
     char    tmp[ 16];
 
     if (std_val != -1L) {               /* Version is specified     */
-        if (cplus)
-            cplus = std_val;            /* Value of __cplusplus     */
+        if (cplus_val)
+            cplus_val = std_val;        /* Value of __cplusplus     */
         else
             stdc_ver = std_val;     /* Value of __STDC_VERSION__    */
     } else {
-        if (! cplus)
+        if (! cplus_val)
             stdc_ver = stdc_val ? STDC_VERSION : 0L;
     }
 
@@ -1562,14 +1563,14 @@ static void init_predefines(
 #if COMPILER == GNUC
         undef_gcc_macro( TRUE);
 #endif
-    } else if (stdc_val || cplus) {
+    } else if (stdc_val || cplus_val) {
         un_predefine( FALSE);           /* Undefine "unix" or so    */
 #if COMPILER == GNUC
         undef_gcc_macro( FALSE);
 #endif
     }
-    sprintf( tmp, "%ldL", cplus ? cplus : stdc_ver);
-    if (cplus) {
+    sprintf( tmp, "%ldL", cplus_val ? cplus_val : stdc_ver);
+    if (cplus_val) {
         look_and_install( "__cplusplus", DEF_NOARGS - 2, null, tmp);
     } else {
         if (stdc_ver)
@@ -1580,9 +1581,9 @@ static void init_predefines(
 #endif
     }
     set_limit();
-    stdc2 = cplus || stdc_ver >= 199901L;
-    stdc3 = (cplus >= 199901L) || (stdc_ver >= 199901L);
-                /* (cplus >= 199901L) makes C++ C99-compatible specs    */
+    stdc2 = cplus_val || stdc_ver >= 199901L;
+    stdc3 = (cplus_val >= 199901L) || (stdc_ver >= 199901L);
+            /* (cplus_val >= 199901L) makes C++ C99-compatible specs    */
     if (standard)
         init_std_defines();
     if (stdc3)
@@ -1593,9 +1594,9 @@ static void init_std_defines( void)
 /*
  * For STD and POST_STD modes.
  * The magic pre-defines (Standard predefined macros) are initialized with
- * negative argument counts.  expand() notices this and calls the appropriate
- * routine.  DEF_NOARGS is one greater than the first "magic" definition.
- * 'DEF_NOARGS - n' is reserved for pre-defined macros.
+ * negative argument counts.  expand_macro() notices this and calls the
+ * appropriate routine.  DEF_NOARGS is one greater than the first "magic"
+ * definition.  'DEF_NOARGS - n' is reserved for pre-defined macros.
  * __STDC_VERSION__ and __cplusplus are defined by chk_opts() and set_cplus().
  */
 {
@@ -1630,7 +1631,7 @@ static void init_std_defines( void)
         look_and_install( "__STDC_HOSTED__", DEF_NOARGS - 1, null, tmp);
     }
 #if COMPILER != GNUC        /* GCC do not undefine __STDC__ on C++  */
-    if (cplus)
+    if (cplus_val)
         return;
 #endif
     /* Define __STDC__ as 1 or such for Standard conforming compiler.   */
@@ -1645,7 +1646,7 @@ static void set_limit( void)
  * Set the minimum translation limits specified by the Standards.
  */
 {
-    if (cplus) {                /* Specified by C++ 1998 Standard   */
+    if (cplus_val) {            /* Specified by C++ 1998 Standard   */
         str_len_min = SLEN_CPLUS_MIN;
         id_len_min = IDLEN_CPLUS_MIN;
         n_mac_pars_min = NMACPARS_CPLUS_MIN;
@@ -1717,9 +1718,9 @@ void    at_start( void)
     /* -fworking-directory  */
     if (gcc_work_dir && (preinclude <= --preinc_end && *preinc_end != NULL)) {
         open_include( *preinc_end, TRUE, FALSE);
-        line++;
+        src_line++;
         put_info();                 /* Putout the current directory */
-        line--;
+        src_line--;
     }
 #endif
     /*
@@ -1773,7 +1774,7 @@ static void set_env_dirs( void)
 {
     const char *    env;
 
-    if (cplus) {
+    if (cplus_val) {
         if ((env = getenv( ENV_CPLUS_INCLUDE_DIR)) != NULL)
             parse_env( env);
     }
@@ -1820,7 +1821,7 @@ static void set_sys_dirs(
  * list.
  */
 {
-    if (cplus && set_cplus_dir) {
+    if (cplus_val && set_cplus_dir) {
 #ifdef  CPLUS_INCLUDE_DIR1
         set_a_dir( CPLUS_INCLUDE_DIR1);
 #endif
@@ -1950,7 +1951,7 @@ static char *   norm_path(
             strcpy( slbuf1, slbuf2);
         }
     }
-    if (debug & PATH) {
+    if (mcpp_debug & PATH) {
         if (slbuf2[ 0])
             mcpp_fprintf( DBG, "Dereferenced \"%s%s\" to \"%s\"\n"
                     , dir, fname ? fname : "", slbuf1);
@@ -2092,7 +2093,7 @@ static char *   norm_path(
             *cp1 = PATH_DELIM;
     }
 #endif
-    if (debug & PATH) {
+    if (mcpp_debug & PATH) {
         char    debug_buf[ FILENAMEMAX+1];
         strcpy( debug_buf, dir);
         strcat( debug_buf, fname ? fname : "");
@@ -2160,7 +2161,7 @@ void    conv_case(
     for (sp = name; sp < lim; sp++) {
         c = *sp & UCHARMAX;
 #if MBCHAR
-        if ((type[ c] & mbstart)) {
+        if ((char_type[ c] & mbstart)) {
             char    tmp[ FILENAMEMAX+1];
             char *  tp = tmp;
             *tp++ = *sp++;
@@ -2187,7 +2188,7 @@ void    put_info( void)
     if (! put_info_done && ! no_output && gcc_work_dir)
         mcpp_fprintf( OUT, "%s%ld \"%s%c\"\n"
                 , std_line_prefix ? "#line " : LINE_PREFIX
-                , line, cur_work_dir, '/');
+                , src_line, cur_work_dir, '/');
     put_info_done = TRUE;
 #endif
 }
@@ -2240,7 +2241,7 @@ static void init_gcc_macro(
         /* The predefined macro file    */
         cp = i ? "std" : "old";
         sprintf( fname, "%smcpp_g%s%d%d_predef_%s.h"
-                , include_dir, cplus ? "xx" : "cc"
+                , include_dir, cplus_val ? "xx" : "cc"
                 , gcc_maj_ver, gcc_min_ver, cp);
             /* Note that norm_path() append a PATH_DELIM.   */
         if ((fp = fopen( fname, "r")) == NULL) {
@@ -2252,8 +2253,9 @@ static void init_gcc_macro(
         while (fgets( lbuf, BUFSIZ, fp) != NULL) {
             unget_string( lbuf, "gcc_predefine");
             if (skip_ws() == '#'
-                && scan_token( skip_ws(), (tp = work, &tp), work_end) == NAM
-                    && str_eq( work, "define")) {
+                && scan_token( skip_ws(), (tp = work_buf, &tp), work_end)
+                        == NAM
+                    && str_eq( work_buf, "define")) {
                 defp = do_define( TRUE);    /* Ignore re-definition */ 
                 if (defp->nargs >= DEF_NOARGS - 1)
                     *predef++ = defp;   /* Register only non-Standard macros*/
@@ -2330,7 +2332,7 @@ static void init_msc_macro(
     i = atoi( defp->repl);
     if (i >= 1400) {                        /* _MSC_VER >= 1400     */
         look_and_install( "_MT", DEF_NOARGS - 1, null, "1");
-        if (cplus && ! wchar_t_modified) {
+        if (cplus_val && ! wchar_t_modified) {
             /* -Zc:wchar_t- was not specified   */
             look_and_install( "_NATIVE_WCHAR_T_DEFINED", DEF_NOARGS - 1, null
                     , "1");
@@ -2363,7 +2365,7 @@ void    put_depend(
         out_p = md_init( filename, output);
         fp = mkdep_fp;
         llen = strlen( output);
-        pos_num = 0;            /* Initialize for MCPP_LIB mode     */
+        pos_num = 0;            /* Initialize for MCPP_LIB build    */
     } else if (filename == NULL) {              /* End of input     */
         out_p = stpcpy( out_p, "\n\n");
         if (mkdep & MD_PHONY) {
@@ -2402,7 +2404,7 @@ void    put_depend(
             mcpp_fputs( output, OUT);
         else            /* To the file specified by -MF, -MD, -MMD options  */
             fputs( output, fp);
-        fp = NULL;      /* Clear for the next call in MCPP_LIB mode */
+        fp = NULL;      /* Clear for the next call in MCPP_LIB build        */
         return;
     }
 
@@ -2548,7 +2550,7 @@ int     do_include(
     }
     fname = infile->bptr - 1;       /* Current token for diagnosis  */
 
-    if (standard && type[ delim] & LET) {   /* Maybe a macro        */
+    if (standard && char_type[ delim] & LET) {  /* Maybe a macro    */
         int     c;
         char    *hp;
 
@@ -2556,10 +2558,10 @@ int     do_include(
         c = delim;
         while (get_unexpandable( c, FALSE) != NO_TOKEN) {
                                 /* Expand any macros in the line    */
-            if (header + FILENAMEMAX < hp + (int) (workp - work))
-                cfatal( toolong_fname, header, 0L, work);
-            hp = stpcpy( hp, work);
-            while ((c = get()) == ' ')
+            if (header + FILENAMEMAX < hp + (int) (workp - work_buf))
+                cfatal( toolong_fname, header, 0L, work_buf);
+            hp = stpcpy( hp, work_buf);
+            while ((c = get_ch()) == ' ')
                 *hp++ = ' ';
         }
         *hp = EOS;                          /* Ensure to terminate  */
@@ -2573,12 +2575,12 @@ int     do_include(
         }
     }
 
-    token_type = scan_token( delim, (workp = work, &workp)
-            , work + FILENAMEMAX);
+    token_type = scan_token( delim, (workp = work_buf, &workp)
+            , work_buf + FILENAMEMAX);
     if (token_type == STR)                  /* String literal form  */
         goto  found_name;
     else if (token_type == OPE && openum == OP_LT)          /* '<'  */
-        workp = scan_quote( delim, work, work + FILENAMEMAX, TRUE);
+        workp = scan_quote( delim, work_buf, work_buf + FILENAMEMAX, TRUE);
                                         /* Re-construct or diagnose */
     else                                    /* Any other token in-  */
         goto  not_header;                   /*   cluding <=, <<, <% */
@@ -2587,15 +2589,15 @@ int     do_include(
         goto  syntax_error;
 
 found_name:
-    *--workp = EOS;                     /* Remove the closing and   */
-    fname = save_string( &work[ 1]);    /*  the starting delimiter. */
+    *--workp = EOS;                         /* Remove the closing and   */
+    fname = save_string( &work_buf[ 1]);    /*  the starting delimiter. */
 
     if (skip_ws() != '\n') {
         if (standard) {
             cerror( excess_token, infile->bptr-1, 0L, NULL);
             skip_nl();
             goto  error;
-        } else if (mode == OLD_PREP) {
+        } else if (mcpp_mode == OLD_PREP) {
             skip_nl();
         } else {
             if (warn_level & 1)
@@ -2676,7 +2678,7 @@ static int  open_include(
     }
 #endif
 
-    if (debug & PATH)
+    if (mcpp_debug & PATH)
         mcpp_fprintf( DBG, "filename:%s\n", filename);
     if ((searchlocal && ((search_rule & CURRENT) || !has_dir)) || full_path) {
         /*
@@ -2764,9 +2766,9 @@ static int  search_dir(
     for ( ; incptr < incend; incptr++) {
         if (strlen( *incptr) + strlen( filename) >= FILENAMEMAX) {
             char *  cp;
-            cp = stpcpy( work, *incptr);
+            cp = stpcpy( work_buf, *incptr);
             strcpy( cp, filename);
-            cfatal( toolong_fname, work, 0L, "");           /* _F_  */
+            cfatal( toolong_fname, work_buf, 0L, "");       /* _F_  */
         }
         if (open_file( incptr, filename, FALSE))
             /* Now infile has been renewed  */
@@ -2799,7 +2801,7 @@ static int  open_file(
     char *      cp;
     char        fullname[ FILENAMEMAX + 1];
 
-    if (debug & PATH)
+    if (mcpp_debug & PATH)
         mcpp_fprintf( DBG, "Searching %s\n", **dirp == EOS ? "." : *dirp);
     if (standard && included( *dirp, filename)) /* Once included    */
         return  TRUE;
@@ -2842,7 +2844,7 @@ static int  open_file(
     /*
      * Remember the directory for #include_next.
      * Note: inc_dirp is restored to the parent includer's directory
-     *   by get() when the current includer is finished.
+     *   by get_ch() when the current includer is finished.
      */
     infile->dirp = inc_dirp = dirp;
     strcpy( cur_fullname, fullname);
@@ -2850,10 +2852,10 @@ static int  open_file(
     if (zflag) {
         no_output++;        /* Don't output the included file       */
     } else {
-        line = 1;                       /* Working on line 1 now    */
+        src_line = 1;                       /* Working on line 1 now    */
         sharp();            /* Print out the included file name     */
     }
-    line = 0;                           /* To read the first line   */
+    src_line = 0;                           /* To read the first line   */
     return  TRUE;
 }
 
@@ -2925,9 +2927,9 @@ void cur_file( void)
 
     while (file->fp == NULL)
         file = file->parent;
-    cp = stpcpy( work, *(file->dirp));
+    cp = stpcpy( work_buf, *(file->dirp));
     strcpy( cp, file->filename);
-    name = work;
+    name = work_buf;
     if (sharp_filename == NULL || ! str_eq( name, sharp_filename)) {
         if (sharp_filename != NULL)
             free( sharp_filename);
@@ -2959,7 +2961,7 @@ static char *   bsl2sl(
         if (bsl_in_mbchar) {
             int     c;
             c = *cp & UCHARMAX;
-            if (type[ c] & mbstart) {  /* First byte of MBCHAR */
+            if (char_type[ c] & mbstart) {  /* First byte of MBCHAR */
                 char    tmp[ FILENAMEMAX];
                 char *  tp = tmp;
                 *tp++ = *cp++;
@@ -3000,7 +3002,7 @@ static int  is_junk( void)
     int     c;
 
     c = skip_ws();
-    unget();
+    unget_ch();
     if (c != '\n') {                        /* Trailing junk        */
         if (warn_level & 1)
             cwarn( unknown_arg, infile->bptr, 0L, NULL);
@@ -3042,10 +3044,10 @@ void    do_pragma( void)
     if (c == '\n') {
         if (warn_level & 1)
             cwarn( "No sub-directive", NULL, 0L, NULL);     /* _W1_ */
-        unget();
+        unget_ch();
         return;
     }
-    token_type = scan_token( c, (tp = work, &tp), work_end);
+    token_type = scan_token( c, (tp = work_buf, &tp), work_end);
 #if EXPAND_PRAGMA
 #if COMPILER == MSC
     if (token_type == NAM
@@ -3064,24 +3066,24 @@ void    do_pragma( void)
         tp = stpcpy( mp, identifier);
         do {                /* Expand all the macros in the line    */
             if (token_type == NAM && (defp = is_macro( &tp)) != NULL) {
-                tp = expand( defp, bp, mp_end);
+                tp = expand_macro( defp, bp, mp_end);
                 if (! stdc3 && (warn_level & 2))
                     cwarn(
                 "\"%s\" is macro expanded in other than C99 mode"   /* _W2_ */
                             , identifier, 0L, NULL);
             }
-            token_type = scan_token( c = get(), (bp = tp, &tp), mp_end);
+            token_type = scan_token( c = get_ch(), (bp = tp, &tp), mp_end);
         } while (c != '\n');
         unget_string( mp, NULL);                    /* To re-read   */
         free( mp);
         c = skip_ws();
         bp = infile->bptr - 1;
-        token_type = scan_token( c, (tp = work, &tp), work_end);
+        token_type = scan_token( c, (tp = work_buf, &tp), work_end);
     }
 #endif
     if (token_type != NAM) {
         if (warn_level & 1)
-            cwarn( not_ident, work, 0L, NULL);
+            cwarn( not_ident, work_buf, 0L, NULL);
         goto  skip_nl;
     } else if (str_eq( identifier, "once")) {   /* #pragma once     */
        if (! is_junk()) {
@@ -3092,9 +3094,9 @@ void    do_pragma( void)
             goto  skip_nl;
         }
     } else if (str_eq( identifier, "MCPP")) {
-        if (scan_token( skip_ws(), (tp = work, &tp), work_end) != NAM) {
+        if (scan_token( skip_ws(), (tp = work_buf, &tp), work_end) != NAM) {
             if (warn_level & 1)
-                cwarn( not_ident, work, 0L, NULL);
+                cwarn( not_ident, work_buf, 0L, NULL);
         }
         if (str_eq( identifier, "put_defines")) {
             if (! is_junk())
@@ -3129,7 +3131,7 @@ void    do_pragma( void)
 #if COMPILER == GNUC
     /* The #pragma lines for GCC is skipped not to confuse cc1.     */
     } else if (str_eq( identifier, "GCC")) {    /* #pragma GCC *    */
-        if ((scan_token( skip_ws(), (tp = work, &tp), work_end) == NAM)
+        if ((scan_token( skip_ws(), (tp = work_buf, &tp), work_end) == NAM)
                 && (str_eq( identifier, "poison")
                     || str_eq( identifier, "dependency")
                     || str_eq( identifier, "system_header"))) {
@@ -3143,12 +3145,13 @@ void    do_pragma( void)
 #if COMPILER == MSC
     } else if (str_eq( identifier, "setlocale")) {
         if (skip_ws() == '('
-                && scan_token( skip_ws(), (tp = work, &tp), work_end) == STR
+                && scan_token( skip_ws(), (tp = work_buf, &tp), work_end)
+                    == STR
                 && skip_ws() == ')') {
             if (! is_junk()) {
-                work[ 0] = *(tp - 1) = '\0';
-                set_encoding( work + 1, NULL, SETLOCALE);
-                work[ 0] = *(tp - 1) = '"';
+                work_buf[ 0] = *(tp - 1) = '\0';
+                set_encoding( work_buf + 1, NULL, SETLOCALE);
+                work_buf[ 0] = *(tp - 1) = '"';
             }   /* else warned by is_junk() */
         } else {
             warn = TRUE;
@@ -3156,13 +3159,13 @@ void    do_pragma( void)
 #else   /* COMPILER != MSC  */
     } else if (str_eq( identifier, "__setlocale")) {
         if (skip_ws() == '('
-                && scan_token( skip_ws(), (tp = work, &tp), work_end)
+                && scan_token( skip_ws(), (tp = work_buf, &tp), work_end)
                         == STR
                 && skip_ws() == ')') {
             if (! is_junk()) {              /* #pragma __setlocale  */
-                work[ 0] = *(tp - 1) = '\0';
-                set_encoding( work + 1, NULL, __SETLOCALE);
-                work[ 0] = *(tp - 1) = '"';
+                work_buf[ 0] = *(tp - 1) = '\0';
+                set_encoding( work_buf + 1, NULL, __SETLOCALE);
+                work_buf[ 0] = *(tp - 1) = '"';
             }   /* else warned by is_junk() */
         } else {
             warn = TRUE;
@@ -3181,7 +3184,7 @@ void    do_pragma( void)
 #if COMPILER == LCC
     } else if (str_eq( identifier, "optimize")
                 && (skip_ws() == '(')
-                && (type[ (c = skip_ws()) & UCHARMAX] == DIG)
+                && (char_type[ (c = skip_ws()) & UCHARMAX] == DIG)
                 && (skip_ws() == ')')) {
         char    tmp[ 2];
 
@@ -3210,7 +3213,7 @@ void    do_pragma( void)
         mcpp_fputs( bp, OUT);           /* Line is put out          */
     }
 skip_nl: /* Don't use skip_nl() which skips to the newline in source file */
-    while (get() != '\n')
+    while (get_ch() != '\n')
         ;
 }
 
@@ -3255,7 +3258,7 @@ static int  included(
     for (inc = start_inc; inc; inc = inc->next) {
         if (str_eq( inc->fname, fname)) {
             /* Already included */
-            if (debug & PATH)
+            if (mcpp_debug & PATH)
                 mcpp_fprintf( DBG, "Once included \"%s\"\n", fname);
             free( fname);
             return  TRUE;
@@ -3285,14 +3288,15 @@ static void push_or_pop(
     size_t          s_name, s_def;
 
     if (skip_ws() == '('
-            && scan_token( skip_ws(), (tp = work, &tp), work_end) == STR
+            && scan_token( skip_ws(), (tp = work_buf, &tp), work_end) == STR
             && skip_ws() == ')') {          /* Correct syntax       */
 
         if (is_junk())
             return;
-        s_name = strlen( work) - 2;
-        *(work + s_name + 1) = '\0';
-        memcpy( identifier, work + 1, s_name + 1);  /* Remove enclosing '"' */
+        s_name = strlen( work_buf) - 2;
+        *(work_buf + s_name + 1) = '\0';
+        memcpy( identifier, work_buf + 1, s_name + 1);
+                                            /* Remove enclosing '"' */
         prevp = look_prev( identifier, &cmp);
         if (cmp == 0) { /* Current definition or pushed definition exists   */
             defp = *prevp;
@@ -3306,7 +3310,7 @@ static void push_or_pop(
                 /* Else the current definition exists.  Push it     */
                 s_def = sizeof (DEFBUF) + 3 + s_name
                         + strlen( defp->repl) + strlen( defp->fname);
-                if (mode == STD)
+                if (mcpp_mode == STD)
                     s_def += strlen( defp->parmnames);
                 dp = (DEFBUF *) xmalloc( s_def);
                 memcpy( dp, defp, s_def);   /* Copy the definition  */
@@ -3365,10 +3369,10 @@ static void do_asm(
         else
             cerror( "Without #asm", NULL, 0L, NULL);        /* _E_  */
         skip_nl();
-        unget();
+        unget_ch();
         return;
     }
-    in_asm = asm_start ? line : 0L;
+    in_asm = asm_start ? src_line : 0L;
 }
 
 void    do_old( void)
@@ -3405,7 +3409,7 @@ void    do_old( void)
         cwarn( infile->buffer, NULL, 0L, NULL);
                                     /* Always output the warning    */
         skip_nl();
-        unget();
+        unget_ch();
         return;
     } else if (str_eq( identifier, "ident") || str_eq( identifier, "sccs")) {
         if ((compiling && (warn_level & 1))
@@ -3422,7 +3426,7 @@ void    do_old( void)
         if (! compiling)
             return;
         skip_nl();
-        unget();
+        unget_ch();
         return;
     }
 #endif  /* COMPILER == GNUC */
@@ -3434,7 +3438,7 @@ void    do_old( void)
             return;
         mcpp_fputs( infile->buffer, OUT);   /* Putout the line as is*/
         skip_nl();
-        unget();
+        unget_ch();
         return;
     }
 #endif
@@ -3454,7 +3458,7 @@ void    do_old( void)
         cwarn( unknown, identifier, 0L, " (in skipped block)");
     }
     skip_nl();
-    unget();
+    unget_ch();
     return;
 }
 
@@ -3467,11 +3471,11 @@ static int  do_prestd_directive( void)
     if (str_eq( identifier, "assert")) {    /* #assert              */
         if (! compiling)                    /* Only validity check  */
             return  TRUE;
-        if (eval() == 0L) {                 /* Assert expression    */
+        if (eval_if() == 0L) {              /* Assert expression    */
             cerror( "Preprocessing assertion failed"        /* _E_  */
                     , NULL, 0L, NULL);
             skip_nl();
-            unget();
+            unget_ch();
         }
         return  TRUE;
     } else
@@ -3479,30 +3483,30 @@ static int  do_prestd_directive( void)
     if (str_eq( identifier, "put_defines")) {
         if (! compiling)                    /* Only validity check  */
             return  TRUE;
-        if (mode != OLD_PREP && ! is_junk())
+        if (mcpp_mode != OLD_PREP && ! is_junk())
             dump_def( dDflag, TRUE);        /* #put_defines         */
         skip_nl();
-        unget();
+        unget_ch();
         return  TRUE;
     } else if (str_eq( identifier, "preprocess")) {
         if (! compiling)                    /* Only validity check  */
             return  TRUE;
-        if (mode != OLD_PREP && ! is_junk())
+        if (mcpp_mode != OLD_PREP && ! is_junk())
         /* Just putout the directive for the succeding preprocessor */
             mcpp_fputs( "#preprocessed\n", OUT);
         skip_nl();
-        unget();
+        unget_ch();
         return  TRUE;
     } else if (str_eq( identifier, "preprocessed")) {
         if (! compiling)                    /* Only validity check  */
             return  TRUE;
-        if (mode != OLD_PREP && ! is_junk()) {
+        if (mcpp_mode != OLD_PREP && ! is_junk()) {
             skip_nl();
             do_preprocessed();              /* #preprocessed        */
             return  TRUE;
         }
         skip_nl();
-        unget();
+        unget_ch();
         return  TRUE;
     }
 
@@ -3525,7 +3529,7 @@ static int  do_prestd_directive( void)
     if (str_eq( identifier, "endasm")) {    /* #endasm              */
         do_asm( FALSE);
         skip_nl();                          /* Skip comments, etc.  */
-        unget();
+        unget_ch();
         return  TRUE;
     }
 
@@ -3600,7 +3604,7 @@ static void do_preprocessed( void)
                     || (memcmp( --comment, "/* ", 3) != 0)
                     || ((colon = strrchr( comment, ':')) == NULL))
                 cfatal( corrupted, NULL, 0L, NULL);
-            line = atol( colon + 1);        /* Pseudo line number   */
+            src_line = atol( colon + 1);    /* Pseudo line number   */
             *colon = EOS;
             dir = comment + 3;
             inc_dirp = &null;
@@ -3617,9 +3621,9 @@ static void do_preprocessed( void)
             strcpy( comment - 2, "\n");     /* Remove the comment   */
             unget_string( lbuf + 8, NULL);
             do_define( FALSE);
-            get();      /* '\n' */
-            get();      /* Clear the "file" */
-            unget();    /* infile == file   */
+            get_ch();                           /* '\n' */
+            get_ch();                           /* Clear the "file" */
+            unget_ch();                         /* infile == file   */
         }
     }
     file->bptr = file->buffer + strlen( file->buffer);
@@ -3653,49 +3657,49 @@ static int  do_debug(
 
     c = skip_ws();
     if (c == '\n') {
-        unget();
+        unget_ch();
         if (set) {
             if (warn_level & 1)
                 cwarn( "No argument", NULL, 0L, NULL);      /* _W1_ */
             return TRUE;
         } else {
-            debug = 0;                      /* Clear all the flags  */
+            mcpp_debug = 0;                 /* Clear all the flags  */
             return FALSE;
         }
     }
-    while (scan_token( c, (workp = work, &workp), work_end) == NAM) {
+    while (scan_token( c, (workp = work_buf, &workp), work_end) == NAM) {
         argp = debug_args;
         while (argp->arg_name) {
-            if (str_eq( argp->arg_name, work))
+            if (str_eq( argp->arg_name, work_buf))
                 break;
             argp++;
         }
         if (argp->arg_name == NULL) {
             if (warn_level & 1)
-                cwarn( unknown_arg, work, 0L, NULL);
+                cwarn( unknown_arg, work_buf, 0L, NULL);
             goto  diagnosed;
         } else {
             num = argp->arg_num;
             if (set) {
-                debug |= num;
+                mcpp_debug |= num;
                 if (num == PATH)
                     dump_path();
                 else if (num == MEMORY)
                     print_heap();
             } else {
-                debug &= ~num;
+                mcpp_debug &= ~num;
             }
         }
         c = skip_ws();
     }
     if (c != '\n') {
         if (warn_level & 1)
-            cwarn( not_ident, work, 0L, NULL);
+            cwarn( not_ident, work_buf, 0L, NULL);
         skip_nl();
-        unget();
+        unget_ch();
         goto  diagnosed;
     }
-    unget();
+    unget_ch();
     return FALSE;
 diagnosed:
     return TRUE;
@@ -3770,7 +3774,7 @@ void    at_end( void)
     }
 #endif
 
-    if (debug & MEMORY)
+    if (mcpp_debug & MEMORY)
         print_heap();
 }
 

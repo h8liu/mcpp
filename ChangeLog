@@ -1,6 +1,6 @@
 ChangeLog of MCPP and its accompanying Validation Suite
 
-2007/02/27  kmatsui
+2007/03/24  kmatsui
         * V.2.6.3-prerelease
         * Fixed a bug of some #line directive handling which wrongly
         affected #include path.  Added a new member for real file name
@@ -27,6 +27,15 @@ ChangeLog of MCPP and its accompanying Validation Suite
         Kress and slightly modified by kmatsui) (internal.H, main.c,
         directive.c, eval.c, expand.c, mbchar.c, support.c, system.c,
         lib.c, mcpp_lib.h)
+        * Renamed some global names in order to lessen the possibility
+        of name collisions in subroutine-build.  Renamed the variables
+        mode, cplus, line, debug, type[] and work[] to mcpp_mode,
+        cplus_val, src_line, mcpp_debug, char_type[] and work_buf[]
+        respectively.  Renamed the functions install(), eval(), expand(),
+        get() and unget() to install_macro(), eval_if(), expand_macro(),
+        get_ch() and unget_ch() respectively.
+        * Added 'mcpplib' target to make subroutine (library) build in
+        configure.ac and noconfig/*.mak.
         * Revised some other minor points.  (all sources)
         * Changed default setting of noconfig.H to that of FreeBSD 6.* /
         stand-alone / GCC 3.4.  (noconfig.H)
@@ -35,8 +44,6 @@ ChangeLog of MCPP and its accompanying Validation Suite
         * Abolished 'install-data' and 'uninstall-data' targets of
         configured makefile.  On the other hand, made 'install' target
         install also mcpp-manual.html.
-        * Updated documents in 'doc-jp' directory, meanwhile the ones in
-        'doc' directory are not yet updated.
 
 2006/11/12  kmatsui
         * V.2.6.2

@@ -116,24 +116,24 @@ void    directive( void)
     c = skip_ws();
     if (c == '\n')                              /* 'null' directive */
         goto  ret;
-    token_type = scan_token( c, (workp = work, &workp), work_end);
+    token_type = scan_token( c, (workp = work_buf, &workp), work_end);
     if (in_asm && (token_type != NAM            /* In #asm block    */
             || (! str_eq( identifier, "asm")    /* Ignore #anything */
                 && ! str_eq( identifier, "endasm"))))   /*   other  */
         goto  skip_line;                /*    than #asm or #endasm  */
     if (token_type != NAM) {
-        if (mode == OLD_PREP && token_type == NUM) {    /* # 123 [fname]    */
+        if (mcpp_mode == OLD_PREP && token_type == NUM) {   /* # 123 [fname]*/
             strcpy( identifier, "line");
         } else {
             if (compiling) {
                 if (lang_asm) {
                     if (warn_level & 1)
-                        cwarn( illeg_dir, work, 0L, NULL);
+                        cwarn( illeg_dir, work_buf, 0L, NULL);
                 } else {
-                    cerror( illeg_dir, work, 0L, NULL);
+                    cerror( illeg_dir, work_buf, 0L, NULL);
                 }
             } else if (warn_level & 8) {
-                cwarn( illeg_dir, work, 0L, in_skipped);
+                cwarn( illeg_dir, work_buf, 0L, in_skipped);
             }
             goto  skip_line;
         }
@@ -192,7 +192,7 @@ void    directive( void)
                     && &ifstack[ blk_nest_min + 1] == ifptr)
                 cwarn( many_nesting, NULL, (long) blk_nest_min, in_skipped);
             ifptr->stat = 0;                /* !WAS_COMPILING       */
-            ifptr->ifline = line;           /* Line at section start*/
+            ifptr->ifline = src_line;       /* Line at section start*/
             goto  skip_line;
         default     :                       /* Other directives     */
             if (tp == NULL && (warn_level & 8))
@@ -214,7 +214,7 @@ void    directive( void)
                 &ifstack[ blk_nest_min + 1] == ifptr)
             cwarn( many_nesting, NULL , (long) blk_nest_min, NULL);
         ifptr->stat = WAS_COMPILING;
-        ifptr->ifline = line;
+        ifptr->ifline = src_line;
         goto  ifdo;
 
     case L_elif:
@@ -236,11 +236,11 @@ void    directive( void)
         hash = L_if;
 ifdo:
         c = do_if( hash);
-        if (debug & IF) {
+        if (mcpp_debug & IF) {
             mcpp_fprintf( DBG
                     , "#if (#elif, #ifdef, #ifndef) evaluate to %s.\n"
                     , compiling ? "TRUE" : "FALSE");
-            mcpp_fprintf( DBG, "line %ld: %s", line, infile->buffer);
+            mcpp_fprintf( DBG, "line %ld: %s", src_line, infile->buffer);
         }
         if (c == FALSE) {                   /* Error                */
             compiling = FALSE;              /* Skip this group      */
@@ -260,7 +260,7 @@ ifdo:
         if (ifptr->stat & ELSE_SEEN)
             goto  else_seen_err;
         ifptr->stat |= ELSE_SEEN;
-        ifptr->elseline = line;
+        ifptr->elseline = src_line;
         if (ifptr->stat & WAS_COMPILING) {
             if (compiling || (ifptr->stat & TRUE_SEEN) != 0)
                 compiling = FALSE;
@@ -294,9 +294,9 @@ ifdo:
 
     case L_line:
         if ((c = do_line()) > 0) {
-            line = c;
+            src_line = c;
             sharp();    /* Putout the new line number and file name */
-            infile->line = --line;  /* Next line number is 'line'   */
+            infile->line = --src_line;  /* Next line number is 'src_line'   */
             newlines = -1;
         } else {            /* Error already diagnosed by do_line()  */
             skip_nl();
@@ -352,7 +352,7 @@ ifdo:
             break;          /* Already read over the line           */
         /* Else fall through    */
     default :               /* L_else, L_endif, L_undef, etc.       */
-        if (mode == OLD_PREP) {
+        if (mcpp_mode == OLD_PREP) {
         /*
          * Ignore the rest of the #directive line so you can write
          *          #if     foo
@@ -406,17 +406,17 @@ static int  do_if( int hash)
     int     found;
 
     if ((c = skip_ws()) == '\n') {
-        unget();
+        unget_ch();
         cerror( no_arg, NULL, 0L, NULL);
         return  FALSE;
     }
     if (hash == L_if) {                 /* #if or #elif             */
-        unget();
-        found = (eval() != 0L);         /* Evaluate expression      */
+        unget_ch();
+        found = (eval_if() != 0L);      /* Evaluate expression      */
         hash = L_ifdef;                 /* #if is now like #ifdef   */
     } else {                            /* #ifdef or #ifndef        */
-        if (scan_token( c, (workp = work, &workp), work_end) != NAM) {
-            cerror( not_ident, work, 0L, NULL);
+        if (scan_token( c, (workp = work_buf, &workp), work_end) != NAM) {
+            cerror( not_ident, work_buf, 0L, NULL);
             return  FALSE;      /* Next token is not an identifier  */
         }
         found = (look_id( identifier) != NULL); /* Look in table    */
@@ -453,7 +453,7 @@ static long do_line( void)
 
     if ((c = skip_ws()) == '\n') {
         cerror( no_arg, NULL, 0L, NULL);
-        unget();                            /* Push back <newline>  */
+        unget_ch();                         /* Push back <newline>  */
         return  -1L;                /* Line number is not changed   */
     }
 
@@ -465,28 +465,28 @@ static long do_line( void)
             goto  no_num;
         if (token_type != NUM)
             goto  illeg_num;
-    } else if (scan_token( c, (workp = work, &workp), work_end) != NUM) {
+    } else if (scan_token( c, (workp = work_buf, &workp), work_end) != NUM) {
         goto  illeg_num;
     }
-    for (workp = work; *workp != EOS; workp++) {
+    for (workp = work_buf; *workp != EOS; workp++) {
         if (! isdigit( *workp & UCHARMAX)) {
             if (standard) {
-                cerror( not_digits, work, 0L, NULL);
+                cerror( not_digits, work_buf, 0L, NULL);
                 return  -1L;
             } else if (warn_level & 1) {
-                cwarn( not_digits, work, 0L, NULL);
+                cwarn( not_digits, work_buf, 0L, NULL);
             }
         }
     }
-    valp = eval_num( work);                 /* Evaluate number      */
+    valp = eval_num( work_buf);             /* Evaluate number      */
     if (valp->sign == VAL_ERROR) {  /* Error diagnosed by eval_num()*/
         return  -1;
     } else if (standard && (line_limit < valp->val || valp->val <= 0L)) {
         if (valp->val < LINE99LIMIT && valp->val > 0L) {
             if (warn_level & 1)
-                cwarn( out_of_range, work, line_limit, NULL);
+                cwarn( out_of_range, work_buf, line_limit, NULL);
         } else {
-            cerror( out_of_range, work, line_limit, NULL);
+            cerror( out_of_range, work_buf, line_limit, NULL);
             return  -1L;
         }
     }
@@ -504,10 +504,10 @@ static long do_line( void)
         }
     } else {
         if ((c = skip_ws()) == '\n') {
-            unget();
+            unget_ch();
             return  (long) valp->val;
         }
-        if (scan_token( c, (workp = work, &workp), work_end) != STR)
+        if (scan_token( c, (workp = work_buf, &workp), work_end) != STR)
             goto  not_fname;
     }
 #if COMPILER == GNUC
@@ -517,27 +517,27 @@ static long do_line( void)
 #endif
     {
         *(workp - 1) = EOS;                 /* Ignore right '"'     */
-        save = save_string( &work[ 1]);     /* Ignore left '"'      */
+        save = save_string( &work_buf[ 1]); /* Ignore left '"'      */
     }
 
     if (standard) {
         if (get_unexpandable( skip_ws(), FALSE) != NO_TOKEN) {
-            cerror( excess, work, 0L, NULL);
+            cerror( excess, work_buf, 0L, NULL);
             free( save);
             return  -1L;
         }
-    } else if (mode == OLD_PREP) {
+    } else if (mcpp_mode == OLD_PREP) {
         skip_nl();
-        unget();
+        unget_ch();
     } else if ((c = skip_ws()) == '\n') {
-        unget();
+        unget_ch();
     } else {
         if (warn_level & 1) {
-            scan_token( c, (workp = work, &workp), work_end);
-            cwarn( excess, work, 0, NULL);
+            scan_token( c, (workp = work_buf, &workp), work_end);
+            cwarn( excess, work_buf, 0, NULL);
         }
         skip_nl();
-        unget();
+        unget_ch();
     }
 
     infile->filename = save;                /* New file name        */
@@ -549,10 +549,10 @@ no_num:
     cerror( "No line number", NULL, 0L, NULL);              /* _E_  */
     return  -1L;
 illeg_num:
-    cerror( "Not a line number \"%s\"", work, 0L, NULL);    /* _E_  */
+    cerror( "Not a line number \"%s\"", work_buf, 0L, NULL);        /* _E_  */
     return  -1L;
 not_fname:
-    cerror( "Not a file name \"%s\"", work, 0L, NULL);      /* _E_  */
+    cerror( "Not a file name \"%s\"", work_buf, 0L, NULL);  /* _E_  */
     return  -1L;
 }
 
@@ -567,12 +567,12 @@ not_fname:
 /*
  * look_id()    Looks for the name in the defined symbol table.  Returns a
  *              pointer to the definition if found, or NULL if not present.
- * install()    Installs the definition.  Updates the symbol table.
+ * install_macro()  Installs the definition.  Updates the symbol table.
  * undefine()   Deletes the definition from the symbol table.
  */
 
 /*
- * Global work[] are used to store #define parameter lists and parlist[]
+ * Global work_buf[] are used to store #define parameter lists and parlist[]
  * point to them.
  * 'nargs' contains the actual number of parameters stored.
  */
@@ -639,10 +639,10 @@ DEFBUF *    do_define(
     repl_end = & repl_list[ NMACWORK];
     if ((c = skip_ws()) == '\n') {
         cerror( no_ident, NULL, 0L, NULL);
-        unget();
+        unget_ch();
         return  NULL;
-    } else if (scan_token( c, (workp = work, &workp), work_end) != NAM) {
-        cerror( not_ident, work, 0L, NULL);
+    } else if (scan_token( c, (workp = work_buf, &workp), work_end) != NAM) {
+        cerror( not_ident, work_buf, 0L, NULL);
         return  NULL;
     } else {
         prevp = look_prev( identifier, &cmp);
@@ -650,7 +650,7 @@ DEFBUF *    do_define(
         if (standard) {
             if (cmp || defp->push) {    /* Not known or 'pushed' macro      */
                 if (str_eq( identifier, "defined")
-                        || ((stdc_val || cplus)
+                        || ((stdc_val || cplus_val)
                             &&  str_eq( identifier, "__VA_ARGS__"))) {
                     cerror(
             "\"%s\" shouldn't be defined", identifier, 0L, NULL);   /* _E_  */
@@ -698,7 +698,7 @@ DEFBUF *    do_define(
     in_define = FALSE;
     if (redefined) {
         if (dnargs != nargs || ! str_eq( defp->repl, repl_list)
-                || (mode == STD && ! str_eq( defp->parmnames, work))
+                || (mcpp_mode == STD && ! str_eq( defp->parmnames, work_buf))
                 ) {             /* Warn if differently redefined    */
             if (warn_level & 1) {
                 cwarn(
@@ -711,8 +711,9 @@ DEFBUF *    do_define(
             return  defp;
         }
     }                                   /* Else new or re-definition*/
-    defp = install( macroname, nargs, work, repl_list, prevp, cmp);
-    if (mode == STD && cplus && id_operator( macroname) && (warn_level & 1))
+    defp = install_macro( macroname, nargs, work_buf, repl_list, prevp, cmp);
+    if (mcpp_mode == STD && cplus_val && id_operator( macroname)
+            && (warn_level & 1))
         /* These are operators, not identifiers, in C++98   */
         cwarn( "\"%s\" is defined as macro", macroname      /* _W1_ */
                 , 0L, NULL);
@@ -721,7 +722,7 @@ DEFBUF *    do_define(
 
 static int  get_parm( void)
 /*
- *   Get parameters i.e. numbers into nargs, name into work[], name-length
+ *   Get parameters i.e. numbers into nargs, name into work_buf[], name-length
  * into parlen[].
  *   Return TRUE if the parameters are legal, else return FALSE.
  *   In STD mode preprocessor must remember the parameter names, only for
@@ -736,19 +737,19 @@ static int  get_parm( void)
     int     token_type;
     int     c;
 
-    parlist[ 0] = workp = work;
-    work[ 0] = EOS;
+    parlist[ 0] = workp = work_buf;
+    work_buf[ 0] = EOS;
 
     /* POST_STD mode    */
     insert_sep = NO_SEP;    /* Clear the inserted token separator   */
-    c = get();
+    c = get_ch();
 
     if (c == '(') {                         /* With arguments?      */
         nargs = 0;                          /* Init parms counter   */
         if (skip_ws() == ')')
             return  TRUE;                   /* Macro with 0 parm    */
         else
-            unget();
+            unget_ch();
 
         do {                                /* Collect parameters   */
             if (nargs >= NMACPARS) {
@@ -763,7 +764,7 @@ static int  get_parm( void)
                 } else if (c == ',' || c == ')') {
                     cerror( "Empty parameter", NULL, 0L, NULL);     /* _E_  */
                     return  FALSE;
-                } else if (standard && (stdc_val || cplus)
+                } else if (standard && (stdc_val || cplus_val)
                         && token_type == OPE && openum == OP_ELL) {
                     /*
                      * Enable variable argument macro which is a feature of
@@ -783,7 +784,7 @@ static int  get_parm( void)
                     return  FALSE;          /* Bad parameter syntax */
                 }
             }
-            if (standard && (stdc_val || cplus)
+            if (standard && (stdc_val || cplus_val)
                     && str_eq( identifier, "__VA_ARGS__")) {
                 cerror( illeg_parm, parlist[ nargs], 0L, NULL);
                 return  FALSE;
@@ -802,10 +803,10 @@ static int  get_parm( void)
 
         *--workp = EOS;                     /* Remove excessive ',' */
         if (c != ')') {                     /* Must end at )        */
-            unget();                        /* Push back '\n'       */
+            unget_ch();                     /* Push back '\n'       */
             cerror(
         "Missing \",\" or \")\" in parameter list \"(%s\""  /* _E_  */
-                    , work, 0L, NULL);
+                    , work_buf, 0L, NULL);
             return  FALSE;
         }
     } else {
@@ -814,7 +815,7 @@ static int  get_parm( void)
          * "#define foo" and "#define foo()".
          */
         nargs = DEF_NOARGS;                 /* Object-like macro    */
-        unget();
+        unget_ch();
     }
 ret:
 #if NMACPARS > NMACPARS90MIN
@@ -851,10 +852,10 @@ static int  get_repl( const char * macroname)
 
     *repl_cur = EOS;
     token_p = NULL;
-    if (mode == STD) {
-        c = get();
-        unget();
-        if (((type[ c] & SPA) == 0) && (nargs < 0) && (warn_level & 1))
+    if (mcpp_mode == STD) {
+        c = get_ch();
+        unget_ch();
+        if (((char_type[ c] & SPA) == 0) && (nargs < 0) && (warn_level & 1))
             cwarn( "No space between macro name \"%s\" and repl-text"/* _W1_ */
                 , macroname, 0L, NULL);
     }
@@ -919,7 +920,7 @@ static int  get_repl( const char * macroname)
             if (temp == NULL) {             /* Not a parameter name */
                 if (! standard)
                     break;
-                if ((stdc_val || cplus)
+                if ((stdc_val || cplus_val)
                             && str_eq( identifier, "__VA_ARGS__")) {
                     cerror( "\"%s\" without corresponding \"...\""  /* _E_  */
                             , identifier, 0L, NULL);
@@ -930,7 +931,7 @@ static int  get_repl( const char * macroname)
             } else {                        /* Parameter name       */
                 repl_cur = temp;
 #if COMPILER == GNUC
-                if (mode == STD && str_eq( identifier, "__VA_ARGS__")
+                if (mcpp_mode == STD && str_eq( identifier, "__VA_ARGS__")
                         && prev_token && *prev_token == CAT
                         && prev_prev_token && *prev_prev_token == ',')
                         /* ", ## __VA_ARGS__" sequence              */
@@ -942,25 +943,25 @@ static int  get_repl( const char * macroname)
 
         case STR:                           /* String in mac. body  */
         case CHR:                           /* Character constant   */
-            if (mode == OLD_PREP)
+            if (mcpp_mode == OLD_PREP)
                 repl_cur = str_parm_scan( repl_cur);
             break;
         case SEP:
-            if (mode == OLD_PREP && c == COM_SEP)
+            if (mcpp_mode == OLD_PREP && c == COM_SEP)
                 repl_cur--;                 /* Skip comment now     */
             break;
         default:                            /* Any token as it is   */
             break;
         }
 
-        c = get();
+        c = get_ch();
         if (c == ' ') {
             *repl_cur++ = ' ';
-            c = get();
+            c = get_ch();
         }
     }
 
-    unget();                                /* For syntax check     */
+    unget_ch();                             /* For syntax check     */
     if (standard) {
         if (token_p && *token_p == CAT) {
             cerror( "No token after ##", NULL, 0L, NULL);   /* _E_  */
@@ -1026,9 +1027,9 @@ static char *   def_stringization( char * repl_cur)
     char *  temp;
 
     *repl_cur++ = ST_QUOTE;                 /* prefix               */
-    if ((c = get()) == ' ') {
+    if ((c = get_ch()) == ' ') {
         *repl_cur++ = ' ';
-        c = get();
+        c = get_ch();
     }
     token_p = repl_cur;                     /* Remember the pointer */
     if (scan_token( c, &repl_cur, repl_end) == NAM) {
@@ -1084,7 +1085,7 @@ static char *   str_parm_scan( char * string_end)
     unget_string( ++token_p, NULL);
     /* Pseudo-token-parsing in a string literal */
     wp = token_p;
-    while ((c = get()) != delim) {
+    while ((c = get_ch()) != delim) {
         token_p = wp;
         if (scan_token( c, &wp, string_end) != NAM)
             continue;
@@ -1106,13 +1107,13 @@ static void do_undef( void)
 
     if ((c = skip_ws()) == '\n') {
         cerror( no_ident, NULL, 0L, NULL);
-        unget();
+        unget_ch();
         return;
     }
-    if (scan_token( c, (workp = work, &workp), work_end) != NAM) {
-        cerror( not_ident, work, 0L, NULL);
+    if (scan_token( c, (workp = work_buf, &workp), work_end) != NAM) {
+        cerror( not_ident, work_buf, 0L, NULL);
         skip_nl();
-        unget();
+        unget_ch();
     } else {
         if ((defp = look_id( identifier)) == NULL) {
             if (warn_level & 8)
@@ -1126,7 +1127,7 @@ static void do_undef( void)
                     , identifier, 0L, NULL);
         } else if (standard) {
             c = skip_ws();
-            unget();
+            unget_ch();
             if (c != '\n')                      /* Trailing junk    */
                 return;
             else
@@ -1221,11 +1222,11 @@ DEFBUF *    look_and_install(
     int         cmp;    /* Result of comparison of new name and old */
 
     prevp = look_prev( name, &cmp);
-    defp = install( name, numargs, parmnames, repl, prevp, cmp);
+    defp = install_macro( name, numargs, parmnames, repl, prevp, cmp);
     return  defp;
 }
 
-DEFBUF *    install(
+DEFBUF *    install_macro(
     const char *    name,                   /* Name of the macro    */
     int     numargs,                        /* The numbers of parms */
     const char *    parmnames,  /* Names of parameters concatenated */
@@ -1251,7 +1252,7 @@ DEFBUF *    install(
         cfatal( "Bug: Illegal macro installation of \"%s\"" /* _F_  */
                 , name, 0L, NULL);      /* Use "" instead of NULL   */
     s_name = strlen( name);
-    if (mode == STD)
+    if (mcpp_mode == STD)
         s_parmnames = strlen( parmnames) + 1;
     s_repl = strlen( repl) + 1;
     dp = (DEFBUF *)
@@ -1269,7 +1270,7 @@ DEFBUF *    install(
         dp->push = 0;
         dp->parmnames = (char *)dp + sizeof (DEFBUF) + s_name;
         dp->repl = dp->parmnames + s_parmnames;
-        if (mode == STD)
+        if (mcpp_mode == STD)
             memcpy( dp->parmnames, parmnames, s_parmnames);
     } else {
         dp->repl = (char *)dp + sizeof (DEFBUF) + s_name;
@@ -1279,7 +1280,7 @@ DEFBUF *    install(
     /* Remember where the macro is defined  */
     dp->dir = *inc_dirp;
     dp->fname = cur_fname;
-    dp->mline = line;
+    dp->mline = src_line;
     if (standard && cmp && ++num_of_macro == n_macro_min + 1 && n_macro_min
             && (warn_level & 4))
         cwarn( "More than %.0s%ld macros defined"           /* _W4_ */
@@ -1336,7 +1337,7 @@ static void dump_repl(
                 if ((numargs & VA_ARGS) && c == (numargs & ~AVA_ARGS) - 1) {
                     mcpp_fputs( "__VA_ARGS__", FP2DEST( fp));
                 } else {
-                    if (mode == STD) {
+                    if (mcpp_mode == STD) {
                         for (i = 0, cp1 = parlist[ c]; i < parlen[ c]; i++)
                             mcpp_fputc( *cp1++, FP2DEST( fp));
                     } else {
@@ -1373,7 +1374,7 @@ static void dump_repl(
              * Though TOK_SEP coincides to COM_SEP, this cannot appear in
              * Standard mode.
              */
-            if (mode == OLD_PREP)
+            if (mcpp_mode == OLD_PREP)
                 mcpp_fputs( "/**/", FP2DEST( fp));
             break;
         default:
@@ -1424,7 +1425,7 @@ void    dump_a_def(
     mcpp_fprintf( FP2DEST( fp), "%s#define %s", commented ? "/* " : "",
             dp->name);                      /* Macro name           */
     if (numargs >= 0) {                     /* Parameter list       */
-        if (mode == STD) {
+        if (mcpp_mode == STD) {
             mcpp_fprintf( FP2DEST( fp), "(%s)", dp->parmnames);
             if (! newdef) {
                 for (i = 0, cp = dp->parmnames; i < numargs;

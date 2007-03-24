@@ -66,8 +66,8 @@
  */
 
 /*
- * The variable 'mode' specifies the mode of preprocessing as one of OLD_PREP,
- *           KR, STD, or POST_STD.
+ * The variable 'mcpp_mode' specifies the mode of preprocessing as one of 
+ *          OLD_PREP, KR, STD, or POST_STD.
  *      Those modes have many differences each other --
  *          i.e. handling of translation phases; handling of some
  *          preprocessing tokens; availability of some directives; way of
@@ -154,7 +154,7 @@
  *      argument of #line directive other than dicimal-digits.
  */
 
-/* The values of 'mode'.    */
+/* The values of 'mcpp_mode'.   */
 #define OLD_PREP            1           /* "Reiser" cpp mode    */
 #define KR                  2           /* K&R 1st mode         */
 #define STD                 3           /* Standard moce        */

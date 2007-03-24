@@ -16,7 +16,8 @@ MCPP is a C/C++ preprocessor with the following features:
   6. Highly portable.  Supports many compiler systems on UNIX-like
     systems and Windows.  It can replace resident preprocessor of the
     compiler system.  It can also behave independently from any compiler
-    systems.
+    systems.  Moreover, it can be built as a subroutine from any other
+    main program, too.
   7. Preprocessors of various behavior specifications can be generated
     from the source.
   8. Is an open source software released under BSD-style-license.

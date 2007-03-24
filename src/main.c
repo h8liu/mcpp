@@ -42,10 +42,10 @@
 #include    "internal.H"
 #endif
 
-    /* Function pointer to expand() functions.  */
-    char *   (*expand)( DEFBUF * defp, char * out, char * out_end);
+    /* Function pointer to expand_macro() functions.    */
+    char *   (*expand_macro)( DEFBUF * defp, char * out, char * out_end);
 
-    int     mode = STD;             /* Mode of preprocessing        */
+    int     mcpp_mode = STD;        /* Mode of preprocessing        */
 
     int     cflag = FALSE;          /* -C option (keep comments)    */
     int     zflag = FALSE;      /* -i option (no output of included file)   */
@@ -53,14 +53,14 @@
     int     qflag = FALSE;      /* -Q option (diagnostics to "mcpp.err")    */
     int     trig_flag = TRIGRAPHS_INIT;     /* -3 option (trigraphs)*/
     int     dig_flag = DIGRAPHS_INIT;       /* -2 option (digraphs) */
-    long    cplus = 0L;             /* Value of __cplusplus for C++ */
+    long    cplus_val = 0L;         /* Value of __cplusplus for C++ */
     long    stdc_ver = 0L;          /* Value of __STDC_VERSION__    */
     int     stdc_val = 0;           /* Value of __STDC__            */
-    int     stdc2;                  /* cplus || stdc_ver >= 199901L */
-    int     stdc3;              /* cplus >= 199901L || stdc_ver >= 199901L.
-        (cplus >= 199901L) specifies compatible mode to C99 (extended feature
-        of this preprocessor)   */
-    int     standard = TRUE;    /* TRUE, if mode is STD or POST_STD */
+    int     stdc2;              /* cplus_val || stdc_ver >= 199901L */
+    int     stdc3;              /* cplus_val >= 199901L || stdc_ver >= 199901L.
+        (cplus_val >= 199901L) specifies compatible mode to C99 (extended
+        feature of this preprocessor)   */
+    int     standard = TRUE;    /* TRUE, if mcpp_mode is STD or POST_STD    */
 
 /*
  * lang_asm allows the following non-standard features.
@@ -89,7 +89,7 @@
 
 /*
  * Commonly used global variables:
- * line         is the current input line number.
+ * src_line     is the current input line number.
  * wrong_line   is set in many places when the actual output line is out of
  *              sync with the numbering, e.g, when expanding a macro with an
  *              embedded newline.
@@ -104,7 +104,7 @@
  *              to one of incdir[] or to the current directory (represented as
  *              "".  This should not be NULL.
  */
-    long        line;               /* Current line number          */
+    long        src_line;           /* Current line number          */
     int         wrong_line;         /* Force #line to compiler      */
     int         newlines;           /* Count of blank lines         */
     int         errors = 0;         /* Cpp error counter            */
@@ -119,7 +119,7 @@
         /* Full path of current source file (i.e. *inc_dirp/cur_fname)      */
     int         no_source_line;     /* Do not output line in diag.  */
     char        identifier[ IDMAX + IDMAX/8];       /* Current identifier   */
-    int         debug = 0;          /* != 0 if debugging now        */
+    int         mcpp_debug = 0;     /* != 0 if debugging now        */
 
 /*
  *   in_directive is set TRUE while a directive line is scanned by directive().
@@ -206,12 +206,12 @@
 
 /*
  * In POST_STD mode, insert_sep is set to INSERT_SEP when :
- *  1. the next get() shall insert a token separator.
- *  2. unget() has been called when insert_sep == INSERTED_SEP.
+ *  1. the next get_ch() shall insert a token separator.
+ *  2. unget_ch() has been called when insert_sep == INSERTED_SEP.
  * set to INSERTED_SEP when :
- *  get() has been called when insert_sep == INSERT_SEP.
+ *  get_ch() has been called when insert_sep == INSERT_SEP.
  * set to NO_SEP when :
- *  get() has been called when insert_sep == INSERTED_SEP.
+ *  get_ch() has been called when insert_sep == INSERTED_SEP.
  */
     int     insert_sep = NO_SEP;
 
@@ -239,18 +239,19 @@
     jmp_buf error_exit;             /* Exit on fatal error          */
 
 /*
- * work[] and workp are used to store one piece of text in a temporary buffer.
- * To initialize storage, set workp = work.  Note that the work buffer is used
- * by several subroutines -- be sure that your data won't be overwritten.
- * work[] is used for:
- *      1. temporary buffer in macro expansion (exp_special(), expand(),
+ * work_buf[] and workp are used to store one piece of text in a temporary
+ * buffer.
+ * To initialize storage, set workp = work_buf.  Note that the work buffer is
+ * used by several subroutines -- be sure that your data won't be overwritten.
+ * work_buf[] is used for:
+ *      1. temporary buffer in macro expansion (exp_special(), expand_macro(),
  *         catenate())
  *      2. temporary buffer in processing directive line.
  */
-    char        work[ NWORK + IDMAX];   /* Work buffer              */
-    char *      workp;                  /* Pointer into work[]      */
-    char * const     work_end = & work[ NWORK];
-                                        /* End of buffer work[]     */
+    char        work_buf[ NWORK + IDMAX];       /* Work buffer      */
+    char *      workp;              /* Pointer into work_buf[]      */
+    char * const     work_end = & work_buf[ NWORK];
+                                    /* End of buffer of work_buf[]  */
 
 #define MBCHAR_IS_ESCAPE_FREE   (SJIS_IS_ESCAPE_FREE && \
             BIGFIVE_IS_ESCAPE_FREE && ISO2022_JP_IS_ESCAPE_FREE)
@@ -293,11 +294,11 @@ static char *   esc_mbchar( char * str, char * str_end);
 static void     init_main( void)
 /* Initialize global variables on re-entering.  */
 {
-    mode = STD;
+    mcpp_mode = STD;
     cflag = zflag = pflag = qflag = FALSE;
     trig_flag = TRIGRAPHS_INIT;
     dig_flag = DIGRAPHS_INIT;
-    cplus = stdc_ver = 0L;
+    cplus_val = stdc_ver = 0L;
     stdc_val = 0;
     standard = TRUE;
     lang_asm = FALSE;
@@ -312,7 +313,7 @@ static void     init_main( void)
     in_asm = 0L;
     macro_line = 0L;
     compat_mode = FALSE;
-    debug = mkdep = no_output = exp_mac_ind = keep_comments = 0;
+    mcpp_debug = mkdep = no_output = exp_mac_ind = keep_comments = 0;
     ifstack[0].stat = WAS_COMPILING;
     ifstack[0].ifline = ifstack[0].elseline = 0L;
     ifptr = ifstack;
@@ -369,9 +370,9 @@ int     main
             mcpp_fprintf( ERR, "Can't open input file \"%s\".\n", in_file);
             return( IO_ERROR);
         }
-        strcpy( work, in_file);     /* Remember input filename      */
+        strcpy( work_buf, in_file); /* Remember input filename      */
     } else {
-        strcpy( work, "<stdin>");
+        strcpy( work_buf, "<stdin>");
     }
     /* Open output file, "-" means stdout.  */
     if (out_file != NULL && ! str_eq( out_file, "-")) {
@@ -386,11 +387,11 @@ int     main
             return( IO_ERROR);
         }
     }
-    add_file( fp_in, work);         /* "open" main input file       */
+    add_file( fp_in, work_buf);     /* "open" main input file       */
     infile->dirp = inc_dirp;
-    strcpy( cur_fullname, work);
+    strcpy( cur_fullname, work_buf);
     if (mkdep && str_eq( infile->real_fname, "<stdin>") == FALSE)
-        put_depend( work);          /* Putout target file name      */
+        put_depend( work_buf);      /* Putout target file name      */
     at_start();                     /* Do the pre-main commands     */
 
     mcpp_main();                    /* Process main file            */
@@ -424,9 +425,9 @@ void    sharp( void)
     if (keep_comments)
         mcpp_fputc( '\n', OUT);         /* Ensure to be on line top */
     if (std_line_prefix)
-        mcpp_fprintf( OUT, "#line %ld", line);
+        mcpp_fprintf( OUT, "#line %ld", src_line);
     else
-        mcpp_fprintf( OUT, "%s%ld", LINE_PREFIX, line);
+        mcpp_fprintf( OUT, "%s%ld", LINE_PREFIX, src_line);
     cur_file();
     mcpp_fputc( '\n', OUT);
 sharp_exit:
@@ -619,10 +620,10 @@ static void mcpp_main( void)
     DEFBUF *    defp;               /* Macro definition             */
 
     if (! no_output) {  /* Explicitly output a #line at the start of cpp    */
-        line++;
+        src_line++;
         sharp();
         put_info();                         /* -fworking-directory  */
-        line--;
+        src_line--;
     }
     keep_comments = cflag && !no_output;
 
@@ -634,28 +635,28 @@ static void mcpp_main( void)
      * 'newlines' variable counts the number of blank lines that have been
      * skipped over.  These are then either output via #line records or
      * by outputting explicit blank lines.
-     * 'newlines' will be cleared on end of an included file by get().
+     * 'newlines' will be cleared on end of an included file by get_ch().
      */
     while (1) {                             /* For the whole input  */
         newlines = 0;                       /* Count empty lines    */
 
         while (1) {                         /* For each line, ...   */
-            c = get();                      /* First of the line    */
+            c = get_ch();                   /* First of the line    */
             out_ptr = output;               /* Top of the line buf  */
             if (c == ' ') {         /* Dosen't occur in POST_STD    */
                 *out_ptr++ = ' ';           /* Retain a space       */
-                c = get();          /* First of token (else '\n')   */
+                c = get_ch();       /* First of token (else '\n')   */
             }
-            if (mode == OLD_PREP && c == COM_SEP)
-                 c = get();                 /* Skip 0-length comment*/
+            if (mcpp_mode == OLD_PREP && c == COM_SEP)
+                 c = get_ch();              /* Skip 0-length comment*/
             if (c == '#') {                 /* Is 1st non-space '#' */
                 directive();                /* Do a #directive      */
-            } else if (mode == STD && dig_flag && c == '%') {
+            } else if (mcpp_mode == STD && dig_flag && c == '%') {
                     /* In POST_STD digraphs are already converted   */
-                if (get() == ':') {         /* '%:' i.e. '#'        */
+                if (get_ch() == ':') {      /* '%:' i.e. '#'        */
                     directive();            /* Do a #directive      */
                 } else {
-                    unget();
+                    unget_ch();
                     if (! compiling) {
                         skip_nl();
                         newlines++;
@@ -705,7 +706,7 @@ static void mcpp_main( void)
         while (c != '\n' && c != CHAR_EOF) {    /* For the whole line   */
             if (scan_token( c, (wp = out_ptr, &wp), out_wend) == NAM
                     && (defp = is_macro( &wp)) != NULL) {   /* A macro  */
-                wp = expand( defp, out_ptr, out_wend);
+                wp = expand_macro( defp, out_ptr, out_wend);
                                             /* Expand it completely */
                 if (has_pragma) {           /* Found _Pramga()      */
                     do_pragma_op();         /* Do _Pragma() operator*/
@@ -720,12 +721,12 @@ static void mcpp_main( void)
                 if (wrong_line)             /* is_macro() swallowed */
                     break;                  /*      the newline     */
             }
-            if ((c = get()) == ' ') {       /* Token separator      */
+            if ((c = get_ch()) == ' ') {    /* Token separator      */
                 *out_ptr++ = ' ';
-                c = get();                  /* First of token       */
+                c = get_ch();               /* First of token       */
             }
-            if (mode == OLD_PREP && c == COM_SEP)
-                c = get();                  /* Skip 0-length comment*/
+            if (mcpp_mode == OLD_PREP && c == COM_SEP)
+                c = get_ch();               /* Skip 0-length comment*/
         }                                   /* Line for loop        */
 
         putout( output);                    /* Output the line      */
@@ -751,7 +752,7 @@ static void do_pragma_op( void)
     int     c;
 
     file = unget_string( out_ptr, NULL);
-    while (c = get(), file == infile) {
+    while (c = get_ch(), file == infile) {
         if (c == ' ') {
             *out_ptr++ = ' ';
             continue;
@@ -763,8 +764,8 @@ static void do_pragma_op( void)
                 putout( output);    /* Putout the previous sequence */
                 cp1 = stpcpy( output, "pragma ");   /* From top of buffer   */
             }
-            *cp1++ = get();                                 /* '('  */
-            while ((c = get()) == ' ')
+            *cp1++ = get_ch();                              /* '('  */
+            while ((c = get_ch()) == ' ')
                 *cp1++ = ' ';
             if (((token_type = scan_token( c, (cp2 = cp1, &cp1), out_wend))
                     != STR && token_type != WSTR)) {
@@ -772,16 +773,16 @@ static void do_pragma_op( void)
                 put_seq( output, cp1);
                 return;
             }
-            workp = de_stringize( cp2, work);
-            while ((c = get()) == ' ')
+            workp = de_stringize( cp2, work_buf);
+            while ((c = get_ch()) == ' ')
                 *cp1++ = ' ';
             if (c != ')') {         /* More than a string literal   */
-                unget();
+                unget_ch();
                 put_seq( output, cp1);
                 return;
             }
             strcpy( workp, "\n");       /* Terminate with <newline> */
-            unget_string( work, NULL);
+            unget_string( work_buf, NULL);
             do_pragma();                /* Do the #pragma "line"    */
             infile->bptr += strlen( infile->bptr);      /* Clear sequence   */
             cp1 = out_ptr = output;     /* From the top of buffer   */
@@ -791,7 +792,7 @@ static void do_pragma_op( void)
             prev = TRUE;
         }
     }
-    unget();
+    unget_ch();
     if (prev)
         putout( output);
 }
@@ -809,9 +810,9 @@ static void put_seq(
 
     cerror( "Operand of _Pragma() is not a string literal"  /* _E_  */
             , NULL, 0L, NULL);
-    while (c = get(), file == infile)
+    while (c = get_ch(), file == infile)
         *seq++ = c;
-    unget();
+    unget_ch();
     out_ptr = seq;
     putout( begin);
 }
@@ -855,7 +856,7 @@ static void putout(
 #if ! MBCHAR_IS_ESCAPE_FREE
     post_preproc( out);
 #elif   ! HAVE_DIGRAPHS
-    if (mode == STD && dig_flag)
+    if (mcpp_mode == STD && dig_flag)
         post_preproc( out);
 #endif
     /* Else no post-preprocess  */
@@ -882,7 +883,7 @@ static void devide_line(
     file = unget_string( out, NULL);        /* To re-read the line  */
     wp = out_ptr = out;
 
-    while ((c = get()), file == infile) {
+    while ((c = get_ch()), file == infile) {
         if (c == ' ') {
             if (out == out_ptr || *(out_ptr - 1) != ' ') {
                 *out_ptr++ = ' ';
@@ -905,7 +906,7 @@ static void devide_line(
         }
     }
 
-    unget();                    /* Push back the source character   */
+    unget_ch();                 /* Push back the source character   */
     put_a_line( out);                   /* Putout the last tokens   */
     sharp();                                /* Correct line number  */
 }
@@ -925,7 +926,7 @@ static void put_a_line(
         return;
     len = strlen( out);
     tp = out_p = out + len - 2;             /* Just before '\n'     */
-    while (type[ *out_p & UCHARMAX] & SPA)
+    while (char_type[ *out_p & UCHARMAX] & SPA)
         out_p--;                    /* Remove trailing white spaces */
     if (out_p < tp) {
         *++out_p = '\n';
@@ -972,7 +973,7 @@ static int  post_preproc(
     char *  cp = out;
 
     unget_string( out, NULL);
-    while ((c = get()) != '\n') {   /* Not to read over to next line    */
+    while ((c = get_ch()) != '\n') {    /* Not to read over to next line    */
         if (c == ' ') {
             *cp++ = ' ';
             continue;
@@ -993,7 +994,7 @@ static int  post_preproc(
 #endif  /* ! MBCHAR_IS_ESCAPE_FREE  */
 #if ! HAVE_DIGRAPHS
         case OPE    :
-            if (mode == STD && (openum & OP_DIGRAPH)) {
+            if (mcpp_mode == STD && (openum & OP_DIGRAPH)) {
                 cp = conv_a_digraph( cp);   /* Convert a digraph    */
                 di_count++;
             }
@@ -1004,7 +1005,7 @@ static int  post_preproc(
     *cp++ = '\n';
     *cp = EOS;
 #if ! HAVE_DIGRAPHS
-    if (mode == STD && di_count && (warn_level & 16))
+    if (mcpp_mode == STD && di_count && (warn_level & 16))
         cwarn( "%.0s%ld digraph(s) converted"           /* _W16_    */
                 , NULL, (long) di_count, NULL);
 #endif
@@ -1070,9 +1071,9 @@ static char *   esc_mbchar(
     if ((delim = *str++) == 'L')
         delim = *str++;                         /* The quote character  */
     while ((c = *str++ & UCHARMAX) != delim) {
-        if (type[ c] & mbstart) {               /* MBCHAR   */
+        if (char_type[ c] & mbstart) {               /* MBCHAR   */
             cp = str;
-            mb_read( c, &str, (workp = work, &workp));
+            mb_read( c, &str, (workp = work_buf, &workp));
             while (cp++ < str) {
                 c = *(cp - 1);
                 if (c == '\\' || c == '"' || c == '\'') {
@@ -1083,7 +1084,7 @@ static char *   esc_mbchar(
                     str_end++;
                 }
             }
-        } else if (c == '\\' && ! (type[ *str & UCHARMAX] & mbstart)) {
+        } else if (c == '\\' && ! (char_type[ *str & UCHARMAX] & mbstart)) {
             str++;                              /* Escape sequence      */
         }
     }

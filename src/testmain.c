@@ -3,7 +3,7 @@
  * 2006/11  Contributed by Juergen Mueller.
  * Refer to mcpp-porting.html section 3.12 for compiling mcpp as a subroutine.
  *
- * 2007/02  Updated to enable testing of memory buffer output.
+ * 2007/03  Updated to enable testing of memory buffer output.
  */
 
 #include <stdio.h>
@@ -12,8 +12,6 @@
 
 #define MCPP_LIB    1
 #include "mcpp_lib.h"
-
-extern int  mcpp_lib_main(int argc, char **argv);
 
 int main(int argc, char *argv[])
 {

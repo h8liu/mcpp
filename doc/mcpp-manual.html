@@ -11,7 +11,7 @@
 <h2>== How to Use MCPP ==</h2>
 </div>
 <div align="right">
-<h4>for V.2.6.3 (2007/02)<br>
+<h4>for V.2.6.3 (2007/03)<br>
 Kiyoshi Matsui (kmatsui@t3.rim.or.jp)</h4>
 </div>
 <div align="center">
@@ -54,7 +54,7 @@ Kiyoshi Matsui (kmatsui@t3.rim.or.jp)</h4>
 <dd><a name="toc.3.6" href="#3.6">3.6. #assert, #asm, #endasm</a>
 <dd><a name="toc.3.7" href="#3.7">3.7. New C99 Features (_Pragma() operator, Variadic Macro and others)</a>
 <dd><a name="toc.3.8" href="#3.8">3.8. Asm Statement in Borland C and Other Special Syntaxes</a>
-<dd><dl><dt><a name="toc.3.9" href="#3.9">3.9. Compatibility with GCC</a>
+<dd><dl><dt><a name="toc.3.9" href="#3.9">3.9. Problems of GCC and Compatibility with GCC</a>
 <dd><a name="toc.3.9.1" href="#3.9.1">3.9.1. Preprocessing FreeBSD 2/Kernel Sources</a>
 <dd><a name="toc.3.9.2" href="#3.9.2">3.9.2. Preprocessing FreeBSD 2/Libc</a>
 <dd><a name="toc.3.9.3" href="#3.9.3">3.9.3. Problems Concerning GCC 2/cpp</a>
@@ -996,7 +996,7 @@ Also <b>mcpp</b> dereferences the symbolic link to its linked-file, and displays
 <p>Each time control is passed to and returned from a certain set of <b>mcpp</b> internal functions, <b>mcpp</b> displays the trace information along with the function name.  The following table shows the role of these functions.  Reading <b>mcpp</b> source code will gives you a concrete idea on what each function is doing.</p>
 <blockquote>
 <table>
-  <tr><th>expand      </th><td>Entrance routine for macro expansion</td></tr>
+  <tr><th>expand_macro</th><td>Entrance routine for macro expansion</td></tr>
   <tr><th>replace     </th><td>Expands a macro one level down.</td></tr>
   <tr><th>collect_args</th><td>Collects arguments.</td></tr>
   <tr><th>prescan     </th><td>Scans a replacement list and processes # and ## operator.</td></tr>
@@ -1004,7 +1004,7 @@ Also <b>mcpp</b> dereferences the symbolic link to its linked-file, and displays
   <tr><th>rescan      </th><td>Rescans a replacement list.</td></tr>
 </table>
 </blockquote>
-<p>Except for expand, above functions are indirectly recursive with each other.</p>
+<p>Except for expand_macro, above functions are indirectly recursive with each other.</p>
 <p>For replace and collect_args, <b>mcpp</b> displays data it internally stacks during macro expansion.  This data is displayed using the following internal codes:</p>
 <blockquote>
 <table>
@@ -1026,7 +1026,7 @@ Also <b>mcpp</b> dereferences the symbolic link to its linked-file, and displays
 <p>With these directives, <b>mcpp</b> traces evaluation of a #if or #elif expression.  DECUS cpp, based on which <b>mcpp</b> has been developed, provides these directives for the purpose of debugging cpp itself.  I scarcely modified them.  This directive outputs a very long list of internal functions, as well as variable names and their values.  Unless you read the <b>mcpp</b> source code, you may not understand these variables.  However, without the source code, you can manage to understand how the <b>mcpp</b> pushes onto and takes out of a evaluation stack a complex expression value.</p>
 
 <h3><a name="3.5.6" href="#toc.3.5.6">3.5.6. #pragma MCPP debug getc, #debug getc</a></h3>
-<p>With these directives, <b>mcpp</b> outputs detailed data each time it calls get(), a function to read one byte.  When <b>mcpp</b> in Standard mode scans a pp-token, this routine is called to read only the first byte of the pp-token.</p>
+<p>With these directives, <b>mcpp</b> outputs detailed data each time it calls get_ch(), a function to read one byte.  When <b>mcpp</b> in Standard mode scans a pp-token, this routine is called to read only the first byte of the pp-token.</p>
 <p>With a #debug getc, <b>mcpp</b> calls this routine during token scan, resulting in a tremendous amount of data output.</p>
 <p>In any way, using these directives outputs a huge amount of data, so you scarcely need to use them.</p>
 
@@ -1116,7 +1116,7 @@ asm {
 <p>GCC provide a Standard-conforming built-in function asm() which is used as asm( " mov x,4\n").</p>
 <br>
 
-<h2><a name="3.9" href="#toc.3.9">3.9. Compatibility with GCC</a></h2>
+<h2><a name="3.9" href="#toc.3.9">3.9. Problems of GCC and Compatibility with GCC</a></h2>
 <p>Although I tried to develop <b>mcpp</b> in such manner that the GCC-specific-build provides compatibility with GCC / cpp (cc1) to the extent that it does not hinder practical use, it is still incompatible in many aspects.</p>
 <p>First of all, as shown in Chapter 2, there are many differences in execution options.  <b>mcpp</b> implements neither -A option nor non-conforming directives, including #assert and #ident. *1</p>
 <p>Fortunately, there seems to be quite few sources that cannot be compiled due to a lack of this compatibility.</p>
@@ -1850,7 +1850,7 @@ Since GCC2 spec corresponds to GCC3 spec one-to-one, it is easy to rewrite macro
 #define libc_hidden_proto(name, ...)    hidden_proto (name, ## __VA_ARGS__)
 </pre>
 
-<p>That is, change <samp>...attrs</samp> to <samp>...</samp>, and change <samp>attrs</samp> to <samp>__VA_ARGS__</samp>.</p>
+<p>That is, change <samp>attrs...</samp> to <samp>...</samp>, and change <samp>attrs</samp> to <samp>__VA_ARGS__</samp>.</p>
 
 <p>Note:</p>
 <p>*1 As for variadic macro of GCC2 spec and GCC3 spec, see <a href="#3.9.1.6">3.9.1.6</a>, <a href="#3.9.6.3">3.9.6.3</a> respectively.</p>
@@ -2597,7 +2597,7 @@ In pre-Standard mode, an integer constant token is evaluated within the range of
 <blockquote>
 <table>
   <tr><th>FreeBSD 6.2        </th><td>GCC V.3.4</td></tr>
-  <tr><th>VineLinux 4.0-x86  </th><td>GCC V.2.95, V.3.2, V.3.3, V.3.4, V.4.1</td></tr>
+  <tr><th>VineLinux 4.1-x86  </th><td>GCC V.2.95, V.3.2, V.3.3, V.3.4, V.4.1</td></tr>
   <tr><th>CygWIN             </th><td>1.3.10 (GCC V.2.95), 1.5.18 (GCC 3.4)</td></tr>
   <tr><th>MinGW &amp; MSYS       </th><td>GCC 3.4</td></tr>
   <tr><th>WIN32              </th><td>LCC-Win32 2003-08, 2006-03</td></tr>
