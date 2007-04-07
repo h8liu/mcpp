@@ -11,7 +11,7 @@
 <h2>== How to Use MCPP ==</h2>
 </div>
 <div align="right">
-<h4>for V.2.6.3 (2007/03)<br>
+<h4>for V.2.6.3 (2007/04)<br>
 Kiyoshi Matsui (kmatsui@t3.rim.or.jp)</h4>
 </div>
 <div align="center">
@@ -467,8 +467,9 @@ string literal"
 <li><b>mcpp</b> does not insert spaces around a macro expansion result, and does not regard an unintended token merging of the macro expansion result with its adjascent token as an error.<br>
 </ol>
 <p>These sometimes happen to GNU source code, however, this option for GCC is -x assembler-with-cpp or -lang-asm.<br>
-This option cannot be used in <i>POSTSTD</i> mode.
-This manual calls this mode <b>lang-asm</b> mode.</p>
+This option cannot be used in <i>POSTSTD</i> mode.<br>
+This manual calls this mode <b>lang-asm</b> mode.<br>
+This mode is recommended when you use <b>mcpp</b> as a macro processor for some text other than C/C++, for example, as a cpp called from xrdb.</p>
 <li><samp>-I-</samp><br>
 Cancel default include directories and enable only ones specified with an environment variable and the -I option.  Instead of -I-, GCC-specific-build uses -nostdinc.  In GCC, the -I- option provides quite different functionality.  See 
 <a href="#2.6"> 2.6</a>.<br>

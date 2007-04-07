@@ -91,6 +91,10 @@ install' of compiler-independent-build installs the least documents as
 well as the executable.  This is for the convenience of making a binary
 package.
 
+Note that on Linux and CygWIN the system's standard headers have certain
+defects, and some workarounds are necessary for the compiler-independent-
+build of MCPP.  See mcpp-manual.html 3.9.9 for this problem.
+
 2.2. The compiler-specific-build
 
 This command will generate a compiler-specific executable and will
@@ -116,11 +120,11 @@ After configuring, do 'make'.
 
 2.2.1.1. make install
 
-After configuring and 'make', the 'make install' command installs mcpp
+After configuring and 'make', the 'make install' command installs MCPP
 into the compiler's directory (e.g. /usr/libexec or /usr/lib/gcc-lib/
 i686-pc-linux-gnu/VERSION).  This is the directory where cpp (cc1),
 which is called by gcc, is located.  'make install' saves GCC / cpp0
-(cc1) and setups gcc and g++ command appropriately to call mcpp.  This
+(cc1) and setups gcc and g++ command appropriately to call MCPP.  This
 setting is different depending on GCC being V.2.* or V.3.*-4.*. (Refer
 section 3.9.5 and 3.9.7 of mcpp-manual.html).
 
@@ -128,7 +132,7 @@ section 3.9.5 and 3.9.7 of mcpp-manual.html).
 
 In the MCPP Validation Suite, there is an edition which can be used as
 testsuite of GCC.  If GCC / testsuite has been installed, 'make check'
-can test mcpp using the testsuite edition of Validation Suite.  Because
+can test MCPP using the testsuite edition of Validation Suite.  Because
 this edition is to be used as a part of GCC / testsuite, the testsuite
 should be installed and ready to execute in advance.  GCC / testsuite is
 usually a part of the source code of GCC. (It can be a separate package
@@ -150,8 +154,8 @@ testsuite edition of Validation Suite into GCC / testsuite.  After the
 required settings are applied according to whether GCC is V.2.* or V.3.*
 -4.*, the testsuite will be executed.  Usually, 'make check' would run
 before 'make install' in the normal software, but this order is reversed
-in MCPP.  This is because testsuite cannot be applied to mcpp unless
-mcpp is called from gcc.  Due to this, the option '--enable-replace-cpp'
+in MCPP.  This is because testsuite cannot be applied to MCPP unless
+MCPP is called from gcc.  Due to this, the option '--enable-replace-cpp'
 is also required.
 
 The testsuite edition of Validation Suite can also be applied to cpp0
@@ -342,7 +346,7 @@ become available. (Refer mcpp-manual.html 2.10)
 
 On Windows, any include directory is not preset except MinGW/GCC-
 specific-build and GygWIN, hence you must specify them by the
-environment variable INCLUDE and CPLUS_INCLUDE.
+environment variable INCLUDE (and CPLUS_INCLUDE, if necessary).
 
 GCC / testsuite cannot be used in Windows, MCPP needs to be checked
 directly by preprocessing the test samples in test-t, test-c and test-l
@@ -371,6 +375,6 @@ preprocessor comprehensively.  Validation Suite has 265 items and can be
 applied to any preprocessor as well as MCPP.  Refer to 3.1 and 3.2 of
 cpp-test.html.
 
-March, 2007
+April, 2007
 Kiyoshi Matsui <kmatsui@t3.rim.or.jp>
 

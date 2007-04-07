@@ -24,7 +24,7 @@ compiler-specific-build: 特定の処理系のプリプロセッサを（もし可能なら）
     代替するためのものです。その処理系に専用の仕様を持ち、その処理系の専
     用のディレクトリにインストールされます。
 
-Subroutine-build についてはここでは説明は略します。mcpp-porting.html 3.
+  Subroutine-build についてはここでは説明は略します。mcpp-porting.html 3.
 12 を見てください。以下はすべて stand-alone-build についての説明です。
 
 2、configure と make
@@ -72,17 +72,21 @@ path を ${mcpp-dir} と表記します。
 定していると '/usr/local' の部分が 'DIR' に置き換わる）。バイナリ・パッ
 ケージを作るにはこの方法を使います。
 
-GCC 4.1 以降には -fstack-protector (-fstack-protector-all) というオプシ
-ョンがありますが、configure または make で CFLAGS+=-fstack-protector と
-いうオプションを指定することでこれを有効にすることができます。これは GCC-
-specific-build でも同様です。
+  GCC 4.1 以降には -fstack-protector (-fstack-protector-all) というオプ
+ションがありますが、configure または make で CFLAGS+=-fstack-protector
+というオプションを指定することでこれを有効にすることができます。これは
+GCC-specific-build でも同様です。
 
-なお、MCPP V.2.6.2 までの make には install-data, uninstall-data という
-ターゲットがありましたが、V.2.6.3 から廃止しました。ソースからインストー
-ルする場合は、ドキュメントと検証セットをわざわざ別ディレクトリにコピーす
-る必要はないと思われるからです。しかし、compiler-independent-build では
-make install で最小限のドキュメントがインストールされるようにしました。
+  なお、MCPP V.2.6.2 までの make には install-data, uninstall-data とい
+うターゲットがありましたが、V.2.6.3 から廃止しました。ソースからインスト
+ールする場合は、ドキュメントと検証セットをわざわざ別ディレクトリにコピー
+する必要はないと思われるからです。しかし、compiler-independent-build で
+は make install で最小限のドキュメントがインストールされるようにしました。
 これはバイナリ・パッケージを作るつごうに合わせたものです。
+
+  Linux や CygWIN ではシステムの標準ヘッダに欠陥があるので、compiler-
+independent-build の mcpp ではその対策が必要です。この問題については
+mcpp-manual.html 3.9.9 を見てください。
 
 2、2、compiler-specific-build
 
@@ -274,10 +278,10 @@ noconfig.H の次の行の 'INDEPENDENT' をそのコンパイラを表すマクロに書き換
     #define COMPILER    INDEPENDENT
 
 'COMPILER' は make のオプションで上書きすることもできるので、noconfig.H
-は必ずしも書き換える必要はありません。例えば、Visual C では
-'nmake COMPILER=MSC' として 'nmake COMPILER=MSC install' します。Borland
-C では 'make -DCOMPILER=BORLANDC' として
-'make -DCOMPILER=BORLANDC install' します。
+は必ずしも書き換える必要はありません。例えば、Visual C では 'nmake
+COMPILER=MSC' として 'nmake COMPILER=MSC install' します。Borland C では
+'make -DCOMPILER=BORLANDC' として 'make -DCOMPILER=BORLANDC install' し
+ます。
 
   もし、ターゲット処理系とコンパイルする処理系とが違っている場合は、
 noconfig.H / Part 1 をターゲット処理系の仕様に合わせ、Part 2 をコンパイ
@@ -295,8 +299,8 @@ noconfig.H / Part 1 をターゲット処理系の仕様に合わせ、Part 2 をコンパイ
 
 3、5、テスト
   Windows では MinGW / GCC-specific-build および CygWIN 以外では include
-directory は設定されないので、INCLUDE, CPLUS_INCLUDE という環境変数で設
-定します。
+directory は設定されないので、INCLUDE という環境変数で設定します（必要な
+ら CPLUS_INCLUDE も）。
   Windows では GCC / testsuite は使えないので、test-t, test-c, test-l デ
 ィレクトリにあるテスト用サンプルを直接、プリプロセスして確かめます。tool
 /cpp_test.c を使うと、一部のテストだけですが、自動的に実行できます（cpp-
@@ -320,6 +324,6 @@ MCPP の "pre-preprocess" という機能を使って MCPP をリコンパイルしてみる
 MCPP だけでなく任意のプリプロセッサに適用することができます。その使い方
 については、cpp-test.html 3.1, 3.2 を参照してください。
 
-2007/03
+2007/04
                                          松井　潔 <kmatsui@t3.rim.or.jp>
 
