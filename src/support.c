@@ -109,7 +109,12 @@ static void     dump_token( int token_type, const char * cp);
 
 #define EXP_MAC_IND_MAX     16
 /* Information of current expanding macros for diagnostic   */
-static const char * expanding_macro[ EXP_MAC_IND_MAX];
+typedef struct  expanding_mac {
+    const char *    name;       /* Name of the macro just expanded  */
+    int             to_be_freed;    /* Name should be freed later   */
+} EXPANDING_MAC;
+static EXPANDING_MAC    expanding_macro[ EXP_MAC_IND_MAX];
+static int  exp_mac_ind = 0;        /* Index into expanding_macro[] */
 
 static int  in_token = FALSE;       /* For token scanning functions */
 static int  in_string = FALSE;      /* For get_ch() and parse_line()*/
@@ -121,6 +126,7 @@ static int  use_mem_buffers = FALSE;
 void    init_support( void)
 {
     in_token = in_string = squeezews = FALSE;
+    clear_exp_mac();
 }
 
 typedef struct  mem_buf {
@@ -142,6 +148,8 @@ void    mcpp_use_mem_buffers(
         int i;
 
         for (i = 0; i < NUM_OUTDEST; ++i) {
+            if (mem_buffers[ i].buffer)     /* Already allocated    */
+                free( mem_buffers[ i].buffer);
             mem_buffers[ i].buffer = NULL;
             mem_buffers[ i].entry_pt = NULL;
             mem_buffers[ i].size = 0;
@@ -1417,17 +1425,38 @@ int     id_operator(
 }
 
 void    expanding(
-    const char *    name
+    const char *    name,       /* The name of (nested) macro just expanded. */
+    int             to_be_freed /* The name should be freed later.  */
 )
 /*
  * Remember used macro name for diagnostic.
  */
 {
-    if (exp_mac_ind < EXP_MAC_IND_MAX - 1)
+    if (exp_mac_ind < EXP_MAC_IND_MAX - 1) {
         exp_mac_ind++;
-    else
-        exp_mac_ind = 1;
-    expanding_macro[ exp_mac_ind] = name;
+    } else {
+        clear_exp_mac();
+        exp_mac_ind++;
+    }
+    expanding_macro[ exp_mac_ind].name = name;
+    expanding_macro[ exp_mac_ind].to_be_freed = to_be_freed;
+}
+
+void    clear_exp_mac( void)
+/*
+ * Initialize expanding_macro[] freeing names registered in
+ * name_to_be_freed[].
+ */
+{
+    int     i;
+
+    for (i = 1; i < EXP_MAC_IND_MAX; i++) {
+        if (expanding_macro[ i].to_be_freed) {
+            free( (void *) expanding_macro[ i].name);
+            expanding_macro[ i].to_be_freed = FALSE;
+        }
+    }
+    exp_mac_ind = 0;
 }
 
 int     get_ch( void)
@@ -1517,7 +1546,8 @@ int     get_ch( void)
     infile = file->parent;                  /* Unwind file chain    */
     free( file->buffer);                    /* Free buffer          */
     if (infile == NULL) {                   /* If at end of input,  */
-        free( file->filename);              /* Free filename        */
+        if (file->filename)
+            free( file->filename);              /* Free filename        */
         free( file);
         return  CHAR_EOF;                   /*   return end of file.*/
     }
@@ -1525,11 +1555,12 @@ int     get_ch( void)
         char *  cp;
 
         free( file->filename);              /* Free filename        */
+        file->filename = NULL;
         fclose( file->fp);                  /* Close finished file  */
         cp = stpcpy( cur_fullname, *(infile->dirp));
         strcpy( cp, infile->real_fname);
         cur_fname = infile->real_fname;     /* Restore current fname*/
-        if (infile->pos != 0L) {            /* Includer is closed   */
+        if (infile->pos != 0L) {            /* Includer was closed  */
             infile->fp = fopen( cur_fullname, "r");
             fseek( infile->fp, infile->pos, SEEK_SET);
         }   /* Re-open the includer and restore the file-position   */
@@ -1548,8 +1579,11 @@ int     get_ch( void)
         sharp();                            /* Need a #line now     */
         src_line--;
         newlines = 0;                       /* Clear the blank lines*/
-    } else if (file->filename && macro_name) {  /* Expanding macro  */
-        expanding( file->filename);
+    } else if (file->filename) {            /* Expanding macro      */
+        if (macro_name)     /* file->filename should be freed later */
+            expanding( file->filename, TRUE);
+        else
+            free( file->filename);
     }
     free( file);                            /* Free file space      */
     return  get_ch();                       /* Get from the parent  */
@@ -1801,7 +1835,7 @@ static char *   get_line(
         }
         if (*(ptr + len - 1) != '\n')   /* Unterminated source line */
             break;
-        if (*(ptr + len - 2) == '\r') {         /* [CR+LF]          */
+        if (len >= 2 && *(ptr + len - 2) == '\r') {         /* [CR+LF]      */
             *(ptr + len - 2) = '\n';
             *(ptr + --len) = EOS;
             if (! cr_converted && (warn_level & cr_warn_level)) {
@@ -2118,7 +2152,6 @@ FILEINFO *  get_file(
 
     file = (FILEINFO *) xmalloc( sizeof (FILEINFO));
     file->buffer = xmalloc( bufsize);
-    file->filename = xmalloc( (name ? strlen( name) : 0) + 1);
     file->bptr = file->buffer;              /* Initialize line ptr  */
     file->buffer[ 0] = EOS;                 /* Force first read     */
     file->line = 0L;                        /* (Not used just yet)  */
@@ -2128,17 +2161,19 @@ FILEINFO *  get_file(
     file->initif = ifptr;                   /* Initial ifstack      */
     file->dirp = NULL;                      /* No sys-header yet    */
     file->real_fname = name;                /* Save file/macro name */
-    if (name)
+    if (name) {
+        file->filename = xmalloc( strlen( name) + 1);
         strcpy( file->filename, name);      /* Copy for #line       */
-    else
+    } else {
         file->filename = NULL;
+    }
 #if MCPP_LIB
     file->last_fputc = mcpp_lib_fputc;
     file->last_fputs = mcpp_lib_fputs;
     file->last_fprintf = mcpp_lib_fprintf;
 #endif
     if (infile != NULL) {                   /* If #include file     */
-        infile->line = src_line;                /* Save current line    */
+        infile->line = src_line;            /* Save current line    */
 #if MCPP_LIB
         infile->last_fputc = mcpp_fputc;
         infile->last_fputs = mcpp_fputs;
@@ -2333,23 +2368,24 @@ static void do_msg(
     if (! macro_name)
         goto  free_arg;
     /* Additional information of macro definitions  */
-    expanding_macro[ 0] = macro_name;
+    expanding_macro[ 0].name = macro_name;
     for (ind = 0; ind <= exp_mac_ind; ind++) {
         int         ind_done;
         FILEINFO *  file;
 
         for (ind_done = 0; ind_done < ind; ind_done++)
-            if (str_eq( expanding_macro[ ind], expanding_macro[ ind_done]))
+            if (str_eq( expanding_macro[ ind].name
+                    , expanding_macro[ ind_done].name))
                 break;                      /* Already reported     */
         if (ind_done < ind)
             continue;
         for (file = infile; file; file = file->parent)
             if (file->fp == NULL && file->filename
-                    && str_eq( expanding_macro[ ind], file->filename))
+                    && str_eq( expanding_macro[ ind].name, file->filename))
                 break;                      /* Already reported     */
         if (file)
             continue;
-        if ((defp = look_id( expanding_macro[ ind])) != NULL) {
+        if ((defp = look_id( expanding_macro[ ind].name)) != NULL) {
             if (defp->nargs < DEF_NOARGS - 2)
                 continue;                   /* __FILE__, __LINE__   */
             dump_a_def( "    macro", defp, FALSE, FALSE, TRUE, fp_err);

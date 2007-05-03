@@ -11,7 +11,7 @@
 <h2>== How to Port MCPP ==</h2>
 </div>
 <div align="right">
-<h4>for V.2.6.3 (2007/04)<br>
+<h4>for V.2.6.4 (2007/05)<br>
 Kiyoshi Matsui (kmatsui@t3.rim.or.jp)</h4>
 </div>
 <div align="center">
@@ -164,6 +164,7 @@ In March 2004, V.2.4.1 was released.  In this version, recursive macro expansion
 In August 2006, V.2.6.1 was released.  In this version, porting to MinGW was added, some bugs were fixed and some relatively small improvements were done.<br>
 In November 2006, V.2.6.2 was released.  In this version, most of the text file documents were converted to html, some bugs were fixed, and subroutine-build of <b>mcpp</b> was implemented by contribution from Juergen Mueller.<br>
 In April 2007, V.2.6.3 was released.  In this version, compatibility of GCC-specific-build to GCC was increased, and output to memory buffer was implemented in subroutine-build by contribution from Greg Kress.  In addition, binary packages for some systems were begun to be provided.<br>
+In May 2007, V.2.6.4 was released.  This is a bug-fixed version of V.2.6.3.<br>
 </ol>
 <p>Note:</p>
 <p>*1 The outline of the "Exploratory Software Project" can be seen at the following site (the documents are only in Japanese).</p>
@@ -418,7 +419,7 @@ For CygWIN V.1.5.18 / GCC V.3.4.4, apply cyg1518.dif.</p>
 <br>
 
 <h2><a name="3.6" href="#toc.3.6">3.6. Standard headers</a></h2>
-<p>In the source code of <b>mcpp</b>, stdio.h, string.h, stdlib.h, ctype.h, errno.h and time.h are included unconditionally.  For UNIX-like systems, unistd.h is also included.  There should not be a compiler system which does not have these.</p>
+<p>In the source code of <b>mcpp</b>, stdio.h, string.h, stdlib.h, ctype.h, errno.h and time.h are included unconditionally.  For UNIX-like systems, unistd.h is also included.  When you build <b>mcpp</b> with configure and make, limits.h is also included.  There should not be a compiler system which does not have these.</p>
 <br>
 
 <h2><a name="3.7" href="#toc.3.7">3.7. Makefile and recompilation using <b>mcpp</b></a></h2>
@@ -572,7 +573,7 @@ sudo make install
 Then libmcpp.so and libmcpp.so.0 will be created as links to libmcpp.so.$(SHLIB_VER).
 The *.a is a static library, and the *.so is a shared library.
 The file named libmcpp.la will also be created, which is for the tool 'libtool'.
-$(SHLIB_VER) is 0.0.0 on <b>mcpp</b> V.2.6.3.</p>
+$(SHLIB_VER) is 0.0.0 on <b>mcpp</b> V.2.6.3, and 0.0.1 on V.2.6.4.</p>
 <p>On CygWIN and MinGW, DLL named *.dll will be generated instead of *.so.
 On CygWIN, libmcpp.a, libmcpp.dll.a, libmcpp.la will be generated and installed into /usr/local/lib, and cygmcpp-0.dll will be generated and installed into /usr/local/bin.
 On MinGW, those are the same with CygWIN, except cygmcpp-0.dll changes to libmcpp-0.dll.
@@ -600,7 +601,7 @@ On Windows, the name of the libraries are different from those on Linux as shown
   <tr><th>import library of DLL</th><td></td><td>libmcpp-$(DLL_VER).dll.a</td><td>libmcpp-$(DLL_VER).dll.a</td><td>mcpp$(DLL_VER).lib</td></tr>
 </table>
 </blockquote>
-<p>$(SHLIB_VER), $(DLL_VER) is 0.0.0, 0 respectively on <b>mcpp</b> V.2.6.3.</p>
+<p>$(SHLIB_VER) is 0.0.0, 0.0.1 on <b>mcpp</b> V.2.6.3, V.2.6.4 respectively.  $(DLL_VER) is 0 on both of <b>mcpp</b> V.2.6.3 and V.2.6.4.</p>
 <p>On Windows, so-called 'import library' is generated too, which is to use the DLL.
 In order to use the DLL, you must link your main program against this import library.
 The static library and the import library are installed into the $(LIBDIR) specified in the makefile, and the DLL itself is installed into the $(BINDIR).
@@ -714,6 +715,7 @@ This defines the default value of the predefined macro <tt>__STDC_VERSION__</tt>
 <br>
 <li><samp><i>CHARBIT, UCHARMAX, LONGMAX, ULONGMAX</i></samp><br>
 Write values of <tt>CHAR_BIT, UCHAR_MAX, LONG_MAX, ULONG_MAX</tt> in &lt;limits.h&gt; of the target compiler system.<br>
+Be careful about the definition of <tt>UCHAR_MAX</tt>, because limits.h of some system has a wrong definition.  Define as a signed value as 255 or 0xff, do not define as an unsigned value as 255U or 0xffU. (See <a href="cpp-test.html#5.1.3">cpp-test.html#5.1.3</a>.)<br>
 </ul>
 
 <h4><a name="4.1.1.5" href="#toc.4.1.1.5">4.1.1.5. Multi-byte characters</a></h4>

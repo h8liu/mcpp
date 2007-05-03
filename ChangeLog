@@ -1,5 +1,23 @@
 ChangeLog of MCPP and its accompanying Validation Suite
 
+2007/05/03  kmatsui
+        * V.2.6.4-prerelease
+        * Fixed memory leaks in subroutine-build related to file->
+        filename, sharp_filename and others.  (by Juergen Mueller and
+        kmatsui).  (main.c, directive.c, support.c, system.c)
+        * Revised expanding() and expanding_macro[] to fix memory leaks.
+        Created clear_exp_mac().  (internal.H, expand.c, support.c)
+        * Fixed a bug of accessing non-allocated memory.  (by isr).
+        (support.c)
+        * Updated version-info for shared-library-build from 0:0:0 to 0:
+        1:0.
+        * Changed installation directory of some documents in stand-
+        alone-and-compiler-independent-build by configure or by binary
+        packages.
+        * Updated some documents.  Note that some documents are not
+        updated such as mcpp-summary.pdf, mcpp-manual.html and cpp-test.
+        html.
+
 2007/04/07  kmatsui
         * V.2.6.3
         * Fixed a bug of some #line directive handling which wrongly
@@ -46,7 +64,7 @@ ChangeLog of MCPP and its accompanying Validation Suite
         configured makefile.  On the other hand, made 'install' target
         install also mcpp-manual.html.
         * Provided stand-alone-and-compiler-independent-build binary
-        packages .pkg, .rpm, .deb, .zip and their corresponding source
+        packages port, rpm, deb, zip and their corresponding source
         packages.
 
 2006/11/12  kmatsui

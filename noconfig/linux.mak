@@ -1,5 +1,5 @@
-# makefile to compile MCPP version 2.6.3 for Linux / GCC / GNU make
-#       2007/03 kmatsui
+# makefile to compile MCPP version 2.6.3 or later for Linux / GCC / GNU make
+#       2007/05 kmatsui
 #
 # First, you must edit GCCDIR, BINDIR, INCDIR, gcc_maj_ver and gcc_min_ver.
 # To make compiler-independent-build of MCPP:
@@ -37,12 +37,12 @@ NAME = mcpp
 #       e.g. cc, gcc, gcc-2.95.3, i686-pc-linux-gnu-gcc-4.1.1
 CC = gcc
 GPP = g++
-CFLAGS = -c -O2 -Wall   # -v
-#CFLAGS += -fstack-protector-all     # for gcc 4.1 or later
+CFLAGS = -c -O2 -Wall   # -g -v
+#CFLAGS += -fstack-protector     # for gcc 4.1 or later
 CPPFLAGS =
 
 LINKFLAGS = -o $(NAME)
-#LINKFLAGS += -fstack-protector-all  # for gcc 4.1 or later
+#LINKFLAGS += -fstack-protector  # for gcc 4.1 or later
 
 ifeq    ($(COMPILER), )
 # compiler-independent-build
@@ -78,8 +78,8 @@ endif
 endif
 
 # The directory where 'gcc' (cc) command is located
-#GCCDIR = /usr/bin
-GCCDIR = /usr/local/bin
+GCCDIR = /usr/bin
+#GCCDIR = /usr/local/bin
 
 CPLUS =
 ifeq	($(CPLUS), 1)
@@ -169,15 +169,15 @@ mcpplib_a:	$(OBJS)
 
 # shared library
 CUR = 0
-REV = 0
+REV = 1         # mcpp 2.6.3: 0, mcpp 2.6.4: 1
 AGE = 0
-SHLIB_VER = $(CUR).$(REV).$(AGE)
+SHLIB_VER = $(CUR).$(AGE).$(REV)
 SOBJS = main.so directive.so eval.so expand.so support.so system.so mbchar.so lib.so
 .SUFFIXES: .so
 .c.so	:
 	$(GCC) $(CFLAGS) $(MEM_MACRO) -c -fpic -o$*.so $*.c
 mcpplib_so: $(SOBJS)
-	ld -shared -olibmcpp.so.$(SHLIB_VER) $(SOBJS)
+	$(GCC) -shared -olibmcpp.so.$(SHLIB_VER) $(SOBJS) # -fstack-protector
 	chmod a+x libmcpp.so.$(SHLIB_VER)
 
 mcpplib_install:
@@ -199,7 +199,7 @@ LINKFLAGS = $(NAME).o -o$(NAME) -lmcpp
 ifeq	($(MALLOC), KMMALLOC)
 	LINKFLAGS += -lkmmalloc_debug
 endif
-#LINKFLAGS += -fstack-protector-all
+#LINKFLAGS += -fstack-protector
 $(NAME)	:	$(NAME).o
 	$(GCC) $(LINKFLAGS)
 $(NAME)_install	:

@@ -273,7 +273,8 @@ static int      no_cygwin = FALSE;          /* -mno-cygwin          */
 void    init_system( void)
 /* Initialize static variables  */
 {
-    free( sharp_filename);
+    if (sharp_filename)
+        free( sharp_filename);
     sharp_filename = NULL;
     incend = incdir;
     fname_end = fnamelist;
@@ -1127,7 +1128,7 @@ static void version( void)
 #endif
 
 #ifdef  VERSION_MSG
-        "MCPP V.2.6.3 (2007/04) "
+        "MCPP V.2.6.4 (2007/05) "
 #else
         "MCPP V.", VERSION, " (", DATE, ") "
 #endif
@@ -2922,7 +2923,7 @@ void cur_file( void)
  */
 {
     FILEINFO *      file = infile;
-    const char *    name = "";
+    const char *    name;
     char *  cp;
 
     while (file->fp == NULL)
@@ -3773,9 +3774,6 @@ void    at_end( void)
         dump_def( dDflag, FALSE);
     }
 #endif
-
-    if (mcpp_debug & MEMORY)
-        print_heap();
 }
 
 #if MCPP_LIB

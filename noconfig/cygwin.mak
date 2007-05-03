@@ -1,5 +1,5 @@
-# makefile to compile MCPP version 2.6.3 for CygWIN / GCC / GNU make
-# 2007/03   kmatsui
+# makefile to compile MCPP version 2.6.3 and later for CygWIN / GCC / GNU make
+# 2007/05   kmatsui
 #
 # First, you must edit GCCDIR, BINDIR, INCDIR, gcc_maj_ver and gcc_min_ver.
 # To make compiler-independent-build of MCPP do:
@@ -157,7 +157,7 @@ SOBJS = main.so directive.so eval.so expand.so support.so system.so mbchar.so li
 .c.so   :
 	$(GCC) $(CFLAGS) $(MEM_MACRO) -c -DPIC -save-temps -o$*.so $*.c
 mcpplib_dll: $(SOBJS)
-	gcc -shared -ocygmcpp-$(DLL_VER).dll $(SOBJS) -Wl,--enable-auto-image-base,--out-implib,libmcpp.dll.a
+	$(GCC) -shared -ocygmcpp-$(DLL_VER).dll $(SOBJS) -Wl,--enable-auto-image-base,--out-implib,libmcpp.dll.a
 
 mcpplib_install:
 	cp libmcpp.a libmcpp.dll.a $(LIBDIR)

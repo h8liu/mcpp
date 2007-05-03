@@ -143,10 +143,6 @@
  *   macro_name is the currently expanding macro.
  */
     char *  macro_name;
-/*
- *   exp_mac_ind is index into expanding_macro[] in support.c.
- */
-    int     exp_mac_ind = 0;
 
 /*
  *   compat_mode is set to TRUE, if recursive macro call is expanded more
@@ -313,7 +309,7 @@ static void     init_main( void)
     in_asm = 0L;
     macro_line = 0L;
     compat_mode = FALSE;
-    mcpp_debug = mkdep = no_output = exp_mac_ind = keep_comments = 0;
+    mcpp_debug = mkdep = no_output = keep_comments = 0;
     ifstack[0].stat = WAS_COMPILING;
     ifstack[0].ifline = ifstack[0].elseline = 0L;
     ifptr = ifstack;
@@ -368,7 +364,11 @@ int     main
     if (in_file != NULL && ! str_eq( in_file, "-")) {
         if (freopen( in_file, "r", fp_in) == NULL) {
             mcpp_fprintf( ERR, "Can't open input file \"%s\".\n", in_file);
+#if MCPP_LIB
+            goto  fatal_error_exit;
+#else
             return( IO_ERROR);
+#endif
         }
         strcpy( work_buf, in_file); /* Remember input filename      */
     } else {
@@ -378,13 +378,21 @@ int     main
     if (out_file != NULL && ! str_eq( out_file, "-")) {
         if (freopen( out_file, "w", fp_out) == NULL) {
             mcpp_fprintf( ERR, "Can't open output file \"%s\".\n", out_file);
+#if MCPP_LIB
+            goto  fatal_error_exit;
+#else
             return( IO_ERROR);
+#endif
         }
     }
     if (qflag) {                            /* Redirect diagnostics */
         if (freopen( "mcpp.err", "a", fp_err) == NULL) {
             mcpp_fprintf( OUT, "Can't open \"mcpp.err\"\n");
+#if MCPP_LIB
+            goto  fatal_error_exit;
+#else
             return( IO_ERROR);
+#endif
         }
     }
     add_file( fp_in, work_buf);     /* "open" main input file       */
@@ -407,6 +415,8 @@ fatal_error_exit:
     clear_symtable();
 #endif
 
+    if (mcpp_debug & MEMORY)
+        print_heap();
     if (errors > 0 && no_source_line == FALSE) {
         mcpp_fprintf( ERR, "%d error%s in preprocessor.\n",
                 errors, (errors == 1) ? "" : "s");

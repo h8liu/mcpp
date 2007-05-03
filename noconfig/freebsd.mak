@@ -1,5 +1,5 @@
-# makefile to compile MCPP version 2.6.3 for FreeBSD / GCC / UCB make
-#       2007/03 kmatsui
+# makefile to compile MCPP version 2.6.3 and later for FreeBSD / GCC / UCB make
+#       2007/05 kmatsui
 #
 # First, you must edit GCCDIR, BINDIR, INCDIR, gcc_maj_ver and gcc_min_ver.
 # To make compiler-independent-build of MCPP do:
@@ -35,14 +35,14 @@
 NAME ?= mcpp
 CC = gcc
 GPP = g++
-CFLAGS = -c -O2 -Wall   # -v
-#CFLAGS += -fstack-protector-all     # for gcc 4.1 or later
+CFLAGS = -c -O2 -Wall   # -g -v
+#CFLAGS += -fstack-protector        # for gcc 4.1 or later
 CPPFLAGS =
 #CPPFLAGS = -Wp,-v,-Q,-W3
     # for MCPP to output a bit verbose diagnosis to "mcpp.err"
 
 LINKFLAGS = -o $(NAME)
-#LINKFLAGS += -fstack-protector-all  # for gcc 4.1 or later
+#LINKFLAGS += -fstack-protector     # for gcc 4.1 or later
 
 .if     empty(COMPILER)
 # compiler-independent-build
@@ -164,15 +164,15 @@ mcpplib_a:  $(OBJS)
 
 # shared library
 CUR = 0
-REV = 0
+REV = 1         # mcpp 2.6.3: 0, mcpp 2.6.4: 1
 AGE = 0
-SHLIB_VER = $(CUR).$(REV).$(AGE)
+SHLIB_VER = $(CUR).$(AGE).$(REV)
 SOBJS = main.so directive.so eval.so expand.so support.so system.so mbchar.so lib.so
 .SUFFIXES: .so
 .c.so   :
 	$(GCC) $(CFLAGS) $(MEM_MACRO) -c -fpic -o$*.so $*.c
 mcpplib_so: $(SOBJS)
-	ld -shared -olibmcpp.so.$(SHLIB_VER) $(SOBJS)
+	$(GCC) -shared -olibmcpp.so.$(SHLIB_VER) $(SOBJS)   # -fstack-protector
 	chmod a+x libmcpp.so.$(SHLIB_VER)
 
 mcpplib_install:
