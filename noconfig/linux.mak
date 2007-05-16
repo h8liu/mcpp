@@ -4,7 +4,7 @@
 # First, you must edit GCCDIR, BINDIR, INCDIR, gcc_maj_ver and gcc_min_ver.
 # To make compiler-independent-build of MCPP:
 #       make
-#	    sudo make install
+#       sudo make install
 # To make GCC-specific-build of MCPP:
 #       make COMPILER=GNUC
 #       sudo make COMPILER=GNUC install
@@ -18,12 +18,8 @@
 #       make MCPP_LIB=1 mcpplib
 #    	sudo make MCPP_LIB=1 mcpplib_install
 # To make testmain using libmcpp:
-#		make MCPP_LIB=1 [OUT2MEM=1] testmain
-#		sudo make MCPP_LIB=1 [OUT2MEM=1] testmain_install
-# To compile cpp with C++, rename *.c other than lib.c to *.cc,
-#   and do:
-#       make CPLUS=1
-#       sudo make CPLUS=1 install
+#       make MCPP_LIB=1 [OUT2MEM=1] testmain
+#       sudo make MCPP_LIB=1 [OUT2MEM=1] testmain_install
 
 # COMPILER:
 #   Specify whether make a compiler-independent-build or GCC-specific-build
@@ -81,15 +77,6 @@ endif
 GCCDIR = /usr/bin
 #GCCDIR = /usr/local/bin
 
-CPLUS =
-ifeq	($(CPLUS), 1)
-	GCC = $(GPP)
-	preproc = preproc.cc
-else
-	GCC = $(CC)
-	preproc = preproc.c
-endif
-
 ifneq	($(MALLOC), )
 ifeq	($(MALLOC), KMMALLOC)
 	LINKFLAGS += -lkmmalloc_debug
@@ -104,7 +91,7 @@ OBJS = main.o directive.o eval.o expand.o support.o system.o mbchar.o lib.o
 
 all	:	$(NAME)
 $(NAME): $(OBJS)
-	$(GCC) $(OBJS) $(LINKFLAGS)
+	$(CC) $(OBJS) $(LINKFLAGS)
 
 PREPROCESSED = 0
 
@@ -115,7 +102,7 @@ CMACRO = -DPREPROCESSED
 # Make a "pre-preprocessed" header file to recompile MCPP with MCPP.
 mcpp.H	: system.H noconfig.H internal.H
 ifeq    ($(COMPILER), GNUC)
-	$(GCC) -E -Wp,-b  $(CPPFLAGS) $(CPPOPTS) $(MEM_MACRO) -o mcpp.H $(preproc)
+	$(CC) -E -Wp,-b  $(CPPFLAGS) $(CPPOPTS) $(MEM_MACRO) -o mcpp.H preproc.c
 else
 	@echo "Do 'sudo make COMPILER=GNUC install' prior to recompile."
 	@echo "Then, do 'make COMPILER=GNUC PREPROCESSED=1'."
@@ -129,15 +116,8 @@ main.o directive.o eval.o expand.o support.o system.o mbchar.o:   \
         system.H internal.H
 endif
 
-ifeq	($(CPLUS), 1)
-.cc.o	:
-	$(GPP) $(CFLAGS) $(CMACRO) $(CPPFLAGS) $<
 .c.o	:
 	$(CC) $(CFLAGS) $(CMACRO) $(CPPFLAGS) $<
-else
-.c.o	:
-	$(CC) $(CFLAGS) $(CMACRO) $(CPPFLAGS) $<
-endif
 
 install :
 	install -s $(NAME) $(BINDIR)/$(NAME)
@@ -175,9 +155,9 @@ SHLIB_VER = $(CUR).$(AGE).$(REV)
 SOBJS = main.so directive.so eval.so expand.so support.so system.so mbchar.so lib.so
 .SUFFIXES: .so
 .c.so	:
-	$(GCC) $(CFLAGS) $(MEM_MACRO) -c -fpic -o$*.so $*.c
+	$(CC) $(CFLAGS) $(MEM_MACRO) -c -fpic -o$*.so $*.c
 mcpplib_so: $(SOBJS)
-	$(GCC) -shared -olibmcpp.so.$(SHLIB_VER) $(SOBJS) # -fstack-protector
+	$(CC) -shared -olibmcpp.so.$(SHLIB_VER) $(SOBJS) # -fstack-protector
 	chmod a+x libmcpp.so.$(SHLIB_VER)
 
 mcpplib_install:
@@ -201,7 +181,7 @@ ifeq	($(MALLOC), KMMALLOC)
 endif
 #LINKFLAGS += -fstack-protector
 $(NAME)	:	$(NAME).o
-	$(GCC) $(LINKFLAGS)
+	$(CC) $(LINKFLAGS)
 $(NAME)_install	:
 	install -s $(NAME) $(BINDIR)/$(NAME)
 $(NAME)_uninstall	:

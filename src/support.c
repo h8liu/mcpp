@@ -1637,7 +1637,7 @@ static char *   parse_line( void)
                 else if (temp == tp || *(tp - 1) != ' ')
                     *tp++ = ' ';            /* Squeeze white spaces */
                 break;
-            case '/':
+            case '/':                                       /* //   */
                 if (! standard)
                     goto  not_comment;
                 /* Comment when C++ or __STDC_VERSION__ >= 199901L      */
@@ -1646,10 +1646,10 @@ static char *   parse_line( void)
                     cwarn( "Parsed \"//\" as comment"       /* _W2_ */
                             , NULL, 0L, NULL);
                 if (keep_comments) {
-                    mcpp_fputs( "/*", OUT);     /* Convert to C style       */
-                    while ((c = *sp++) != '\n')
-                        mcpp_fputc( c, OUT);    /* Until the end of line    */
-                    mcpp_fputs( "*/", OUT);
+                    sp -= 2;
+                    while (*sp != '\n')
+                        mcpp_fputc( *sp++, OUT);    /* Until end of line    */
+                    wrong_line = TRUE;      /* Need to adjust #line */
                 }
                 goto  end_line;
             default:                        /* Not a comment        */

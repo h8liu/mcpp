@@ -1,7 +1,7 @@
 ChangeLog of MCPP and its accompanying Validation Suite
 
-2007/05/03  kmatsui
-        * V.2.6.4-prerelease
+2007/05/15  kmatsui
+        * V.2.6.4
         * Fixed memory leaks in subroutine-build related to file->
         filename, sharp_filename and others.  (by Juergen Mueller and
         kmatsui).  (main.c, directive.c, support.c, system.c)
@@ -9,14 +9,18 @@ ChangeLog of MCPP and its accompanying Validation Suite
         Created clear_exp_mac().  (internal.H, expand.c, support.c)
         * Fixed a bug of accessing non-allocated memory.  (by isr).
         (support.c)
+        * Revised output of // comment by -C option.  Output // comment
+        as it is, not converting to /* */.  (thanks to Taras Glek).
+        (support.c)
+        * Removed the settings to be compiled with C++.  (configed.H,
+        noconfig.H, noconfig/*.mak)
         * Updated version-info for shared-library-build from 0:0:0 to 0:
         1:0.
         * Changed installation directory of some documents in stand-
         alone-and-compiler-independent-build by configure or by binary
         packages.
         * Updated some documents.  Note that some documents are not
-        updated such as mcpp-summary.pdf, mcpp-manual.html and cpp-test.
-        html.
+        updated such as mcpp-manual.html and cpp-test.html.
 
 2007/04/07  kmatsui
         * V.2.6.3
@@ -41,10 +45,10 @@ ChangeLog of MCPP and its accompanying Validation Suite
         mcpp_get_mem_buffer(), mcpp_set_out_func(),
         mcpp_reset_def_out_func(), mem_putc(), mem_puts(),
         append_to_buffer(), function pointers mcpp_fputs, mcpp_fputc,
-        mcpp_fprintf and some macros.  (All were contributed by Greg
-        Kress and slightly modified by kmatsui) (internal.H, main.c,
-        directive.c, eval.c, expand.c, mbchar.c, support.c, system.c,
-        lib.c, mcpp_lib.h)
+        mcpp_fprintf and some macros.  This update disabled compilation
+        by C++.  (All were contributed by Greg Kress and slightly
+        modified by kmatsui) (internal.H, main.c, directive.c, eval.c,
+        expand.c, mbchar.c, support.c, system.c, lib.c, mcpp_lib.h)
         * Renamed some global names in order to lessen the possibility
         of name collisions in subroutine-build.  Renamed the variables
         mode, cplus, line, debug, type[] and work[] to mcpp_mode,

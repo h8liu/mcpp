@@ -97,7 +97,7 @@ Kiyoshi Matsui (kmatsui@t3.rim.or.jp)</h4>
 <br>
 
 <h2><a name="1.1" href="#toc.1.1">1.1. High portability</a></h2>
-<p><b>mcpp</b> is a portable preprocessor, supporting various operating systems, including Linux, FreeBSD and Windows.  Its source has a wide portability, and can be compiled by any compilers which support Standard C or C++ (ANSI/ISO C or C++).  The library functions used are only the classic ones.</p>
+<p><b>mcpp</b> is a portable preprocessor, supporting various operating systems, including Linux, FreeBSD and Windows.  Its source has a wide portability, and can be compiled by any compilers which support Standard C (ANSI/ISO C).  The library functions used are only the classic ones.</p>
 <p>To port <b>mcpp</b> to each compiler system, in many cases, one only needs to change some macro definitions in the header files and simply compile it.  In the worst case, adding several dozen of lines into a source file would be enough.</p>
 <p>To process multi-byte characters (Kanji), it supports Japanese EUC-JP, shift-JIS and ISO2022-JP, Chinese GB-2312, Taiwanese Big-5 and Korean KSC-5601 (KSX 1001), as well as UTF-8.  For shift-JIS, ISO2022-JP or Big-5, <b>mcpp</b> can complement the compiler-proper if it does not recognize them.</p>
 <br>
@@ -478,14 +478,7 @@ For further information, see
 <br>
 
 <h2><a name="3.8" href="#toc.3.8">3.8. Compiler systems which can compile <b>mcpp</b></a></h2>
-<p>Though some configuration is required to port to each compiler system, compiling <b>mcpp</b>'s source code can be done by any compiler system which satisfies C90 specifications. *1</p>
-<p><b>mcpp</b> can be compiled by C++ too. (Whether C++ is used is decided by #ifdef <tt>__cplusplus</tt>.)  Compile with the next steps.</p>
-<ol>
-<li>Rename all *.c, except <samp>lib.c</samp>, to *.cc or *.cpp.<br>
-<li>Run 'make'.  When "pre-preprocessing" by using <b>mcpp</b>, add -+ option.<br>
-</ol>
-<p>Invoke 'make' using attached *.mak with an option of CPLUS=1 or -DCPLUS=1 depending on the 'make'.<br>
-There is no merit in compiling with C++, though.</p>
+<p>Though some configuration is required to port to each compiler system, compiling <b>mcpp</b>'s source code can be done by any compiler system which satisfies C90 specifications. *1, *2</p>
 <p>The char type can be either signed or unsigned.</p>
 <p>Floating point operation is not necessary.</p>
 <p>This source code is written so as not be affected by the minor discrepancies of the compiler systems.  Of course, it is necessary to avoid the compiler system's own bugs in order to actually compile with the compiler system.  This cannot be found out until it has to be done.  When I was porting to some compiler systems, there were a few cases which took me a long time to trace the bug and to find out a work around.</p>
@@ -494,6 +487,7 @@ There is no merit in compiling with C++, though.</p>
 <p>The CPUs for which integer operation is not two's complement are also not supported.  If it is not two's complement, it may run incorrectly when an overflow has occurred at a #if expression.</p>
 <p>Note:</p>
 <p>*1 Up to V.2.5, <b>mcpp</b> source was compilable even by K&amp;R 1st compiler.  From V.2.6, it presupposes C90 compiler, because K&amp;R spec is no longer required by current compiler systems.  I tidied up the source and this document accordingly.</p>
+<p>*2 Up to V.2.6.2, <b>mcpp</b> source was compilable by C++, too.  V.2.6.3 and later, however, is compilable only by C.</p>
 <br>
 
 <h2><a name="3.9" href="#toc.3.9">3.9. Host compiler system and target compiler system</a></h2>

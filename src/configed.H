@@ -361,22 +361,10 @@
 #define NEED_GETOPT     FALSE
 #endif
 
-#ifdef  __cplusplus
-extern "C" {
-    char *  stpcpy( char * dest, const char * src);
-}
-#else
 extern char *   stpcpy( char * dest, const char * src);
-#endif
 
 /* For debugging malloc systems by kmatsui  */
 #if     KMMALLOC && _MEM_DEBUG
-#if     __cplusplus
-extern "C" {
-#endif
 #include        "xalloc.h"
-#if     __cplusplus
-}
-#endif
 #endif
 

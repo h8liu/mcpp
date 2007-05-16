@@ -54,17 +54,9 @@
 
 /* Functions other than standard.   */
 #if     HOST_SYS_FAMILY != SYS_UNIX     /* On UNIX "unistd.h" will suffice  */
-#ifdef  __cplusplus
-extern "C" {
-    int     getopt( int argc, char * const * argv, const char * opts);
-    extern int      optind;
-    extern char *   optarg;
-}
-#else   /* #ifndef __cplusplus  */
 extern int      getopt( int argc, char * const * argv, const char * opts);
 extern int      optind;
 extern char *   optarg;
-#endif
 #endif
 
 /*
@@ -2352,7 +2344,7 @@ void    put_depend(
  */
 {
 #define MAX_OUT_LEN     76      /* Maximum length of output line    */
-#define MKDEP_MAXLEN    (MKDEP_MAX * 0x100)
+#define MKDEP_MAXLEN    (MKDEP_MAX * 0x200)
     static char     output[ MKDEP_MAXLEN];          /* File names   */
     static char *   pos[ MKDEP_MAX];      /* Pointers to filenames  */
     static int      pos_num;              /* Index of pos[]         */
@@ -3742,11 +3734,7 @@ static void dump_path( void)
  * See "kmmalloc-2.5.1.lzh" by kmatsui.
  */
 #if     KMMALLOC
-#ifdef  __cplusplus
-    extern "C"  int     list_heap( int);
-#else
     int     list_heap( int);
-#endif
 #elif   BSD_MALLOC
     int     list_heap( char *);
 #elif   DB_MALLOC || DMALLOC

@@ -243,7 +243,7 @@ typedef struct ifinfo {
     (fp == fp_out) ? OUT : \
     ((fp == fp_err) ? ERR : \
     ((fp == fp_debug) ? DBG : \
-    (-1)))
+    ((OUTDEST) -1)))
 
 /* VAL_SIGN structure stores information about evaluated number.    */
 typedef struct val_sign {
