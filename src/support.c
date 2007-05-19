@@ -1619,6 +1619,16 @@ static char *   parse_line( void)
     tp = temp = xmalloc( (size_t) NBUFF);
     limit = temp + NBUFF - 2;
 
+    if (mcpp_mode == POST_STD) {
+        while (((c = *sp++ & UCHARMAX) == ' ') || c == '\t')
+            ;                           /* Skip the line top spaces */
+    } else {
+        /* Putout the line top spaces as they are   */
+        while (((c = *sp++ & UCHARMAX) == ' ') || c == '\t')
+            *tp++ = c;
+    }
+    sp--;
+
     while ((c = *sp++ & UCHARMAX) != '\n') {
 
         switch (c) {
@@ -1668,12 +1678,13 @@ not_comment:
                     , NULL, (long) c, NULL);
         case '\t':                          /* Horizontal space     */
         case ' ':
-            if (mcpp_mode == POST_STD && temp < tp && *(tp - 1) != ' ')
-                *tp++ = ' ';                /* Skip line top spaces */
-            else if (mcpp_mode == OLD_PREP && temp < tp && *(tp - 1) == COM_SEP)
-                *(tp - 1) = ' ';    /* Squeeze COM_SEP with spaces  */
-            else if (temp == tp || *(tp - 1) != ' ')
-                *tp++ = ' ';                /* Squeeze white spaces */
+            if (mcpp_mode == OLD_PREP) {
+                if ((*(tp - 1) != ' ' && *(tp - 1) != COM_SEP))
+                    *(tp - 1) = ' ';        /* Squeeze COM_SEP with spaces  */
+            } else {
+                if (*(tp - 1) != ' ')
+                    *tp++ = ' ';            /* Squeeze white spaces */
+            }
             break;
         case '"':                           /* String literal       */
         case '\'':                          /* Character constant   */

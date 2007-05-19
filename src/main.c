@@ -628,6 +628,7 @@ static void mcpp_main( void)
     int     c;                      /* Current character            */
     char *  wp;                     /* Temporary pointer            */
     DEFBUF *    defp;               /* Macro definition             */
+    int     line_top;       /* Is in the line top, possibly spaces  */
 
     if (! no_output) {  /* Explicitly output a #line at the start of cpp    */
         src_line++;
@@ -651,14 +652,15 @@ static void mcpp_main( void)
         newlines = 0;                       /* Count empty lines    */
 
         while (1) {                         /* For each line, ...   */
-            c = get_ch();                   /* First of the line    */
             out_ptr = output;               /* Top of the line buf  */
-            if (c == ' ') {         /* Dosen't occur in POST_STD    */
-                *out_ptr++ = ' ';           /* Retain a space       */
-                c = get_ch();       /* First of token (else '\n')   */
+            c = get_ch();
+            while (c == ' ' || c == '\t'
+                    || (mcpp_mode == OLD_PREP && c == COM_SEP)) {
+                if (c == ' ' || c == '\t')
+                    *out_ptr++ = c; /* Retain line top white spaces */
+                                    /* Else skip 0-length comment   */
+                c = get_ch();
             }
-            if (mcpp_mode == OLD_PREP && c == COM_SEP)
-                 c = get_ch();              /* Skip 0-length comment*/
             if (c == '#') {                 /* Is 1st non-space '#' */
                 directive();                /* Do a #directive      */
             } else if (mcpp_mode == STD && dig_flag && c == '%') {
@@ -713,11 +715,19 @@ static void mcpp_main( void)
         /*
          * Process each token on this line.
          */
+        line_top = TRUE;
         while (c != '\n' && c != CHAR_EOF) {    /* For the whole line   */
             if (scan_token( c, (wp = out_ptr, &wp), out_wend) == NAM
                     && (defp = is_macro( &wp)) != NULL) {   /* A macro  */
                 wp = expand_macro( defp, out_ptr, out_wend);
                                             /* Expand it completely */
+                if (line_top) {     /* The first token is a macro   */
+                    char *  tp = out_ptr;
+                    while (*tp == ' ')
+                        tp++;           /* Remove excessive spaces  */
+                    memmove( out_ptr, tp, strlen( tp) + 1);
+                    wp -= (tp - out_ptr);
+                }
                 if (has_pragma) {           /* Found _Pramga()      */
                     do_pragma_op();         /* Do _Pragma() operator*/
                     has_pragma = FALSE;     /* Reset signal         */
@@ -737,7 +747,8 @@ static void mcpp_main( void)
             }
             if (mcpp_mode == OLD_PREP && c == COM_SEP)
                 c = get_ch();               /* Skip 0-length comment*/
-        }                                   /* Line for loop        */
+            line_top = FALSE;               /* Read over some token */
+        }                                   /* Loop for line        */
 
         putout( output);                    /* Output the line      */
     }                                       /* Continue until EOF   */

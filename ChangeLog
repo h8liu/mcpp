@@ -1,6 +1,6 @@
 ChangeLog of MCPP and its accompanying Validation Suite
 
-2007/05/15  kmatsui
+2007/05/19  kmatsui
         * V.2.6.4
         * Fixed memory leaks in subroutine-build related to file->
         filename, sharp_filename and others.  (by Juergen Mueller and
@@ -12,6 +12,10 @@ ChangeLog of MCPP and its accompanying Validation Suite
         * Revised output of // comment by -C option.  Output // comment
         as it is, not converting to /* */.  (thanks to Taras Glek).
         (support.c)
+        * Changed output of line top white spaces in other than
+        POST_STANDARD mode to preserve them as they are, rather than
+        squeezing to one space, in order to make output more human-
+        readable.  (main.c, support.c)
         * Removed the settings to be compiled with C++.  (configed.H,
         noconfig.H, noconfig/*.mak)
         * Updated version-info for shared-library-build from 0:0:0 to 0:
@@ -19,8 +23,8 @@ ChangeLog of MCPP and its accompanying Validation Suite
         * Changed installation directory of some documents in stand-
         alone-and-compiler-independent-build by configure or by binary
         packages.
-        * Updated some documents.  Note that some documents are not
-        updated such as mcpp-manual.html and cpp-test.html.
+        * Updated the documents.  Note that cpp-test.html were not
+        updated.
 
 2007/04/07  kmatsui
         * V.2.6.3
