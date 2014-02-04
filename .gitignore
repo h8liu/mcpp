@@ -6,3 +6,6 @@
 /src/config.h
 /src/stamp-h1
 tests/Makefile
+/src/*.o
+/src/mcpp
+/autom4te.cache
