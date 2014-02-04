@@ -4,4 +4,4 @@ since 2008.
 
 The author is Kiyoshi Matsui <kmatsui@t3.rim.or.jp>.
 
-This is just a github mirror or the original sources.
+This is just a github mirror of the original one.
